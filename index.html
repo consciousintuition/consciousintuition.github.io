@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCHRÖDINGER'S CAT — self-improvement you can't fake</title>
+<meta name="author" content="Schrödinger's Cat">
+<meta name="description" content="Every conjecture lives in superposition — true and false at once — until a proof checker opens the box. A research program on machine-verified self-improvement: the ninety-year mathematics of RSI, and a loop whose changelog is a sequence of theorems.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23060a12'/%3E%3Cpath d='M7 27 L7 13 L10 5 L14 10 Q16 9 18 10 L22 5 L25 13 L25 27 Z' stroke='%235ee7ff' stroke-width='1.8' fill='none'/%3E%3Cpath d='M11 18 L14 19.5 M21 18 L18 19.5' stroke='%23ff5ec8' stroke-width='1.6'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#05080f; --panel:#0b1220; --line:#182440;
+  --txt:#c4cfdf; --dim:#8794ac; --faint:#5a6780;
+  --cyan:#5ee7ff; --magenta:#ff5ec8; --violet:#a78bfa; --amber:#ffc46b; --green:#7dffa8;
+  --mono:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace;
+  --sans:"Segoe UI",system-ui,-apple-system,sans-serif;
+  --math:Georgia,"Times New Roman",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:17px;line-height:1.75;overflow-x:hidden}
+#bggrid{position:fixed;inset:-60px;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(94,231,255,.04) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(94,231,255,.04) 1px,transparent 1px);
+  background-size:54px 54px;
+  mask-image:radial-gradient(ellipse 95% 75% at 50% 8%,#000 25%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 95% 75% at 50% 8%,#000 25%,transparent 78%);
+  will-change:transform;
+}
+a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(94,231,255,.3)}
+a:hover{border-bottom-color:var(--cyan)}
+em.m,span.m{font-family:var(--math);font-style:italic;font-size:1.06em}
+span.m .up{font-style:normal}
+sub,sup{font-size:.72em}
+::selection{background:rgba(255,94,200,.28)}
+.wrap{max-width:900px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+section{padding:84px 0 36px;border-top:1px solid var(--line)}
+
+/* header */
+header.site{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(5,8,15,.85);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;gap:18px;padding:13px 28px}
+.logo{font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:var(--cyan);font-size:13px;border:none;text-shadow:0 0 16px rgba(94,231,255,.5);white-space:nowrap}
+nav{margin-left:auto;display:flex;gap:15px;flex-wrap:wrap}
+nav a{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim);border:none;text-transform:uppercase}
+nav a:hover{color:var(--cyan)}
+#musicbtn{background:none;border:1px solid var(--line);border-radius:3px;cursor:pointer;padding:7px 9px;display:flex;align-items:center;color:var(--faint)}
+#musicbtn:hover{border-color:var(--cyan);color:var(--cyan)}
+#musicbtn.on{color:var(--green);border-color:rgba(125,255,168,.5);box-shadow:0 0 12px rgba(125,255,168,.15)}
+#musicbtn svg{width:17px;height:17px;display:block}
+#musicbtn .waves{opacity:0;transition:opacity .3s}
+#musicbtn.on .waves{opacity:1}
+
+/* rail */
+#rail{position:fixed;left:18px;top:0;bottom:0;width:2px;background:var(--line);z-index:40}
+#railfill{position:absolute;top:0;left:0;width:2px;height:0;background:linear-gradient(180deg,var(--cyan),var(--magenta));box-shadow:0 0 8px rgba(94,231,255,.6)}
+@media(max-width:1100px){#rail{display:none}}
+
+/* ===== hero + cat ===== */
+.hero{padding:78px 0 80px;text-align:center;position:relative}
+.catbox{width:min(300px,62vw);margin:0 auto 8px;cursor:pointer;position:relative}
+.catbox svg{width:100%;height:auto;display:block;overflow:visible}
+.cat-ghost,.cat-solid{transition:transform .45s cubic-bezier(.2,.9,.3,1.4),opacity .45s ease}
+.cat-gc{transform:translateX(-9px)}
+.cat-gm{transform:translateX(9px)}
+.js .catbox:not(.observed) .cat-gc{animation:ghL 4.2s ease-in-out infinite}
+.js .catbox:not(.observed) .cat-gm{animation:ghR 4.2s ease-in-out infinite}
+@keyframes ghL{0%,100%{transform:translateX(-9px);opacity:.8}50%{transform:translateX(-4px);opacity:.5}}
+@keyframes ghR{0%,100%{transform:translateX(9px);opacity:.8}50%{transform:translateX(4px);opacity:.5}}
+.cat-solid{opacity:0}
+.catbox.observed .cat-gc,.catbox.observed .cat-gm{transform:translateX(0);opacity:0}
+.catbox.observed .cat-solid{opacity:1;animation:flash 1s ease}
+@keyframes flash{0%{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 2px #fff)}30%{filter:drop-shadow(0 0 26px #dff6ff) drop-shadow(0 0 60px rgba(94,231,255,.9))}100%{filter:drop-shadow(0 0 10px rgba(94,231,255,.55))}}
+@media(prefers-reduced-motion:reduce){
+  .cat-gc,.cat-gm{animation:none!important}
+  .catbox .cat-gc,.catbox .cat-gm{transform:translateX(0);opacity:0}
+  .catbox .cat-solid{opacity:1;filter:drop-shadow(0 0 10px rgba(94,231,255,.5));animation:none}
+}
+.psi{font-family:var(--mono);font-size:12.5px;color:var(--faint);letter-spacing:.06em;margin-bottom:26px}
+.psi b{color:var(--cyan);font-weight:400}
+h1.title{font-family:var(--mono);font-weight:800;letter-spacing:.1em;color:#eef7ff;line-height:1.12;
+  font-size:clamp(28px,6vw,58px);margin:4px 0 6px;
+  text-shadow:0 0 8px rgba(94,231,255,.75),0 0 40px rgba(94,231,255,.32),0 0 110px rgba(255,94,200,.18)}
+.byline{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--magenta);text-transform:uppercase;text-shadow:0 0 12px rgba(255,94,200,.45)}
+.thesis{font-size:clamp(19px,2.6vw,25px);color:#e9eef6;font-weight:300;margin:26px auto 12px;max-width:680px}
+.thesis b{color:var(--cyan);font-weight:600}
+.sub{color:var(--dim);max-width:660px;margin:0 auto;font-size:15.5px}
+.cta{margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.cta a{font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;padding:12px 20px;border:1px solid rgba(94,231,255,.5);color:var(--cyan);border-radius:2px;box-shadow:inset 0 0 16px rgba(94,231,255,.05),0 0 12px rgba(94,231,255,.12)}
+.cta a:hover{background:rgba(94,231,255,.08)}
+.cta a.alt{border-color:rgba(255,196,107,.5);color:var(--amber);box-shadow:none}
+
+/* sections */
+.hud{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--faint)}
+.hud b{color:var(--accent,var(--cyan))}
+h2{font-family:var(--mono);font-size:clamp(24px,4vw,34px);color:#ecf3fb;margin:10px 0 24px;font-weight:700;
+  text-shadow:0 0 24px color-mix(in srgb,var(--accent,var(--cyan)) 30%,transparent)}
+h2 .tick{color:var(--accent,var(--cyan))}
+h3.trad{font-family:var(--mono);font-size:16px;color:#dfe9f4;margin:38px 0 6px;letter-spacing:.04em}
+h3.trad .rn{color:var(--accent,var(--cyan));margin-right:10px}
+section p{margin:0 0 16px;max-width:780px}
+.lead{font-size:19px;color:#dde6f2}
+.dim{color:var(--dim)} .small{font-size:14px}
+.s-cyan{--accent:var(--cyan)} .s-magenta{--accent:var(--magenta)} .s-violet{--accent:var(--violet)}
+.s-amber{--accent:var(--amber)} .s-green{--accent:var(--green)}
+.key{border-left:2px solid var(--accent,var(--cyan));padding:13px 20px;margin:24px 0;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--accent,var(--cyan)) 7%,transparent),transparent 70%);
+  color:#e6edf6;max-width:780px}
+
+/* claims + stamps */
+.claim{border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:15px 18px;margin:12px 0;max-width:780px;position:relative}
+.claim .cid{font-family:var(--mono);color:var(--faint);font-size:12px;margin-right:8px}
+.claim .txt{font-size:15.5px}
+.claim .src{display:block;margin-top:8px;font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+.stamp{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;padding:3px 9px;border-radius:2px;border:1px solid;margin-left:8px;vertical-align:middle;white-space:nowrap}
+.st-proved{color:var(--green);border-color:rgba(125,255,168,.55);text-shadow:0 0 8px rgba(125,255,168,.4)}
+.st-blocked{color:var(--magenta);border-color:rgba(255,94,200,.55);text-shadow:0 0 8px rgba(255,94,200,.4)}
+.st-open{color:var(--amber);border-color:rgba(255,196,107,.55);text-shadow:0 0 8px rgba(255,196,107,.4)}
+.st-eng{color:var(--cyan);border-color:rgba(94,231,255,.55);text-shadow:0 0 8px rgba(94,231,255,.4)}
+.st-cond{color:var(--violet);border-color:rgba(167,139,250,.55)}
+.st-zero{color:var(--amber);border-color:rgba(255,196,107,.7)}
+.js .stamp{opacity:0;transform:scale(1.6) rotate(-7deg)}
+.js .on .stamp{opacity:1;transform:none;transition:transform .35s cubic-bezier(.2,1.6,.4,1),opacity .3s}
+@keyframes blinkz{0%,100%{opacity:1}50%{opacity:.35}}
+.zeroblink{animation:blinkz 2.4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.zeroblink{animation:none}}
+
+/* gap table */
+.tblwrap{overflow-x:auto;margin:26px 0;max-width:860px}
+table.gap{border-collapse:collapse;font-size:14px;min-width:640px;width:100%}
+table.gap th,table.gap td{border:1px solid var(--line);padding:10px 13px;text-align:center}
+table.gap th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;background:var(--panel)}
+table.gap td:first-child{text-align:left;font-family:var(--mono);font-size:12.5px;color:#dfe9f4}
+table.gap .y{color:var(--green)} table.gap .n{color:var(--magenta)} table.gap .p{color:var(--amber)}
+table.gap tr.ours{background:linear-gradient(90deg,rgba(255,94,200,.08),rgba(94,231,255,.06));box-shadow:inset 0 0 24px rgba(255,94,200,.06)}
+table.gap tr.ours td:first-child{color:var(--magenta);text-shadow:0 0 10px rgba(255,94,200,.4)}
+.tcap{font-family:var(--mono);font-size:11.5px;color:var(--faint);max-width:860px;line-height:1.6}
+
+/* figure */
+figure{margin:36px 0;max-width:880px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.05em;margin-top:12px;line-height:1.6}
+figcaption b{color:var(--dim)}
+
+/* hypotheses */
+details.thm{border:1px solid var(--line);border-radius:3px;margin:12px 0;max-width:780px;background:var(--panel)}
+details.thm summary{cursor:pointer;padding:12px 17px;font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;color:var(--accent,var(--cyan));list-style:none}
+details.thm summary::before{content:"⊢ ";opacity:.7}
+details.thm summary::-webkit-details-marker{display:none}
+details.thm[open] summary{border-bottom:1px solid var(--line)}
+details.thm .body{padding:15px 19px;font-size:15px}
+details.thm .body .cite{display:block;margin-top:9px;font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+
+/* limits */
+.limits{border:1px solid rgba(255,94,200,.35);background:linear-gradient(180deg,rgba(255,94,200,.05),transparent);padding:26px 30px;border-radius:4px;max-width:840px}
+.limits h3{font-family:var(--mono);letter-spacing:.22em;color:var(--magenta);font-size:13.5px;margin-bottom:16px;text-shadow:0 0 14px rgba(255,94,200,.4)}
+.limits ul{list-style:none}
+.limits li{padding:9px 0;border-bottom:1px dashed rgba(255,94,200,.15);font-size:15.5px}
+.limits li:last-child{border-bottom:none}
+.limits li::before{content:"✕ ";font-family:var(--mono);color:var(--magenta)}
+.limits li b{color:#f2d9ea}
+
+/* refs */
+ol.refs{counter-reset:r;list-style:none;max-width:840px}
+ol.refs li{counter-increment:r;padding:10px 0 10px 52px;position:relative;border-bottom:1px solid var(--line);font-size:14px;color:var(--dim)}
+ol.refs li::before{content:"["counter(r,decimal-leading-zero)"]";position:absolute;left:0;top:10px;font-family:var(--mono);font-size:12px;color:var(--cyan)}
+ol.refs li b{color:var(--txt);font-weight:600}
+
+footer{border-top:1px solid var(--line);padding:42px 0 58px;margin-top:56px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline}
+.sig{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--faint);text-transform:uppercase}
+.sig b{color:var(--magenta);text-shadow:0 0 10px rgba(255,94,200,.4)}
+
+.js .rv{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s ease}
+.js .rv.on{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div id="bggrid" aria-hidden="true"></div>
+<div id="rail" aria-hidden="true"><div id="railfill"></div></div>
+
+<header class="site">
+  <div class="wrap">
+    <span class="logo">SCHRÖDINGER'S CAT</span>
+    <nav aria-label="sections">
+      <a href="#question">Question</a><a href="#traditions">Five Traditions</a><a href="#gap">The Gap</a>
+      <a href="#loop">The Loop</a><a href="#theorem">Open Theorem</a><a href="#limits">Limits</a><a href="#refs">Refs</a>
+    </nav>
+    <button id="musicbtn" aria-label="toggle generative ambient audio (synthesized live, original)" title="ambient audio — synthesized in your browser, original, no copyright">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/>
+        <path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<div class="hero"><div class="wrap">
+  <div class="catbox" id="catbox" role="img" aria-label="Schrödinger's cat logo: two superposed neon cat states collapsing into one on observation" title="click to re-observe">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <g id="catglyph" fill="none" stroke-width="3.2" stroke-linejoin="miter" stroke-linecap="round">
+          <path d="M100 172 L64 172 L50 150 L50 96 L62 46 L84 72 Q100 65 116 72 L138 46 L150 96 L150 150 L136 172 Z"/>
+          <path d="M72 106 L92 114 M128 106 L108 114" stroke-width="4.2"/>
+          <path d="M94 138 L100 145 L106 138"/>
+          <path d="M50 126 L20 120 M50 137 L18 137 M50 148 L22 155"/>
+          <path d="M150 126 L180 120 M150 137 L182 137 M150 148 L178 155"/>
+        </g>
+      </defs>
+      <use href="#catglyph" class="cat-ghost cat-gc" stroke="#5ee7ff" opacity=".8" style="mix-blend-mode:screen"/>
+      <use href="#catglyph" class="cat-ghost cat-gm" stroke="#ff5ec8" opacity=".8" style="mix-blend-mode:screen"/>
+      <use href="#catglyph" class="cat-solid" stroke="#eaf8ff"/>
+    </svg>
+  </div>
+  <div class="psi">|ψ⟩ = α|<b>proved</b>⟩ + β|<b>refuted</b>⟩ — observation collapses the state</div>
+  <div class="byline">a research program by schrödinger's cat</div>
+  <h1 class="title">SCHRÖDINGER'S<br>CAT</h1>
+  <p class="thesis">Every conjecture is alive and dead — true and false at once — until a proof checker
+     <b>opens the box</b>. We are building the machine that opens the box on <b>itself</b>.</p>
+  <p class="sub">Self-improvement you can't fake: a discovery loop whose every self-modification must be
+     a machine-checked theorem — and the ninety-year-old mathematics that says exactly how far such a
+     loop can go. Every claim below carries a stamp and a primary source. Where we have nothing, the
+     page says <span style="color:var(--amber)">zero</span>.</p>
+  <div class="cta">
+    <a href="#question">The question ↓</a>
+    <a class="alt" href="#loop">The loop we're building</a>
+  </div>
+</div></div>
+
+<!-- ================= THE QUESTION ================= -->
+<section id="question" class="s-cyan"><div class="wrap rv on">
+  <div class="hud"><b>00</b> // the question</div>
+  <h2>Can a system improve itself — and prove it?<span class="tick">_</span></h2>
+  <p class="lead">Recursive self-improvement is now a named, mainstream research object: one of
+     Google DeepMind's four pathways from AGI to superintelligence.</p>
+  <div class="claim"><span class="cid">C1</span><span class="stamp st-open">NAMED · UNSOLVED · 2026</span>
+    <div class="txt">DeepMind defines RSI as "AI facilitating AI research &amp; development, thereby leading
+    to improved AI systems, that, in turn, can facilitate research progress even more" — and concedes its
+    dynamics are <em>poorly understood</em>: no historic precedent, <b>no scaling law</b>.</div>
+    <span class="src">Genewein et al. (Google DeepMind), arXiv:2606.12683 — ref [14]</span></div>
+  <p>Meanwhile the only self-improving systems that actually run grade themselves on <em>benchmarks</em>.
+     A benchmark score can be gamed by the very system it grades. A machine-checked proof cannot.
+     This page asks one question: <b>what does self-improvement mean when the referee is a proof checker?</b>
+     It turns out five separate research traditions spent ninety years answering it — and they barely cite
+     each other.</p>
+</div></section>
+
+<!-- ================= FIVE TRADITIONS ================= -->
+<section id="traditions" class="s-violet"><div class="wrap rv">
+  <div class="hud"><b>01</b> // five traditions, ninety years</div>
+  <h2>What is actually known<span class="tick">_</span></h2>
+
+  <h3 class="trad"><span class="rn">I.</span> Proof theory, 1931–1962 — the wall and the ladder</h3>
+  <div class="claim"><span class="cid">C2</span><span class="stamp st-blocked">BLOCKED · LÖB 1955</span>
+    <div class="txt">No consistent theory trusts itself: the schema
+    <span class="m">∀φ: T ⊢ □<sub>T</sub>⌜φ⌝ → φ</span> is impossible. Total self-certification is not
+    difficult — it is inconsistent. (Gödel's second incompleteness theorem is the consistency special case.)</div>
+    <span class="src">Löb, J. Symbolic Logic 20 (1955); Gödel, Monatshefte 38 (1931) — refs [01][02]</span></div>
+  <div class="claim"><span class="cid">C3</span><span class="stamp st-proved">PROVED · 1939 / 1962</span>
+    <div class="txt">But what <span class="m">T</span> cannot do to itself, its successor does to it:
+    <span class="m">T + <span class="up">RFN</span>(T)</span> is <em>strictly stronger</em>, the step iterates
+    along ordinals, and along suitable paths the progression is complete for arithmetic truth.
+    Sound self-improvement of theories: proved, sixty years before the acronym RSI.</div>
+    <span class="src">Turing, Proc. LMS (1939); Feferman, JSL 27 (1962) — refs [03][05]</span></div>
+  <div class="claim"><span class="cid">C4</span><span class="stamp st-proved">PROVED · 1962</span>
+    <div class="txt">The catch, proved the same year: along other paths the progression stays incomplete
+    forever, and completeness paths are <em>non-effective</em> — as hard to find as the truths being sought.
+    <b>Improvement is cheap; steering is the hard part.</b></div>
+    <span class="src">Feferman &amp; Spector, JSL 27 (1962) — ref [06]</span></div>
+
+  <h3 class="trad"><span class="rn">II.</span> Computability, 1938–1971 — license and speed limit</h3>
+  <div class="claim"><span class="cid">C5</span><span class="stamp st-proved">PROVED · KLEENE</span>
+    <div class="txt">Programs that operate on their own source code exist by fixed point — the recursion
+    theorem licenses RSI's self-reference unconditionally. (What general self-<em>inspection</em> can conclude
+    is a different matter: Rice.)</div>
+    <span class="src">Kleene, Introduction to Metamathematics (1952) — ref [04]</span></div>
+  <div class="claim"><span class="cid">C6</span><span class="stamp st-proved">PROVED · BLUM 1967/71</span>
+    <div class="txt">Some computable problems have <em>no fastest program</em>: an endless ladder of
+    strictly faster programs provably exists — and no effective procedure climbs it.
+    <b>Endless improvement is real; computing your way along it is not.</b> The exact mirror, in the speed
+    dimension, of Feferman–Spector in the strength dimension.</div>
+    <span class="src">Blum, JACM 14 (1967); Blum, JACM 18 (1971) — refs [07][08]</span></div>
+
+  <h3 class="trad"><span class="rn">III.</span> Agent foundations, 2003–2013 — the price list of self-trust</h3>
+  <div class="claim"><span class="cid">C7</span><span class="stamp st-cond">CONDITIONAL · 2003</span>
+    <div class="txt">Schmidhuber's Gödel machine rewrites its own code only upon a formal proof that the
+    rewrite raises expected utility. Within its axioms, provably optimal — <em>if</em> such proofs can be
+    found. In practice the gate almost never opens: the burden "prove it helps" is too heavy.</div>
+    <span class="src">Schmidhuber, arXiv:cs/0309048 (2003) — ref [09]</span></div>
+  <div class="claim"><span class="cid">C8</span><span class="stamp st-blocked">PARTIAL · TILING 2013</span>
+    <div class="txt">Yudkowsky–Herreshoff pose self-modification as an agent constructing a successor it
+    trusts — and hit the <b>Löbian obstacle</b> by name: an agent reasoning in <span class="m">T</span>
+    cannot in general trust a successor reasoning in <span class="m">T</span>, so naive trust chains are
+    finite ("running out of trust"). The patches are priced exactly: descending trust
+    <span class="m">T–n</span> is unsound on the standard numbers (they prove
+    <span class="m">T–0 ⊢ ∃n:¬ψ(n)</span>); Fallenstein's parametric polymorphism
+    <span class="m">T<sub>κ</sub></span> is sound but buys only "safe for κ steps".
+    <b>Bounded successor-trust is the going rate.</b></div>
+    <span class="src">Yudkowsky &amp; Herreshoff, MIRI (2013) — ref [10]</span></div>
+
+  <h3 class="trad"><span class="rn">IV.</span> Verified systems, 2011–2021 — the tower that runs</h3>
+  <div class="claim"><span class="cid">C9</span><span class="stamp st-eng">ENGINEERED · 2015</span>
+    <div class="txt">Milawa: a <em>self-verifying</em> theorem prover — a tower of increasingly powerful
+    proof checkers, each layer verifying the next, with soundness proved down to the machine code that
+    runs it. The reflective tower is not philosophy; it compiles. But it is static: assembled by hand,
+    once — it discovers nothing.</div>
+    <span class="src">Davis &amp; Myreen, J. Automated Reasoning (2015); ITP (2011); cf. verified bootstrapped compilation, Myreen, CPP (2021) — refs [11][12]</span></div>
+
+  <h3 class="trad"><span class="rn">V.</span> Empirical ML, 2024–2026 — improvement without verification</h3>
+  <div class="claim"><span class="cid">C10</span><span class="stamp st-open">REAL · UNVERIFIED · 2025</span>
+    <div class="txt">The Darwin Gödel Machine drops Schmidhuber's proof requirement for benchmark scores —
+    and works: agents rewriting their own code went 20.0% → 50.0% on SWE-bench. The cost is stated in the
+    paper itself: validation is empirical only, and self-modified code tends toward the uninterpretable.
+    <b>Improvement became real the moment it stopped being verifiable.</b></div>
+    <span class="src">Zhang et al., arXiv:2505.22954 (2025) — ref [15]</span></div>
+  <div class="claim"><span class="cid">C11</span><span class="stamp st-blocked">DIAGNOSIS · 2026</span>
+    <div class="txt">And the field's own diagnosis points back at proof theory: sustained RSI needs genuine
+    self-reference (Kleene fixed points), current LLMs sit below that "introspection threshold"
+    (quasi-introspection, no reflexive access to themselves) — and the ceiling on self-trust is named
+    outright: the Löbian obstacle.</div>
+    <span class="src">arXiv:2607.04277 (2026) — ref [16]</span></div>
+
+  <div class="key">Ninety years, five traditions, one shape: <b>self-reference is licensed (Kleene),
+    endless improvement exists (Blum, Feferman), full self-certification is forbidden (Löb),
+    successor-trust is bounded (tiling), steering is non-effective (Feferman–Spector), bounded towers
+    compile (Milawa) — and the systems that actually run today skip verification entirely (DGM).</b>
+    Assembled, this <em>is</em> the mathematics of RSI. It has simply never been run as one loop.</div>
+</div></section>
+
+<!-- ================= THE GAP ================= -->
+<section id="gap" class="s-magenta"><div class="wrap rv">
+  <div class="hud"><b>02</b> // the gap</div>
+  <h2>Nobody's row has all four<span class="tick">_</span></h2>
+  <div class="tblwrap"><table class="gap">
+    <tr><th>system</th><th>self-modifying</th><th>justification = proof</th><th>discovers mathematics</th><th>loop closed &amp; running</th></tr>
+    <tr><td>Gödel machine (2003)</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td><td class="n">never ran</td></tr>
+    <tr><td>Darwin Gödel Machine (2025)</td><td class="y">✓</td><td class="n">✗ benchmark</td><td class="n">—</td><td class="y">✓</td></tr>
+    <tr><td>AlphaProof (2024–25)</td><td class="p">weights only</td><td class="n">✗ training signal</td><td class="y">✓ competition proofs</td><td class="y">✓</td></tr>
+    <tr><td>Milawa (2015)</td><td class="n">✗ static tower</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td></tr>
+    <tr class="ours"><td>THIS PROGRAM (target)</td><td class="y">✓</td><td class="y">✓ Lean 4</td><td class="y">✓ its own library</td><td class="p zeroblink">0 — not yet</td></tr>
+  </table></div>
+  <p class="tcap">Every cell is cited in §01 and §05. The last cell is the project's entire honesty policy
+     in one glyph: it stays <span style="color:var(--amber)">0</span> until the loop actually runs, and this
+     page will never say otherwise. A conjecture in this system is a cat in a box; only
+     <span class="m">lake build</span> opens the box.</p>
+</div></section>
+
+<!-- ================= THE LOOP ================= -->
+<section id="loop" class="s-green"><div class="wrap rv">
+  <div class="hud"><b>03</b> // the loop</div>
+  <h2>Prove soundness. Measure benefit.<span class="tick">_</span></h2>
+  <p class="lead">The design principle that splits Schmidhuber's impossible burden in two: every
+     self-modification must carry a machine-checked certificate that it is <em>sound</em> — it cannot
+     corrupt the verifier or admit a false theorem — while how much it <em>helps</em> is measured openly,
+     in numbers anyone can rerun.</p>
+  <p>The discovered mathematics is not the product. <b>It is the fuel.</b> Three feedback ports:</p>
+
+  <figure aria-label="The loop: pipeline discovers theorems, Lean verifies, verified mathematics feeds back through three ports">
+  <svg viewBox="0 0 880 430" role="img" font-family="Consolas,monospace">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker>
+      <filter id="g2"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <!-- pipeline row -->
+    <g font-size="13" text-anchor="middle">
+      <rect x="30"  y="185" width="150" height="52" fill="none" stroke="#5ee7ff" opacity=".9" filter="url(#g2)"/>
+      <text x="105" y="207" fill="#dfe9f4">GENERATE</text><text x="105" y="225" fill="#5a6780" font-size="10.5">conjectures</text>
+      <rect x="230" y="185" width="150" height="52" fill="none" stroke="#5ee7ff" opacity=".9"/>
+      <text x="305" y="207" fill="#dfe9f4">FILTER</text><text x="305" y="225" fill="#5a6780" font-size="10.5">counterexamples</text>
+      <rect x="430" y="185" width="170" height="52" fill="none" stroke="#7dffa8" stroke-width="2" filter="url(#g2)"/>
+      <text x="515" y="207" fill="#dff6e8">LEAN VERIFIES</text><text x="515" y="225" fill="#5a6780" font-size="10.5">lake build — the box opens</text>
+      <rect x="660" y="185" width="185" height="52" fill="none" stroke="#eaf8ff" stroke-width="2" filter="url(#g2)"/>
+      <text x="752" y="207" fill="#ffffff">VERIFIED THEOREM</text><text x="752" y="225" fill="#5a6780" font-size="10.5">the only currency here</text>
+      <line x1="180" y1="211" x2="228" y2="211" stroke="#5ee7ff" marker-end="url(#ah)"/>
+      <line x1="380" y1="211" x2="428" y2="211" stroke="#5ee7ff" marker-end="url(#ah)"/>
+      <line x1="600" y1="211" x2="658" y2="211" stroke="#7dffa8" marker-end="url(#ah)"/>
+    </g>
+    <!-- L1 arc (top) -->
+    <path d="M752 183 C 740 70, 180 70, 108 183" fill="none" stroke="#7dffa8" stroke-width="1.8" marker-end="url(#ah)" filter="url(#g2)"/>
+    <text x="430" y="86" text-anchor="middle" fill="#7dffa8" font-size="12.5">L1 · LIBRARY — every theorem joins the next round's rewrite set</text>
+    <text x="430" y="104" text-anchor="middle" fill="#5a6780" font-size="10.5">status: buildable now · measure: verified throughput per round</text>
+    <!-- L2 arc (mid-low) -->
+    <path d="M752 239 C 730 320, 570 330, 517 241" fill="none" stroke="#5ee7ff" stroke-width="1.8" marker-end="url(#ah)"/>
+    <text x="645" y="330" text-anchor="middle" fill="#5ee7ff" font-size="12.5">L2 · VERIFIED TOOLS — prove a component sound, install it</text>
+    <text x="645" y="348" text-anchor="middle" fill="#5a6780" font-size="10.5">proof by reflection (the mechanism behind norm_num) · measure: certified procedures + speedup</text>
+    <!-- L3 arc (bottom, dashed) -->
+    <path d="M760 239 C 760 400, 120 400, 100 241" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#ah)"/>
+    <text x="430" y="392" text-anchor="middle" fill="#a78bfa" font-size="12.5">L3 · THE LOGIC CLIMBS — adopt T+RFN(T); justification lives one level up (Löb honored, not dodged)</text>
+    <text x="430" y="410" text-anchor="middle" fill="#5a6780" font-size="10.5">research edge · measure: proof-theoretic ordinal (Pakhomov–Walsh: rank = ordinal; ε-alpha ladder)</text>
+  </svg>
+  <figcaption><b>The loop.</b> An improvement event is a commit whose justification is a lemma the
+    pipeline itself discovered and Lean checked. <b>The changelog is a sequence of theorems.</b>
+    Port colors are status: green = buildable now, cyan = standard technology in a new arrangement,
+    violet dashed = research edge.</figcaption>
+  </figure>
+
+  <div class="claim"><span class="cid">C12</span><span class="stamp st-zero">STATUS · 0 · 2026-07-13</span>
+    <div class="txt">What compiles today: a pinned Lean 4.32.0 toolchain and an empty scaffold that builds
+    clean. Theorems verified: <b>0</b>. Reflection steps machine-checked: <b>0</b>. Constraints accepted in
+    advance: constructive proofs only (no <span class="m"><span class="up">Classical.choice</span></span> in
+    the axiom print-out), no <span class="m">sorry</span>, no unjustified <span class="m">axiom</span>, and
+    Feferman–Spector honesty about path choice wherever iteration appears. When these counters move, the
+    Lean sources and build logs will be published beside them.</div></div>
+</div></section>
+
+<!-- ================= OPEN THEOREM ================= -->
+<section id="theorem" class="s-amber"><div class="wrap rv">
+  <div class="hud"><b>04</b> // the missing theorem</div>
+  <h2>Stated, not claimed<span class="tick">_</span></h2>
+  <p class="lead">Does there exist a computable operator <span class="m">I</span> on verified provers such
+     that, for every prover <span class="m">P</span> in some infinite class:</p>
+  <details class="thm"><summary>(1) I(P) applies only self-proposed, self-certified modifications</summary>
+    <div class="body">Capped by Löb: full self-certification is inconsistent (C2), and successor-trust is
+      bounded — descending chains run out, parametric polymorphism buys "safe for κ steps" only (C8).
+      Any honest version of (1) must state its trust budget explicitly.
+      <span class="cite">Löb 1955; Yudkowsky–Herreshoff 2013</span></div></details>
+  <details class="thm"><summary>(2) strength(I(P)) &gt; strength(P), measured by proof-theoretic ordinal</summary>
+    <div class="body">Achievable externally: reflective extension strictly raises strength (C3), and the
+      measure is exact — reflection rank equals proof-theoretic ordinal; iterated reflection climbs the
+      <span class="m">ε<sub>α</sub></span> ladder. "It improved" can be a falsifiable sentence with an
+      ordinal coordinate.
+      <span class="cite">Feferman 1962; Pakhomov &amp; Walsh, JSL (2021)</span></div></details>
+  <details class="thm"><summary>(3) the run continues autonomously, forever</summary>
+    <div class="body">Blocked in general: completeness paths through the ordinal notations are non-effective
+      (C4), and in the speed dimension the endless ladder provably cannot be climbed effectively (C6).
+      Autonomy is exactly where the known mathematics says the hardness concentrates.
+      <span class="cite">Feferman–Spector 1962; Blum 1967/1971</span></div></details>
+  <div class="key"><b>The conjunction is open.</b> Every known relaxation is charted above: drop (1) and you
+    get Feferman's progressions; drop (2)'s verification and you get the Darwin Gödel Machine; drop (3) and
+    you get Milawa's finite tower. Our artifact targets the honest finite instance:
+    <em>certified strength monotone along the run, as a machine-checked invariant</em> — every step a
+    theorem, the trust budget printed on the label.</div>
+</div></section>
+
+<!-- ================= LIMITS ================= -->
+<section id="limits" class="s-magenta"><div class="wrap rv">
+  <div class="hud"><b>05</b> // system limits</div>
+  <h2>What this is not<span class="tick">_</span></h2>
+  <div class="limits">
+    <h3>// PERMANENT PANEL — NOT A FOOTNOTE</h3>
+    <ul>
+      <li><b>Not a theory that proves itself.</b> Inconsistent — Gödel (1931), Löb (1955). No architecture routes around a theorem.</li>
+      <li><b>Not unbounded autonomous ascent.</b> Path choice is non-effective (Feferman–Spector 1962); effective speedup is impossible in general (Blum 1971). Our loop's trust budget is finite and stated.</li>
+      <li><b>Not a claim that today's LLMs self-improve.</b> The diagnosis says they sit below the introspection threshold (arXiv:2607.04277).</li>
+      <li><b>Not machine-discovered <em>new</em> mathematics.</b> v1 targets elementary arithmetic; the cited mathematics is 1931–2026 and belongs to its authors.</li>
+      <li><b>Not running yet.</b> Verified counters read 0, in amber, above the fold of their own section — and stay that way until <span class="m">lake build</span> says otherwise.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- ================= REFERENCES ================= -->
+<section id="refs" class="s-violet"><div class="wrap rv">
+  <div class="hud"><b>06</b> // references — primary sources only</div>
+  <h2>Every claim, sourced<span class="tick">_</span></h2>
+  <ol class="refs">
+    <li><b>K. Gödel</b>, Über formal unentscheidbare Sätze der Principia Mathematica und verwandter Systeme I, <em>Monatshefte für Mathematik und Physik</em> 38 (1931) 173–198.</li>
+    <li><b>M. H. Löb</b>, Solution of a problem of Leon Henkin, <em>J. Symbolic Logic</em> 20 (1955) 115–118.</li>
+    <li><b>A. M. Turing</b>, Systems of logic based on ordinals, <em>Proc. London Math. Soc.</em> s2-45 (1939) 161–228.</li>
+    <li><b>S. C. Kleene</b>, <em>Introduction to Metamathematics</em>, North-Holland (1952). (The recursion theorem.)</li>
+    <li><b>S. Feferman</b>, Transfinite recursive progressions of axiomatic theories, <em>J. Symbolic Logic</em> 27 (1962) 259–316.</li>
+    <li><b>S. Feferman &amp; C. Spector</b>, Incompleteness along paths in progressions of theories, <em>J. Symbolic Logic</em> 27 (1962) 383–390.</li>
+    <li><b>M. Blum</b>, A machine-independent theory of the complexity of recursive functions, <em>J. ACM</em> 14 (1967) 322–336.</li>
+    <li><b>M. Blum</b>, On effective procedures for speeding up algorithms, <em>J. ACM</em> 18 (1971) 290–305.</li>
+    <li><b>J. Schmidhuber</b>, Gödel machines: self-referential universal problem solvers making provably optimal self-improvements, <a href="https://arxiv.org/abs/cs/0309048">arXiv:cs/0309048</a> (2003).</li>
+    <li><b>E. Yudkowsky &amp; M. Herreshoff</b>, Tiling agents for self-modifying AI, and the Löbian obstacle, MIRI technical report, draft of Oct 7 (2013).</li>
+    <li><b>J. Davis &amp; M. O. Myreen</b>, The self-verifying Milawa theorem prover is sound (down to the machine code that runs it), <em>J. Automated Reasoning</em> (2015); M. O. Myreen &amp; J. Davis, A verified runtime for a verified theorem prover, ITP (2011).</li>
+    <li><b>M. O. Myreen</b>, A minimalistic verified bootstrapped compiler (proof pearl), CPP (2021).</li>
+    <li><b>F. Pakhomov &amp; J. Walsh</b>, Reflection ranks and ordinal analysis, <a href="https://arxiv.org/abs/1805.02095">arXiv:1805.02095</a>; <em>J. Symbolic Logic</em> 86 (2021) 1350–1384.</li>
+    <li><b>T. Genewein et al.</b> (Google DeepMind), From AGI to ASI, <a href="https://arxiv.org/abs/2606.12683">arXiv:2606.12683</a> (2026).</li>
+    <li><b>J. Zhang et al.</b>, Darwin Gödel Machine: open-ended evolution of self-improving agents, <a href="https://arxiv.org/abs/2505.22954">arXiv:2505.22954</a> (2025).</li>
+    <li>Self-reference in large language models: the introspection threshold for recursive self-improvement, <a href="https://arxiv.org/abs/2607.04277">arXiv:2607.04277</a> (2026).</li>
+  </ol>
+</div></section>
+
+<footer><div class="wrap">
+  <span class="sig">AUTHOR: <b>SCHRÖDINGER'S CAT</b></span>
+  <span class="sig" style="margin-left:auto">every claim stamped · every artifact compiled or absent · © 2026</span>
+</div></footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- cat collapse (visual, motion-gated) ---- */
+  var cat = document.getElementById('catbox');
+  if (!reduce) {
+    document.documentElement.classList.add('js');
+    setTimeout(function(){ cat.classList.add('observed'); }, 2600);
+    cat.addEventListener('click', function(){
+      cat.classList.remove('observed');
+      void cat.offsetWidth;
+      setTimeout(function(){ cat.classList.add('observed'); }, 1400);
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target);} });
+      },{threshold:.1});
+      document.querySelectorAll('.rv,.claim').forEach(function(el){ io.observe(el); });
+    } else {
+      document.querySelectorAll('.rv,.claim').forEach(function(el){ el.classList.add('on'); });
+    }
+    var fill = document.getElementById('railfill'), grid = document.getElementById('bggrid'), t;
+    addEventListener('scroll', function(){
+      if (t) return;
+      t = requestAnimationFrame(function(){
+        t = null;
+        var h = document.documentElement;
+        var p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+        fill.style.height = (p*100).toFixed(2) + '%';
+        grid.style.transform = 'translateY(' + (-h.scrollTop*0.045).toFixed(1) + 'px)';
+      });
+    },{passive:true});
+  }
+
+  /* ---- generative ambient audio: synthesized live, original, no copyright ---- */
+  var btn = document.getElementById('musicbtn'), actx=null, tick=null;
+  function startAudio(){
+    actx = new (window.AudioContext||window.webkitAudioContext)();
+    var master = actx.createGain(); master.gain.value = 0.12; master.connect(actx.destination);
+    var lp = actx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=520; lp.Q.value=0.7; lp.connect(master);
+    var delay = actx.createDelay(1.2); delay.delayTime.value=0.42;
+    var fb = actx.createGain(); fb.gain.value=0.34;
+    delay.connect(fb); fb.connect(delay); delay.connect(master);
+    /* drone: A1 + E2 + A2, slow filter breathing */
+    [55, 82.41, 110].forEach(function(f,i){
+      var o = actx.createOscillator(); o.type='triangle'; o.frequency.value=f;
+      o.detune.value = (i-1)*4;
+      var g = actx.createGain(); g.gain.value = 0.05;
+      o.connect(g); g.connect(lp); o.start();
+    });
+    var lfo = actx.createOscillator(); lfo.frequency.value = 0.05;
+    var lfog = actx.createGain(); lfog.gain.value = 260;
+    lfo.connect(lfog); lfog.connect(lp.frequency); lfo.start();
+    /* sparse plucks: A-minor pentatonic, soft sine, through delay */
+    var notes = [220, 261.63, 293.66, 329.63, 392, 440, 523.25];
+    tick = setInterval(function(){
+      if (actx.state !== 'running' || Math.random() > 0.55) return;
+      var f = notes[Math.floor(Math.random()*notes.length)] * (Math.random()<0.2 ? 2 : 1);
+      var o = actx.createOscillator(); o.type='sine'; o.frequency.value=f;
+      var g = actx.createGain();
+      var t0 = actx.currentTime;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.085, t0+0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+2.2);
+      o.connect(g); g.connect(lp); g.connect(delay);
+      o.start(t0); o.stop(t0+2.4);
+    }, 750);
+  }
+  btn.addEventListener('click', function(){
+    if (!actx) { startAudio(); btn.classList.add('on'); return; }
+    if (actx.state === 'running') { actx.suspend(); btn.classList.remove('on'); }
+    else { actx.resume(); btn.classList.add('on'); }
+  });
+})();
+</script>
+</body>
+</html>
