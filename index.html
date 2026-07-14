@@ -8,18 +8,18 @@
 <meta name="description" content="An independent research program: recursive self-improvement whose substrate is mathematical theory itself. Real Lean 4 code, really compiled; a living organism of evolving structure; honest zeros until the engine runs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020304'/%3E%3Cpath d='M8 26 L8 13 L11 5.5 L14.5 10 Q16 9.3 17.5 10 L21 5.5 L24 13 L24 26 Z' stroke='%2356c8f2' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#020304; --card:rgba(6,9,14,.88); --cardS:#05080c;
   --line:#10161f; --line2:#1a2330;
   --ink:#e8edf3; --txt:#9aa6b4; --mut:#6b7683; --dim:#454f5b;
-  --acc:#56c8f2; --acc2:#a5e2ff;
+  --acc:#b57bff; --acc2:#dcbcff;
   --ok:#2ee584; --ok2:#8fffc4;
   --sim:#e0a23f;
-  --vio:#a78bfa; --vio2:#c9b8ff; --ros:#d16a8a;
-  --disp:"Space Grotesk","Segoe UI",system-ui,sans-serif;
+  --vio:#a78bfa; --vio2:#c9b8ff; --ros:#ff6ac1;
+  --disp:"Chakra Petch","Space Grotesk","Segoe UI",system-ui,sans-serif;
   --sans:Inter,"Segoe UI",system-ui,sans-serif;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
 }
@@ -27,14 +27,14 @@
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden}
-#ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.5}
+#ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.72}
 #kg{position:fixed;inset:0;z-index:1;width:100vw;height:100vh;pointer-events:none}
 #boot{position:fixed;inset:0;z-index:80;pointer-events:none;image-rendering:pixelated}
 #fog{position:fixed;inset:0;z-index:2;pointer-events:none;
   background:
    radial-gradient(ellipse 130% 95% at 50% 112%,rgba(2,3,4,.96) 22%,rgba(2,3,4,.6) 58%,transparent 100%),
-   radial-gradient(ellipse 150% 100% at 50% -25%,rgba(86,200,242,.04),transparent 55%),
-   linear-gradient(180deg,rgba(2,3,4,.42),rgba(2,3,4,.7) 42%,rgba(2,3,4,.84))}
+   radial-gradient(ellipse 150% 100% at 50% -25%,rgba(150,90,255,.06),transparent 55%),
+   linear-gradient(180deg,rgba(2,3,4,.36),rgba(2,3,4,.64) 42%,rgba(2,3,4,.8))}
 #grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.045;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E")}
 a{color:var(--acc2);text-decoration:none}
@@ -66,12 +66,13 @@ h1{font-family:var(--disp);font-size:clamp(36px,5.6vw,64px);font-weight:700;colo
 h1 .g{color:var(--acc);text-shadow:0 0 44px rgba(86,200,242,.35)}
 .hero .sub{margin:26px auto 34px;max-width:36em;font-size:15.5px;color:var(--txt)}
 .hero .sub b{color:var(--ink);font-weight:600}
-.cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-.btn{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-radius:4px;padding:13px 24px;transition:all .2s;border:1px solid transparent}
-.btn.pri{color:#04121a;background:var(--acc);font-weight:700;box-shadow:0 0 22px rgba(86,200,242,.25)}
-.btn.pri:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 0 30px rgba(86,200,242,.4)}
-.btn.sec{color:var(--acc2);border-color:rgba(86,200,242,.35);background:rgba(86,200,242,.04)}
-.btn.sec:hover{border-color:var(--acc);background:rgba(86,200,242,.1)}
+.cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:14px 28px;transition:all .2s;border:1px solid transparent;position:relative;
+  clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)}
+.btn.pri{color:#100320;background:linear-gradient(120deg,var(--acc),#e0a5ff);font-weight:700;box-shadow:0 0 24px rgba(181,123,255,.35)}
+.btn.pri:hover{transform:translateY(-1px);box-shadow:0 0 38px rgba(181,123,255,.6)}
+.btn.sec{color:var(--acc2);border-color:rgba(181,123,255,.45);background:rgba(181,123,255,.05)}
+.btn.sec:hover{border-color:var(--acc);background:rgba(181,123,255,.12);box-shadow:0 0 22px rgba(181,123,255,.2)}
 .worldcap{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--mut);z-index:4;background:rgba(2,3,4,.6);padding:5px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
 .worldcap i{font-style:normal;color:var(--acc)}
 .worldcap b{font-weight:400;color:var(--ok)}
@@ -420,7 +421,7 @@ if(!reduce && 'IntersectionObserver' in window){
 /* ============ CA WORLD ============ */
 var ca=document.getElementById('ca'), cxa=ca.getContext('2d');
 var CELL=9, gw,gh, grid,hue,age, buf,hbuf,abuf;
-var LINEAGES=[197,172,258,38];
+var LINEAGES=[275,290,258,315];  /* violet · purple · indigo · magenta — evolving lineages */
 var bloomSeed=!reduce;
 function caSize(){
   gw=Math.ceil(innerWidth/CELL); gh=Math.ceil(innerHeight/CELL);
@@ -480,13 +481,14 @@ function caStep(){
   if(births<gw*gh*.004) patch();
 }
 function caDraw(){
-  cxa.fillStyle='rgba(2,3,4,.28)'; cxa.fillRect(0,0,gw,gh);
+  cxa.fillStyle='rgba(3,2,6,.2)'; cxa.fillRect(0,0,gw,gh);  /* longer trails = stronger evolution feel */
   for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
     var i=y*gw+x;
     if(grid[i]){
       var a=age[i];
-      var L=a<3?62:a<10?48:36, A=a<3?.5:a<10?.34:.22;
-      cxa.fillStyle='hsla('+hue[i]+',42%,'+L+'%,'+A+')';
+      /* newborns flare bright (a mutation event), mature cells glow steady violet */
+      var L=a<2?78:a<5?62:a<12?50:40, S=a<5?78:60, A=a<2?.85:a<5?.55:a<12?.4:.28;
+      cxa.fillStyle='hsla('+hue[i]+','+S+'%,'+L+'%,'+A+')';
       cxa.fillRect(x,y,1,1);
     }
   }
@@ -540,8 +542,8 @@ function kgDraw(){
   kedges.forEach(function(e){
     var a=knodes[e[0]],b=knodes[e[1]];
     var hot=Math.max(a.lit,b.lit);
-    kx.strokeStyle='rgba(86,200,242,'+(.05+hot*.25)+')';
-    kx.lineWidth=hot>0?1.2:.7;
+    kx.strokeStyle='rgba(181,123,255,'+(.06+hot*.28)+')';
+    kx.lineWidth=hot>0?1.3:.7;
     kx.beginPath();kx.moveTo(a.x,a.y);kx.lineTo(b.x,b.y);kx.stroke();
   });
   knodes.forEach(function(n){
@@ -552,10 +554,10 @@ function kgDraw(){
       kx.fillStyle='rgba(143,255,196,'+(.5+n.lit*.5)+')';
       n.lit-=.012;
     } else {
-      kx.fillStyle='rgba(86,200,242,.4)';
+      kx.fillStyle='rgba(181,123,255,.42)';
     }
     kx.beginPath();kx.arc(n.x,n.y,2.2,0,6.283);kx.fill();
-    kx.fillStyle=n.lit>0?'rgba(143,255,196,'+(.35+n.lit*.5)+')':'rgba(107,118,131,.3)';
+    kx.fillStyle=n.lit>0?'rgba(143,255,196,'+(.35+n.lit*.5)+')':'rgba(150,130,180,.32)';
     kx.fillText(n.n,n.x+7,n.y+3);
   });
   if(!reduce)requestAnimationFrame(kgDraw);
