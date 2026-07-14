@@ -5,122 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Schrödinger's Cat — the missing mathematics between RSI and ASI</title>
 <meta name="author" content="Schrödinger's Cat">
-<meta name="description" content="An independent research program: a swarm of LLM agents proposing new mathematical theories in univalent foundations and ∞-topos landscapes, checked by intuitionistic proof kernels — hunting the missing theory of the RSI→ASI gap.">
+<meta name="description" content="An independent research program: recursive self-improvement whose substrate is mathematical theory itself. Real Lean 4 code, really compiled; a living organism of evolving structure; honest zeros until the engine runs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020304'/%3E%3Cpath d='M8 26 L8 13 L11 5.5 L14.5 10 Q16 9.3 17.5 10 L21 5.5 L24 13 L24 26 Z' stroke='%2356c8f2' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#020304; --bg2:#04060a; --card:rgba(6,9,14,.85); --cardS:#05080c;
+  --bg:#020304; --card:rgba(6,9,14,.88); --cardS:#05080c;
   --line:#10161f; --line2:#1a2330;
-  --ink:#e6ecf2; --txt:#9aa6b4; --mut:#6b7683; --dim:#454f5b;
-  --acc:#56c8f2; --acc2:#a5e2ff;            /* single primary accent — cold cyan */
-  --ok:#2ee584; --ok2:#8fffc4;              /* reserved: kernel / ground truth only */
-  --sim:#e0a23f;                             /* reserved: simulation labels only */
-  --vio:#8d7bc7; --ros:#d16a8a;             /* terminal secondary, muted */
+  --ink:#e8edf3; --txt:#9aa6b4; --mut:#6b7683; --dim:#454f5b;
+  --acc:#56c8f2; --acc2:#a5e2ff;
+  --ok:#2ee584; --ok2:#8fffc4;
+  --sim:#e0a23f;
+  --vio:#a78bfa; --vio2:#c9b8ff; --ros:#d16a8a;
   --disp:"Space Grotesk","Segoe UI",system-ui,sans-serif;
   --sans:Inter,"Segoe UI",system-ui,sans-serif;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
-  --math:Georgia,"Times New Roman",serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden;font-weight:400}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden}
 #ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.5}
-#fog{position:fixed;inset:0;z-index:1;pointer-events:none;
+#kg{position:fixed;inset:0;z-index:1;width:100vw;height:100vh;pointer-events:none}
+#boot{position:fixed;inset:0;z-index:80;pointer-events:none;image-rendering:pixelated}
+#fog{position:fixed;inset:0;z-index:2;pointer-events:none;
   background:
    radial-gradient(ellipse 130% 95% at 50% 112%,rgba(2,3,4,.96) 22%,rgba(2,3,4,.6) 58%,transparent 100%),
    radial-gradient(ellipse 150% 100% at 50% -25%,rgba(86,200,242,.04),transparent 55%),
-   linear-gradient(180deg,rgba(2,3,4,.42),rgba(2,3,4,.72) 42%,rgba(2,3,4,.85))}
-#boot{position:fixed;inset:0;z-index:80;pointer-events:none;image-rendering:pixelated}
-#grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.045;
+   linear-gradient(180deg,rgba(2,3,4,.42),rgba(2,3,4,.7) 42%,rgba(2,3,4,.84))}
+#grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.045;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E")}
 a{color:var(--acc2);text-decoration:none}
 a:hover{color:var(--acc)}
-.m{font-family:var(--math);font-style:italic}
-.wrap{max-width:1100px;margin:0 auto;padding:0 26px;position:relative;z-index:3}
+.m{font-family:var(--math,Georgia);font-style:italic}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px;position:relative;z-index:4}
+.narrow{max-width:720px;margin:0 auto}
 
-/* ---------- nav ---------- */
 header{position:sticky;top:0;z-index:70;background:rgba(2,3,4,.86);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
-header .row{max-width:1180px;margin:0 auto;padding:15px 26px;display:flex;align-items:center;gap:26px}
+header .row{max-width:1140px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:24px}
 .brand{display:flex;align-items:center;gap:10px;white-space:nowrap}
 .brand svg{width:21px;height:21px;flex:none}
-.brand b{font-family:var(--disp);font-size:13.5px;letter-spacing:.16em;color:var(--ink);font-weight:600}
-@media(max-width:520px){.brand b{font-size:11px;letter-spacing:.08em}}
-nav{margin-left:auto;display:flex;gap:26px;align-items:center}
-nav a.lnk{font-family:var(--sans);font-size:12.5px;font-weight:500;letter-spacing:.02em;color:var(--mut);position:relative;padding:4px 0}
+.brand b{font-family:var(--disp);font-size:13px;letter-spacing:.16em;color:var(--ink);font-weight:600}
+@media(max-width:520px){.brand b{font-size:10.5px;letter-spacing:.08em}}
+nav{margin-left:auto;display:flex;gap:24px;align-items:center}
+nav a.lnk{font-size:12.5px;font-weight:500;color:var(--mut);position:relative;padding:4px 0}
 nav a.lnk::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--acc);transition:right .25s}
 nav a.lnk:hover{color:var(--ink)}
 nav a.lnk:hover::after{right:0}
 @media(max-width:880px){nav a.lnk{display:none}}
 .btn-truth{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--ok);border:1px solid rgba(46,229,132,.4);border-radius:3px;padding:8px 14px}
 .btn-truth:hover{background:rgba(46,229,132,.06);color:var(--ok2)}
-#musicbtn{background:none;border:1px solid var(--line2);border-radius:3px;cursor:pointer;color:var(--mut);padding:7px 8px;display:flex}
-#musicbtn:hover{border-color:var(--acc);color:var(--acc)}
-#musicbtn.on{color:var(--acc);border-color:rgba(86,200,242,.5)}
-#musicbtn svg{width:14px;height:14px}
-#musicbtn .waves{opacity:0;transition:opacity .3s}
-#musicbtn.on .waves{opacity:1}
 
-/* ---------- hero ---------- */
-.hero{position:relative;z-index:3;min-height:86vh;display:flex;align-items:center}
-.hero .inner{max-width:1180px;margin:0 auto;padding:60px 26px 40px;width:100%}
-.kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;color:var(--acc);text-transform:uppercase;margin-bottom:26px}
-h1{font-family:var(--disp);font-size:clamp(38px,5.8vw,72px);font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1.05;max-width:17ch}
+/* hero — centered */
+.hero{position:relative;z-index:4;min-height:72vh;display:flex;align-items:center;text-align:center}
+.hero .inner{max-width:860px;margin:0 auto;padding:70px 24px 30px;width:100%}
+.kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;color:var(--acc);text-transform:uppercase;margin-bottom:24px}
+h1{font-family:var(--disp);font-size:clamp(36px,5.6vw,64px);font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1.07;margin:0 auto;max-width:18ch}
 h1 .g{color:var(--acc);text-shadow:0 0 44px rgba(86,200,242,.35)}
-.hero .sub{margin:30px 0 12px;max-width:37em;font-size:16px;color:var(--txt)}
+.hero .sub{margin:26px auto 34px;max-width:36em;font-size:15.5px;color:var(--txt)}
 .hero .sub b{color:var(--ink);font-weight:600}
-.psi{font-family:var(--math);font-style:italic;font-size:16px;color:var(--mut);margin:10px 0 36px}
-.psi .pu{color:var(--vio);font-style:normal}.psi .gg{color:var(--ok2);font-style:normal}
-.cta{display:flex;gap:12px;flex-wrap:wrap}
-.btn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:13px 24px;transition:all .2s}
-.btn.pri{color:#021016;background:var(--acc);font-weight:700}
-.btn.pri:hover{background:var(--acc2);transform:translateY(-1px)}
-.btn.sec{color:var(--txt);border:1px solid var(--line2);background:rgba(2,3,4,.5)}
-.btn.sec:hover{border-color:var(--acc);color:var(--acc2)}
-.worldcap{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--mut);text-align:center;z-index:3;background:rgba(2,3,4,.6);padding:5px 14px;border-radius:99px;border:1px solid var(--line)}
+.cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-radius:4px;padding:13px 24px;transition:all .2s;border:1px solid transparent}
+.btn.pri{color:#04121a;background:var(--acc);font-weight:700;box-shadow:0 0 22px rgba(86,200,242,.25)}
+.btn.pri:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 0 30px rgba(86,200,242,.4)}
+.btn.sec{color:var(--acc2);border-color:rgba(86,200,242,.35);background:rgba(86,200,242,.04)}
+.btn.sec:hover{border-color:var(--acc);background:rgba(86,200,242,.1)}
+.worldcap{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--mut);z-index:4;background:rgba(2,3,4,.6);padding:5px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
 .worldcap i{font-style:normal;color:var(--acc)}
 .worldcap b{font-weight:400;color:var(--ok)}
+@media(max-width:640px){.worldcap{display:none}}
 
-/* ---------- sections ---------- */
-section{padding:104px 0 10px;position:relative;z-index:3}
-.slab{font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--acc);text-transform:uppercase;margin-bottom:16px}
-h2{font-family:var(--disp);font-size:clamp(26px,3.6vw,40px);font-weight:700;color:var(--ink);letter-spacing:-.025em;line-height:1.12;margin-bottom:18px;max-width:24em}
+section{padding:96px 0 10px;position:relative;z-index:4}
+.slab{font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--acc);text-transform:uppercase;margin-bottom:14px;text-align:center}
+h2{font-family:var(--disp);font-size:clamp(25px,3.4vw,38px);font-weight:700;color:var(--ink);letter-spacing:-.025em;line-height:1.14;margin:0 auto 16px;max-width:24em;text-align:center}
 h2 .g{color:var(--acc)}
-.lede{color:var(--txt);max-width:740px;font-size:16px;margin-bottom:42px}
+.lede{color:var(--txt);max-width:640px;font-size:15.5px;margin:0 auto 42px;text-align:center}
 .lede b{color:var(--ink);font-weight:600}
-.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line2),transparent);margin-top:94px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line2),transparent);margin-top:90px}
 
-/* problem cards */
-.probs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-.prob{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:26px;transition:border-color .25s}
+/* ===== LEAN EDITOR (purple theme, real code) ===== */
+.edwrap{max-width:880px;margin:0 auto}
+.bdg{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:3px 10px;border-radius:99px;border:1px solid}
+.bdg.real{color:var(--ok2);border-color:rgba(46,229,132,.55);background:rgba(46,229,132,.07);
+  box-shadow:0 0 14px rgba(46,229,132,.15);text-shadow:0 0 8px rgba(46,229,132,.4)}
+.editor{position:relative;background:linear-gradient(180deg,#0f0a20,#08050f);border:1px solid #2a1f4a;border-radius:10px;overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 80px rgba(167,139,250,.1),inset 0 0 60px rgba(167,139,250,.02)}
+.editor::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;border-radius:10px;
+  box-shadow:inset 0 0 1px rgba(167,139,250,.4)}
+.edhead{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid #2a1f4a;
+  background:linear-gradient(90deg,rgba(30,20,54,.7),rgba(16,10,32,.5))}
+.eddots span{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.edtab{font-family:var(--mono);font-size:11px;color:var(--vio2);background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);padding:4px 12px;border-radius:4px}
+.edlean{margin-left:auto;font-family:var(--mono);font-size:9px;color:#7a6bab;letter-spacing:.12em}
+.edbody{display:flex;min-height:210px;position:relative}
+.codearea{min-height:210px}
+.edscan{position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:repeating-linear-gradient(180deg,rgba(167,139,250,.035) 0,rgba(167,139,250,.035) 1px,transparent 2px,transparent 4px)}
+@media(prefers-reduced-motion:no-preference){
+  .edscan::after{content:"";position:absolute;left:0;right:0;height:80px;
+    background:linear-gradient(180deg,transparent,rgba(167,139,250,.09),transparent);
+    animation:edsweep 5.5s linear infinite}
+  @keyframes edsweep{0%{top:-80px}100%{top:100%}}
+}
+.edcap{max-width:640px;margin:16px auto 0;text-align:center;font-size:12.5px;color:var(--mut);line-height:1.7}
+.edcap .mono{font-family:var(--mono);font-size:.9em;color:var(--vio2)}
+.gutter{padding:16px 0;text-align:right;user-select:none;background:rgba(12,8,24,.5);border-right:1px solid #1d1535;min-width:44px}
+.gutter div{font-family:var(--mono);font-size:12px;line-height:1.75;color:#4a3f6e;padding:0 12px}
+.codearea{padding:16px 18px;flex:1;overflow-x:auto}
+#code{font-family:var(--mono);font-size:12.5px;line-height:1.75;white-space:pre;color:#cfc6ec}
+#code .kw{color:#c9b8ff;font-weight:500}     /* keywords — violet */
+#code .ty{color:#8fd8f2}                      /* types — cyan */
+#code .cm{color:#5d5482;font-style:italic}    /* comments */
+#code .st{color:#9fe8b8}                      /* strings/attrs */
+#code .fn{color:#f0eaff;font-weight:500}      /* names */
+#code .op{color:#8d7fc0}
+#code .caret{display:inline-block;width:7px;height:14px;background:var(--vio2);vertical-align:-2px;animation:ckblink 1s steps(1) infinite}
+@media(prefers-reduced-motion:reduce){#code .caret{animation:none}}
+@keyframes ckblink{50%{opacity:0}}
+.edstatus{border-top:1px solid #241b3f;background:#080512;padding:12px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.9;min-height:92px}
+.edstatus .cmd{color:#7a6bab}
+.edstatus .oks{color:var(--ok2)}
+.edstatus .ax{color:#c9b8ff}
+.edstatus .dots::after{content:"";animation:edots 1.2s steps(4) infinite}
+@keyframes edots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+/* problems */
+.probs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:960px;margin:0 auto}
+.prob{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:24px;transition:border-color .25s;text-align:left}
 .prob:hover{border-color:rgba(86,200,242,.35)}
 .prob .no{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--acc)}
-.prob h3{font-family:var(--disp);color:var(--ink);font-size:17px;font-weight:600;margin:12px 0 8px}
+.prob h3{font-family:var(--disp);color:var(--ink);font-size:16.5px;font-weight:600;margin:11px 0 8px}
 .prob p{font-size:13.5px;color:var(--mut);line-height:1.75}
 .prob p b{color:var(--txt);font-weight:600}
 
-/* program cards */
-.swarm{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
-.agentcard{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:26px;transition:border-color .25s,transform .25s}
-.agentcard:hover{border-color:rgba(86,200,242,.35);transform:translateY(-3px)}
-.agentcard .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.agentcard .no{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--acc)}
-.agentcard .chip{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;color:var(--sim);border:1px solid rgba(224,162,63,.35);padding:2px 8px;border-radius:99px;white-space:nowrap}
-.agentcard h3{font-family:var(--disp);color:var(--ink);font-size:16.5px;font-weight:600;margin-bottom:3px}
-.agentcard .alias{font-family:var(--math);font-style:italic;color:var(--mut);font-size:13.5px;margin-bottom:12px}
-.agentcard p{font-size:13.5px;color:var(--mut);line-height:1.72;margin-bottom:8px}
-.agentcard p b{color:var(--txt);font-weight:600}
-.agentcard code{font-family:var(--mono);font-size:.84em;color:var(--acc2);background:rgba(86,200,242,.06);padding:1px 5px;border-radius:3px}
-.anchor{border-left:2px solid var(--acc);background:linear-gradient(90deg,rgba(86,200,242,.05),transparent 70%);padding:18px 26px;max-width:790px;margin:40px 0 0}
-.anchor p{font-size:14.5px;color:var(--txt)}
-.anchor p b{color:var(--acc2);font-weight:600}
-.anchor .fals{font-family:var(--mono);font-size:11px;color:var(--sim);margin-top:10px;letter-spacing:.04em}
+/* vision */
+.vision{max-width:720px;margin:0 auto;text-align:left;border-left:2px solid var(--vio);padding:18px 26px;
+  background:linear-gradient(90deg,rgba(167,139,250,.05),transparent 70%)}
+.vision p{font-size:15px;color:var(--txt);margin-bottom:12px}
+.vision p b{color:var(--vio2);font-weight:600}
+.vision .tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--sim)}
 
-/* sim */
-.simpanel{background:rgba(3,5,8,.94);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+/* sim terminal */
+.simpanel{background:rgba(3,5,8,.94);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:1040px;margin:0 auto}
 .simhead{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;opacity:.8}
 .simhead .ttl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--txt)}
@@ -130,17 +158,17 @@ h2 .g{color:var(--acc)}
 .simbtns button:hover{border-color:var(--acc);color:var(--acc2)}
 .simgrid{display:grid;grid-template-columns:1.5fr 1fr}
 @media(max-width:900px){.simgrid{grid-template-columns:1fr}}
-#term{height:380px;overflow-y:auto;padding:16px 18px;font-family:var(--mono);font-size:11.3px;line-height:1.9;background:#010203;border-right:1px solid var(--line)}
+#term{height:360px;overflow-y:auto;padding:15px 17px;font-family:var(--mono);font-size:11.3px;line-height:1.9;background:#010203;border-right:1px solid var(--line);text-align:left}
 #term .ln{white-space:pre-wrap;word-break:break-all}
 #term .in{color:var(--mut)} #term .ok{color:var(--ok2)} #term .er{color:var(--ros)}
-#term .wr{color:var(--sim)} #term .sy{color:var(--vio)} #term .cy{color:var(--acc2)}
-.simside{padding:18px 20px;display:flex;flex-direction:column;gap:13px}
+#term .wr{color:var(--sim)} #term .sy{color:var(--vio2)} #term .cy{color:var(--acc2)}
+.simside{padding:18px 20px;display:flex;flex-direction:column;gap:13px;text-align:left}
 .counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:1020px){.counters{grid-template-columns:1fr 1fr}}
 .cnt{background:var(--cardS);border:1px solid var(--line);border-radius:5px;padding:11px 13px;position:relative}
 .cnt .k{font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--mut);text-transform:uppercase}
 .cnt .v{font-family:var(--mono);font-size:21px;font-weight:700;margin-top:4px}
-.cnt .v.pu{color:var(--vio)} .cnt .v.em{color:var(--ok2)} .cnt .v.cy{color:var(--acc2)}
+.cnt .v.pu{color:var(--vio2)} .cnt .v.em{color:var(--ok2)} .cnt .v.cy{color:var(--acc2)}
 .cnt .simtag{position:absolute;top:6px;right:8px;font-family:var(--mono);font-size:7.5px;color:var(--sim)}
 .sliders{display:flex;flex-direction:column;gap:11px}
 .sl label{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
@@ -151,30 +179,15 @@ h2 .g{color:var(--acc)}
 .groundtruth p{font-size:11px;color:var(--mut);line-height:1.55}
 .groundtruth p b{color:var(--ok2)}
 
-/* constraints */
-.safe{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
-.scard{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:26px}
-.scard h3{font-family:var(--disp);color:var(--ink);font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-weight:600}
-.scard h3 svg{width:17px;height:17px;flex:none}
-.scard p{font-size:13.5px;color:var(--mut);margin-bottom:11px;line-height:1.72}
-.scard p b{color:var(--txt);font-weight:600}
-.scard .m{color:var(--txt)}
-pre.ax{background:#010203;border:1px solid var(--line);border-left:2px solid var(--ok);border-radius:4px;padding:12px 14px;font-family:var(--mono);font-size:10.5px;line-height:1.7;color:var(--txt);overflow-x:auto}
-pre.ax .ok{color:var(--ok2)} pre.ax .cm{color:var(--dim)}
-.ladder{display:flex;flex-direction:column-reverse;gap:6px;margin:13px 0 6px}
-.ladder .lv{border:1px solid var(--line2);border-radius:4px;padding:7px 12px;font-family:var(--mono);font-size:9.8px;color:var(--txt);display:flex;justify-content:space-between;gap:10px}
-.ladder .lv span{color:var(--mut)}
-.ladder .lv.hot{border-color:rgba(46,229,132,.4);color:var(--ok2)}
-
 /* ground truth */
-.statusbar{display:flex;flex-wrap:wrap;gap:20px;align-items:center;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:20px 26px}
+.statusbar{display:flex;flex-wrap:wrap;gap:18px;align-items:center;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:20px 26px;max-width:960px;margin:0 auto;text-align:left}
 .statusbar .item{font-family:var(--mono);font-size:11px;color:var(--mut)}
 .statusbar .item b{color:var(--ok2);font-size:16px;margin-right:6px}
-.statusbar .pledge{margin-left:auto;font-size:11.5px;color:var(--mut);max-width:430px;line-height:1.65}
-.found{font-size:11px;color:var(--dim);line-height:2.15;font-family:var(--mono);margin-top:30px}
+.statusbar .pledge{margin-left:auto;font-size:11.5px;color:var(--mut);max-width:400px;line-height:1.65}
+.found{font-size:11px;color:var(--dim);line-height:2.15;font-family:var(--mono);margin:30px auto 0;max-width:960px;text-align:left}
 .found b{color:var(--mut);font-weight:400}
 
-footer{border-top:1px solid var(--line);margin-top:90px;padding:32px 0 56px;position:relative;z-index:3;background:rgba(2,3,4,.75)}
+footer{border-top:1px solid var(--line);margin-top:90px;padding:32px 0 56px;position:relative;z-index:4;background:rgba(2,3,4,.75)}
 footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 .sig{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
 .sig b{color:var(--acc)}
@@ -183,8 +196,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 @media (prefers-reduced-motion: no-preference){
   .js .stag{opacity:0;transform:translateY(18px);animation:rise .9s cubic-bezier(.2,.7,.3,1) forwards}
-  .js .d1{animation-delay:.05s}.js .d2{animation-delay:.18s}.js .d3{animation-delay:.36s}
-  .js .d4{animation-delay:.52s}.js .d5{animation-delay:.68s}
+  .js .d1{animation-delay:.05s}.js .d2{animation-delay:.18s}.js .d3{animation-delay:.36s}.js .d4{animation-delay:.52s}
   @keyframes rise{to{opacity:1;transform:none}}
   h1 .g{animation:breathe 6.5s ease-in-out infinite}
   @keyframes breathe{0%,100%{text-shadow:0 0 44px rgba(86,200,242,.3)}50%{text-shadow:0 0 60px rgba(86,200,242,.55)}}
@@ -194,32 +206,26 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   @keyframes lfade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
   .cursorline::after{content:"▍";color:var(--acc);animation:blink 1.1s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
-  /* --- name glitch: channel-split slice bursts, subtle --- */
   .glitch{position:relative}
-  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;
+  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;right:0;top:0;
     font:inherit;letter-spacing:inherit;line-height:inherit;pointer-events:none;opacity:0}
   .glitch::before{color:var(--acc)}
   .glitch::after{color:var(--ros)}
   .js .glitch.zap::before{opacity:.7;animation:gl1 .38s steps(2,end) forwards}
   .js .glitch.zap::after{opacity:.7;animation:gl2 .38s steps(2,end) forwards}
   .js .glitch.zap{animation:glshake .38s steps(2,end)}
-  @keyframes gl1{0%{transform:translate(-7px,0);clip-path:inset(10% 0 66% 0)}
-    33%{transform:translate(5px,-2px);clip-path:inset(54% 0 22% 0)}
-    66%{transform:translate(-3px,1px);clip-path:inset(80% 0 4% 0)}
-    100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
-  @keyframes gl2{0%{transform:translate(6px,1px);clip-path:inset(62% 0 20% 0)}
-    33%{transform:translate(-6px,2px);clip-path:inset(6% 0 78% 0)}
-    66%{transform:translate(4px,-1px);clip-path:inset(36% 0 42% 0)}
-    100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
+  @keyframes gl1{0%{transform:translate(-7px,0);clip-path:inset(10% 0 66% 0)}33%{transform:translate(5px,-2px);clip-path:inset(54% 0 22% 0)}66%{transform:translate(-3px,1px);clip-path:inset(80% 0 4% 0)}100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
+  @keyframes gl2{0%{transform:translate(6px,1px);clip-path:inset(62% 0 20% 0)}33%{transform:translate(-6px,2px);clip-path:inset(6% 0 78% 0)}66%{transform:translate(4px,-1px);clip-path:inset(36% 0 42% 0)}100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
   @keyframes glshake{25%{transform:translate(2px,0)}55%{transform:translate(-2px,1px)}80%{transform:translate(1px,0)}}
 }
 </style>
 </head>
 <body>
 <canvas id="ca" aria-hidden="true"></canvas>
-<canvas id="boot" aria-hidden="true"></canvas>
+<canvas id="kg" aria-hidden="true"></canvas>
 <div id="fog" aria-hidden="true"></div>
 <div id="grain" aria-hidden="true"></div>
+<canvas id="boot" aria-hidden="true"></canvas>
 
 <header>
   <div class="row">
@@ -231,16 +237,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <b>SCHRÖDINGER'S CAT</b>
     </span>
     <nav>
+      <a class="lnk" href="#real">Code</a>
       <a class="lnk" href="#problem">Problem</a>
-      <a class="lnk" href="#program">Program</a>
+      <a class="lnk" href="#vision">Direction</a>
       <a class="lnk" href="#sim">Simulation</a>
-      <a class="lnk" href="#rules">Constraints</a>
-      <a class="btn-truth" href="#truth">GROUND TRUTH: 0</a>
-      <button id="musicbtn" aria-label="dark ambient — synthesized live in-browser, original, no recordings" title="ambient (generated live — original)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-          <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
-        </svg>
-      </button>
+      <a class="lnk" href="#truth">Ground&nbsp;truth</a>
     </nav>
   </div>
 </header>
@@ -250,128 +251,97 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   <div class="inner">
     <div class="kick stag d1">An independent research program · foundations of mathematics × AI</div>
     <h1 class="stag d2 glitch" id="mainTitle" data-text="Between RSI and ASI lies a missing mathematics.">Between RSI and ASI lies a <span class="g">missing mathematics</span>.</h1>
-    <p class="sub stag d3">Recursive self-improvement is real and unexplained: today's systems
-    generalize poorly, grade themselves on benchmarks they can game, and no theory predicts when the
-    loop compounds and when it stalls. We think the bridge is not engineering — it is
-    <b>new mathematical theory</b>, built where mathematics itself is rebuilt: univalent foundations,
-    higher toposes, constructive logic. Our instrument: a <b>swarm of LLM agents that propose
-    theories</b> — definitions, axioms, structures, not just lemmas — checked by intuitionistic proof
-    kernels, evolved against the one signal that cannot be gamed.</p>
-    <div class="psi stag d4">|ψ⟩ = α<span class="pu">|proved⟩</span> + β<span class="gg">|refuted⟩</span> — a constructive proof is the measurement</div>
-    <div class="cta stag d5">
-      <a class="btn pri" href="#problem">Why a new theory</a>
-      <a class="btn sec" href="#program">The program</a>
+    <p class="sub stag d3">Self-improving systems exist — and grade themselves on benchmarks they can
+    game. We are building the version whose substrate is <b>mathematical theory itself</b>: structures
+    proposed, connected, and grown, where every step must survive a constructive proof checker.
+    Below: <b>real Lean 4 code, really compiled</b> — and a living picture of the organism we intend.</p>
+    <div class="cta stag d4">
+      <a class="btn pri" href="#real">See the code</a>
+      <a class="btn sec" href="#problem">Why new mathematics</a>
     </div>
   </div>
-  <div class="worldcap">BACKGROUND: LIVE CELLULAR AUTOMATON · <i>lineages evolve, births splice genomes</i> · <b>green pulses = kernel events</b> · AMBIENT VISUAL, NOT DATA</div>
 </div>
 
-<!-- ================= 01 PROBLEM ================= -->
+<!-- ================= REAL LEAN ================= -->
+<section id="real"><div class="wrap rv">
+  <div class="slab">01 · The native language</div>
+  <div class="edwrap">
+    <div class="editor">
+      <div class="edhead">
+        <span class="eddots"><span style="background:#d16a8a"></span><span style="background:#e0a23f"></span><span style="background:#2ee584"></span></span>
+        <span class="edtab">Discovered.lean</span>
+        <span class="bdg real" title="This code really compiled with lake build on Lean 4.32.0.">✓ REAL · lake build</span>
+        <span class="edlean">LEAN 4.32.0</span>
+      </div>
+      <div class="edbody">
+        <div class="gutter" id="gutter"></div>
+        <div class="codearea"><div id="code"></div></div>
+        <div class="edscan" aria-hidden="true"></div>
+      </div>
+      <div class="edstatus" id="edstatus"></div>
+    </div>
+    <p class="edcap">Real theorems, really compiled — zero <span class="mono">sorry</span>, zero classical
+    axioms. The typing is presentational; the code and axiom footprints are verbatim from
+    <span class="mono">lake build</span>.</p>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ================= PROBLEM ================= -->
 <section id="problem"><div class="wrap rv">
-  <div class="slab">01 · The problem</div>
+  <div class="slab">02 · The problem</div>
   <h2>Self-improvement exists. A <span class="g">theory of it</span> does not.</h2>
-  <p class="lede">Three failures define the frontier — and all three are failures of missing
-  mathematics, not missing compute.</p>
+  <p class="lede">Three failures define the frontier — all three are failures of missing mathematics,
+  not missing compute.</p>
   <div class="probs">
     <div class="prob"><div class="no">P1 — GENERALIZATION</div>
       <h3>Learning does not transfer</h3>
-      <p>Systems that master a distribution collapse outside it. There is no accepted mathematical
-      account of <b>when capability generalizes</b> — the field measures generalization with the same
-      benchmarks it trains against. A foundation that made "concept" and "transfer" into
-      mathematical objects would turn an empirical mystery into a provable property.</p></div>
+      <p>Systems that master a distribution collapse outside it — and the field measures generalization
+      with the same benchmarks it trains against. A foundation that made <b>"concept" and "transfer"
+      into mathematical objects</b> would turn an empirical mystery into a provable property.</p></div>
     <div class="prob"><div class="no">P2 — UNVERIFIED RSI</div>
       <h3>The loop grades itself</h3>
-      <p>The only self-improving systems that run validate their own rewrites empirically — the
-      judge is a score the contestant can optimize against. Co-evolving evaluators sharpen the
-      pressure but inherit the drift. <b>Improvement without an ungameable referee is a claim,
-      not a fact.</b></p></div>
+      <p>The self-improving systems that run today validate their own rewrites empirically — the judge
+      is a score the contestant can optimize against. <b>Improvement without an ungameable referee is
+      a claim, not a fact.</b> A proof kernel is the one referee that cannot be gamed.</p></div>
     <div class="prob"><div class="no">P3 — THE GAP ITSELF</div>
-      <h3>RSI→ASI has no theory</h3>
-      <p>The best available survey of the road to superintelligence names recursive improvement as a
-      pathway and admits its dynamics are <b>poorly understood — no precedent, no scaling law</b>.
-      Whether the loop compounds, saturates, or oscillates is exactly the kind of question only a
-      mathematical theory answers. Nobody has one.</p></div>
+      <h3>RSI → ASI has no theory</h3>
+      <p>The best surveys of the road to superintelligence name recursive improvement as a pathway and
+      admit its dynamics are poorly understood — <b>no precedent, no scaling law</b>. Whether the loop
+      compounds, saturates or oscillates is exactly the kind of question only mathematics answers.</p></div>
   </div>
 </div></section>
 
 <div class="divider"></div>
 
-<!-- ================= 02 PROGRAM ================= -->
-<section id="program"><div class="wrap rv">
-  <div class="slab">02 · The program</div>
-  <h2>A swarm that proposes <span class="g">theories</span> — judged constructively.</h2>
-  <p class="lede">Not a theorem factory. The unit of output is a <b>theory</b>: definitions, axioms,
-  structures in the landscape where foundations are actively being rebuilt — homotopy type theory and
-  univalent foundations, <span class="m">∞</span>-toposes, synthetic and modal approaches. Machine
-  verification is one organ among five, deliberately small: the kernel says <i>sound</i>, never
-  <i>interesting</i>. Status of every organ: design. This page simulates the assembly and says so.</p>
-
-  <div class="swarm">
-    <div class="agentcard">
-      <div class="head"><span class="no">ORGAN 1 · PROPOSAL</span><span class="chip">DESIGN</span></div>
-      <h3>Theory Proposers T₁…Tₙ</h3>
-      <div class="alias">LLM agents over the foundations landscape</div>
-      <p>Each agent drafts candidate <b>structures</b> — a new modality, a descent condition, a
-      universe principle, an invariant — stated in the internal language of univalent foundations.
-      Agents share a blackboard of definitions, counterexamples and failed axioms; communication is
-      the medium of the search.</p>
-    </div>
-    <div class="agentcard">
-      <div class="head"><span class="no">ORGAN 2 · REPRODUCTION</span><span class="chip">DESIGN</span></div>
-      <h3>Splice Engine</h3>
-      <div class="alias">selection · crossover · mutation</div>
-      <p>Fitness is <b>verified consequence per unit compute</b>: a proposed theory earns fitness when
-      its definitions support machine-checked, constructive results downstream. Top genomes recombine;
-      an archive keeps stepping stones alive for re-branching.</p>
-    </div>
-    <div class="agentcard">
-      <div class="head"><span class="no">ORGAN 3 · JUDGMENT</span><span class="chip">DESIGN</span></div>
-      <h3>Dynamic Evaluators E₁…Eₘ</h3>
-      <div class="alias">the Red Queen, anchored</div>
-      <p>Evaluators triage: which proposals deserve formalization compute, which smell inconsistent,
-      which are re-inventions. They co-evolve with the proposers — and cannot drift, because their own
-      fitness is <b>calibration against eventual kernel verdicts</b>. A judge that departs from ground
-      truth is culled.</p>
-    </div>
-    <div class="agentcard">
-      <div class="head"><span class="no">ORGAN 4 · MEASUREMENT</span><span class="chip">DESIGN</span></div>
-      <h3>Intuitionistic Verification</h3>
-      <div class="alias">small, fixed, final</div>
-      <p>Constructive proof kernels — cubical type checkers for the HoTT-native fragment, Lean 4 for
-      classical-free elementary results — collapse |ψ⟩. This organ is deliberately the <b>smallest</b>:
-      it never proposes, never ranks, never evolves. It only answers. Every acceptance ships its axiom
-      footprint; nothing non-constructive passes.</p>
-    </div>
-    <div class="agentcard">
-      <div class="head"><span class="no">ORGAN 5 · MISSION</span><span class="chip">DESIGN</span></div>
-      <h3>The Quest</h3>
-      <div class="alias">a theory for the gap</div>
-      <p>The swarm is aimed at the mathematics the gap is missing: a compositional account of
-      generalization; reflection and bounded self-trust; strength that grows along measurable
-      ordinals; invariants that predict when an improvement loop compounds. <b>New foundations as
-      instrument — the RSI→ASI gap as target.</b></p>
-    </div>
-  </div>
-
-  <div class="anchor">
-    <p><b>The loop gain:</b> every verified consequence enriches the blackboard every proposer and
-    evaluator searches; better triage buys more verified consequences per epoch. <b>Metric —
-    reach:</b> results per epoch that were unreachable under the previous library and are
-    machine-checked under the current one. Computed from kernel logs, nothing else.</p>
-    <p class="fals">FALSIFIER — if reach flatlines at 0 across epochs, the swarm is dead, and this page will say so.</p>
+<!-- ================= VISION ================= -->
+<section id="vision"><div class="wrap rv">
+  <div class="slab">03 · The direction</div>
+  <h2>Evolve the <span class="g">theory</span>, not the weights.</h2>
+  <p class="lede">One idea drives this program — stated as a research direction, not a product claim.</p>
+  <div class="vision">
+    <p><b>The unit of evolution is a mathematical theory</b> — its definitions and axioms — not a
+    parameter vector. New structures are proposed in the landscape where foundations are actively
+    rebuilt (univalent foundations, higher structures); <b>bridges between theories</b> — the maps that
+    carry proofs from one world into another — are both the evolutionary operator and the measure of
+    depth: a theory that connects widely is a theory that matters.</p>
+    <p><b>Fitness is verified consequence:</b> a structure earns its place when machine-checked results
+    flow from it — counted from kernel logs, nothing else. The knowledge base itself is the organism:
+    theories are its cells, verified bridges its tissue, and every compile event — like the green
+    pulses on this page — is a heartbeat.</p>
+    <p class="tag">STATUS: RESEARCH DIRECTION — DELIBERATELY EARLY · NOTHING HERE IS CLAIMED AS BUILT</p>
   </div>
 </div></section>
 
 <div class="divider"></div>
 
-<!-- ================= 03 SIMULATION ================= -->
+<!-- ================= SIMULATION ================= -->
 <section id="sim"><div class="wrap rv">
-  <div class="slab">03 · Swarm simulation</div>
+  <div class="slab">04 · Target-loop simulation</div>
   <h2>One epoch, end to end — <span class="g">labeled</span> as what it is.</h2>
-  <p class="lede">Proposals, triage, splice events, kernel verdicts, selection.
-  <b>Synthetic telemetry — no backend.</b> Amber marks simulation; the green panel is the only real
-  number on this page.</p>
-
+  <p class="lede">Proposals, triage, kernel verdicts, selection. <b>Synthetic telemetry — no
+  backend.</b> Amber marks simulation; the green panel is the only real number in this section.</p>
   <div class="simpanel">
     <div class="simhead">
       <span class="dots"><span style="background:#d16a8a"></span><span style="background:#e0a23f"></span><span style="background:#2ee584"></span></span>
@@ -384,7 +354,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <div class="simside">
         <div class="counters">
           <div class="cnt"><span class="simtag">SIM</span><div class="k">Population · epoch</div><div class="v cy" id="c_pop">24 · e9</div></div>
-          <div class="cnt"><span class="simtag">SIM</span><div class="k">Open proposals |ψ⟩</div><div class="v pu" id="c_psi">142</div></div>
+          <div class="cnt"><span class="simtag">SIM</span><div class="k">Open proposals</div><div class="v pu" id="c_psi">142</div></div>
           <div class="cnt"><span class="simtag">SIM</span><div class="k">Verified results</div><div class="v em" id="c_thm">4,892</div></div>
         </div>
         <div class="sliders">
@@ -399,8 +369,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
         </div>
         <div class="groundtruth">
           <span class="z">0</span>
-          <p><b>GROUND TRUTH — REAL.</b> Results verified by the actual engine. Wired to kernel logs,
-          not to this simulation; moves only when a real constructive proof is accepted.</p>
+          <p><b>GROUND TRUTH — REAL.</b> Results discovered by the actual engine: zero. Wired to kernel
+          logs, not to this simulation.</p>
         </div>
       </div>
     </div>
@@ -409,74 +379,31 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <div class="divider"></div>
 
-<!-- ================= 04 CONSTRAINTS ================= -->
-<section id="rules"><div class="wrap rv">
-  <div class="slab">04 · Constraints</div>
-  <h2>Everything evolves except the <span class="g">referee</span>.</h2>
-  <p class="lede">Two invariants, held by construction — the reason this program's claims can be
-  strict where the field's are statistical.</p>
-  <div class="safe">
-    <div class="scard">
-      <h3><svg viewBox="0 0 24 24" fill="none" stroke="#56c8f2" stroke-width="1.7"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>
-        Löb invariance — why the referee is frozen</h3>
-      <p>Blanket self-trust is inconsistent, not merely hard: <span class="m">T ⊢ □⌜φ⌝→φ</span>
-      forces <span class="m">T ⊢ φ</span> (Löb 1955; Gödel II is the <span class="m">φ=⊥</span>
-      corollary). So the verification organ is excluded from evolution <b>by theorem, not by
-      taste</b> — evaluators may sharpen forever; their verdicts stay provisional next to the
-      kernel's.</p>
-      <div class="ladder">
-        <div class="lv hot">L0 · swarm output — theories, proofs, genomes <span>judged at L1</span></div>
-        <div class="lv hot">L1 · constructive kernels <span>fixed · external · non-evolving</span></div>
-        <div class="lv">L2 · kernel soundness <span>assumed — stated, never claimed proved</span></div>
-      </div>
-      <p style="margin-top:10px">A lineage that installs a false result is structurally unreachable:
-      everything enters through the gate or not at all.</p>
-    </div>
-    <div class="scard">
-      <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2ee584" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg>
-        Intuitionistic by construction</h3>
-      <p>The native logic of the foundations we build on is constructive — a proof is an object, not
-      a double negation. The audit gate enforces it: every acceptance ships its axiom footprint,
-      and anything classical is rejected, logged, and returned as selection pressure.</p>
-      <pre class="ax"><span class="cm">-- audit gate, run on every accepted result</span>
-#print axioms SC.result_00000
-<span class="ok">⊢ [propext, Quot.sound]   -- constructive ✓ admitted</span>
-<span class="cm">-- Classical.choice present → discarded, logged,</span>
-<span class="cm">-- lineage fitness debited</span></pre>
-      <p style="margin-top:12px">Failures are first-class output. And scope, stated plainly:
-      <b>nothing here has run yet</b> — no theory proposed, no result verified, no epoch of real
-      evolution. The counters below are the only claim.</p>
-    </div>
-  </div>
-</div></section>
-
-<div class="divider"></div>
-
-<!-- ================= 05 GROUND TRUTH ================= -->
+<!-- ================= GROUND TRUTH ================= -->
 <section id="truth"><div class="wrap rv">
   <div class="slab">05 · Ground truth</div>
   <h2>Real counters, wired to <span class="g">kernel logs</span>.</h2>
   <div class="statusbar">
-    <span class="item"><b>0</b> theories proposed by the running engine</span>
-    <span class="item"><b>0</b> results constructively verified</span>
+    <span class="item"><b>0</b> theorems discovered by the engine</span>
+    <span class="item"><b>3</b> theorems compiled ✓ (the §01 editor — real lake build)</span>
     <span class="item"><b>0</b> epochs of real evolution</span>
-    <span class="item"><b>✓</b> toolchain pinned · scaffold compiles</span>
-    <span class="pledge">Status 2026-07-13. Everything above that moves is simulation and says so.
-    When these numbers move, the sources, kernel logs and genome archives that moved them will be
-    published beside them — the only counters this program will ever ask you to believe.</span>
+    <span class="item"><b>✓</b> Lean 4.32.0 pinned</span>
+    <span class="pledge">Status 2026-07-14. The §01 editor shows real, compiled code in the format the
+    engine is meant to emit. Discovery counters stay at zero until the loop itself produces a result,
+    and every number that ever moves will be published beside the kernel log that moved it.</span>
   </div>
   <p class="found"><b>Foundations (primary sources):</b> Gödel 1931 · Löb 1955 (JSL 20) · Turing 1939 (Proc. LMS) ·
   Feferman 1962 &amp; Feferman–Spector 1962 (JSL 27) · Kleene 1952 · Blum 1967/1971 (JACM 14/18) ·
-  Lambek–Scott 1986 · Schmidhuber 2003 (cs/0309048) · Lurie, Higher Topos Theory (2009) ·
-  The Univalent Foundations Program, HoTT (2013, arXiv:1308.0729) · Yudkowsky–Herreshoff 2013 (MIRI) ·
+  Lambek–Scott 1986 · Hutter, Universal AI (2005); Legg–Hutter 2007 · Schmidhuber 2003 (cs/0309048) ·
+  Lurie, Higher Topos Theory (2009) · Univalent Foundations Program, HoTT (2013) · Yudkowsky–Herreshoff 2013 (MIRI) ·
   Davis–Myreen 2015 (JAR) · Pakhomov–Walsh 2021 (JSL 86) · de Moura–Ullrich 2021 (CADE-28) ·
   Zhang et al. 2025 (arXiv:2505.22954) · Genewein et al. 2026 (arXiv:2606.12683) ·
-  Iacob et al. 2026, Red Queen Gödel Machine (arXiv:2606.26294) · arXiv:2607.04277.</p>
+  Iacob et al. 2026 (arXiv:2606.26294) · arXiv:2607.04277.</p>
 </div></section>
 
 <footer><div class="wrap">
   <span class="sig">AUTHOR: <b>SCHRÖDINGER'S CAT</b></span>
-  <span class="sig" style="margin-left:auto">SIMULATION LABELED · GROUND TRUTH WIRED · © 2026</span>
+  <span class="sig" style="margin-left:auto">REAL CODE SHOWN · SIMULATION LABELED · ZEROS HONEST · © 2026</span>
 </div></footer>
 
 <script>
@@ -490,11 +417,11 @@ if(!reduce && 'IntersectionObserver' in window){
   document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
 }else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('on');});}
 
-/* ============================================================
-   CA WORLD — professional palette, age-graded luminance, trails
-   ============================================================ */
+/* ============ CA WORLD ============ */
 var ca=document.getElementById('ca'), cxa=ca.getContext('2d');
 var CELL=9, gw,gh, grid,hue,age, buf,hbuf,abuf;
+var LINEAGES=[197,172,258,38];
+var bloomSeed=!reduce;
 function caSize(){
   gw=Math.ceil(innerWidth/CELL); gh=Math.ceil(innerHeight/CELL);
   ca.width=gw; ca.height=gh;
@@ -504,20 +431,17 @@ function caSize(){
   cxa.fillStyle='#020304'; cxa.fillRect(0,0,gw,gh);
   seed();
 }
-/* restrained lineage palette: cold cyan, teal, slate-violet, rare amber */
-var LINEAGES=[197,172,258,38];
-var bloom=!reduce; /* first seed blooms from a dense central disk and spreads */
 function seed(){
   var i;
-  if(!bloom){
+  if(!bloomSeed){
     for(i=0;i<gw*gh;i++){
       if(Math.random()<.11){grid[i]=1;hue[i]=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];age[i]=0;}
       else grid[i]=0;
     }
     return;
   }
-  bloom=false;
-  var cx0=gw/2, cy0=gh*.42, r0=Math.max(7,Math.min(gw,gh)*.17);
+  bloomSeed=false;
+  var cx0=gw/2, cy0=gh*.4, r0=Math.max(7,Math.min(gw,gh)*.17);
   for(i=0;i<gw*gh;i++)grid[i]=0;
   for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
     var d=Math.hypot(x-cx0,y-cy0);
@@ -525,7 +449,6 @@ function seed(){
       hue[i]=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];age[i]=0;}
   }
 }
-var fastUntil=0; /* bloom phase: faster CA steps right after reveal */
 function patch(){
   var x0=Math.floor(Math.random()*(gw-8)), y0=Math.floor(Math.random()*(gh-8));
   var h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
@@ -535,39 +458,34 @@ function patch(){
 var flashes=[],pulses=[];
 function caStep(){
   var births=0;
-  for(var y=0;y<gh;y++){
-    for(var x=0;x<gw;x++){
-      var i=y*gw+x, n=0, hs=[], h;
-      for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
-        if(!dx&&!dy)continue;
-        var j=((y+dy+gh)%gh)*gw+((x+dx+gw)%gw);
-        if(grid[j]){n++;hs.push(hue[j]);}
-      }
-      if(grid[i]){buf[i]=(n===2||n===3)?1:0;hbuf[i]=hue[i];abuf[i]=Math.min(250,age[i]+1);}
-      else if(n===3){
-        buf[i]=1;births++;abuf[i]=0;
-        if(hs[0]===hs[1]||hs[0]===hs[2])h=hs[0];
-        else if(hs[1]===hs[2])h=hs[1];
-        else{h=hs[Math.floor(Math.random()*3)];
-          if(flashes.length<20)flashes.push({x:x,y:y,t:1});}
-        if(Math.random()<.06)h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
-        hbuf[i]=h;
-      } else buf[i]=0;
+  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
+    var i=y*gw+x, n=0, hs=[], h;
+    for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
+      if(!dx&&!dy)continue;
+      var j=((y+dy+gh)%gh)*gw+((x+dx+gw)%gw);
+      if(grid[j]){n++;hs.push(hue[j]);}
     }
+    if(grid[i]){buf[i]=(n===2||n===3)?1:0;hbuf[i]=hue[i];abuf[i]=Math.min(250,age[i]+1);}
+    else if(n===3){
+      buf[i]=1;births++;abuf[i]=0;
+      if(hs[0]===hs[1]||hs[0]===hs[2])h=hs[0];
+      else if(hs[1]===hs[2])h=hs[1];
+      else{h=hs[Math.floor(Math.random()*3)];
+        if(flashes.length<20)flashes.push({x:x,y:y,t:1});}
+      if(Math.random()<.06)h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
+      hbuf[i]=h;
+    } else buf[i]=0;
   }
   var t=grid;grid=buf;buf=t; t=hue;hue=hbuf;hbuf=t; t=age;age=abuf;abuf=t;
   if(births<gw*gh*.004) patch();
 }
 function caDraw(){
-  /* persistence: fade instead of clear → soft trails */
   cxa.fillStyle='rgba(2,3,4,.28)'; cxa.fillRect(0,0,gw,gh);
   for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
     var i=y*gw+x;
     if(grid[i]){
       var a=age[i];
-      /* young cells bright, mature cells settle dim — reads as organic tissue */
-      var L = a<3 ? 62 : a<10 ? 48 : 36;
-      var A = a<3 ? .5  : a<10 ? .34 : .22;
+      var L=a<3?62:a<10?48:36, A=a<3?.5:a<10?.34:.22;
       cxa.fillStyle='hsla('+hue[i]+',42%,'+L+'%,'+A+')';
       cxa.fillRect(x,y,1,1);
     }
@@ -575,13 +493,13 @@ function caDraw(){
   flashes.forEach(function(f){cxa.fillStyle='hsla(200,30%,95%,'+(f.t*.7)+')';cxa.fillRect(f.x-1,f.y-1,3,3);f.t-=.1;});
   flashes=flashes.filter(function(f){return f.t>0});
   pulses.forEach(function(p){
-    cxa.strokeStyle='hsla(150,80%,58%,'+(p.t*.6)+')';cxa.lineWidth=.7;
-    cxa.beginPath();cxa.arc(p.x,p.y,(1-p.t)*15+2,0,6.283);cxa.stroke();p.t-=.028;});
+    cxa.strokeStyle='hsla(150,80%,58%,'+(p.t*.65)+')';cxa.lineWidth=.8;
+    cxa.beginPath();cxa.arc(p.x,p.y,(1-p.t)*18+2,0,6.283);cxa.stroke();p.t-=.024;});
   pulses=pulses.filter(function(p){return p.t>0});
 }
-function kernelPulse(){ if(!reduce) pulses.push({x:Math.random()*gw,y:Math.random()*gh,t:1}); }
+var fastUntil=0;
 caSize(); addEventListener('resize',caSize);
-if(reduce){ caStep(); cxa.fillStyle='#020304';cxa.fillRect(0,0,gw,gh); caDraw(); }
+if(reduce){ caStep(); caDraw(); }
 else{
   var last=0;
   (function loop(ts){
@@ -592,10 +510,156 @@ else{
   })(0);
 }
 
-/* ============================================================
-   INTRO — Bayer-dithered checker reveal + name glitch bursts.
-   Starts on first visibility; overlay covers until then.
-   ============================================================ */
+/* ============ THEORY GRAPH (subtle, lit by real compile events) ============ */
+var kg=document.getElementById('kg'), kx=kg.getContext('2d');
+var KW,KH,knodes=[],kedges=[];
+var KNAMES=['Nat.Arith','Parity','ModArith','SumIdent','Induction','Order','Lattice','GroupCore','Univalent.Frag','Descent','Modality','Ordinal'];
+function kgSize(){
+  KW=kg.width=innerWidth; KH=kg.height=innerHeight;
+  knodes=KNAMES.map(function(n,i){
+    var col=i%4, row=Math.floor(i/4);
+    return {n:n,
+      x:KW*(.12+col*.25)+(Math.random()*60-30),
+      y:KH*(.2+row*.28)+(Math.random()*50-25),
+      ph:Math.random()*6.28, lit:0};
+  });
+  kedges=[];
+  knodes.forEach(function(a,i){
+    var ds=knodes.map(function(b,j){return{j:j,d:Math.hypot(a.x-b.x,a.y-b.y)}})
+      .filter(function(o){return o.j!==i}).sort(function(u,v){return u.d-v.d});
+    for(var k=0;k<2;k++){var e=[Math.min(i,ds[k].j),Math.max(i,ds[k].j)];
+      if(!kedges.some(function(x){return x[0]===e[0]&&x[1]===e[1]}))kedges.push(e);}
+  });
+}
+kgSize(); addEventListener('resize',kgSize);
+var KT=0;
+function kgDraw(){
+  KT+=.016;
+  kx.clearRect(0,0,KW,KH);
+  kx.font='9px "JetBrains Mono",monospace';
+  kedges.forEach(function(e){
+    var a=knodes[e[0]],b=knodes[e[1]];
+    var hot=Math.max(a.lit,b.lit);
+    kx.strokeStyle='rgba(86,200,242,'+(.05+hot*.25)+')';
+    kx.lineWidth=hot>0?1.2:.7;
+    kx.beginPath();kx.moveTo(a.x,a.y);kx.lineTo(b.x,b.y);kx.stroke();
+  });
+  knodes.forEach(function(n){
+    if(!reduce){n.x+=Math.sin(KT*.3+n.ph)*.08;n.y+=Math.cos(KT*.23+n.ph)*.06;}
+    if(n.lit>0){
+      kx.strokeStyle='rgba(46,229,132,'+(n.lit*.7)+')';kx.lineWidth=1.2;
+      kx.beginPath();kx.arc(n.x,n.y,(1-n.lit)*26+4,0,6.283);kx.stroke();
+      kx.fillStyle='rgba(143,255,196,'+(.5+n.lit*.5)+')';
+      n.lit-=.012;
+    } else {
+      kx.fillStyle='rgba(86,200,242,.4)';
+    }
+    kx.beginPath();kx.arc(n.x,n.y,2.2,0,6.283);kx.fill();
+    kx.fillStyle=n.lit>0?'rgba(143,255,196,'+(.35+n.lit*.5)+')':'rgba(107,118,131,.3)';
+    kx.fillText(n.n,n.x+7,n.y+3);
+  });
+  if(!reduce)requestAnimationFrame(kgDraw);
+}
+if(reduce){kgDraw();}else{requestAnimationFrame(kgDraw);}
+
+/* the organism reacts: real compile event → graph node lights + CA pulse */
+function kernelEvent(){
+  if(reduce)return;
+  var n=knodes[Math.floor(Math.random()*knodes.length)];
+  n.lit=1;
+  pulses.push({x:(n.x/innerWidth)*gw,y:(n.y/innerHeight)*gh,t:1});
+}
+
+/* ============ LEAN EDITOR — REAL CODE, REAL BUILD OUTPUT ============ */
+/* Source: lean/Discovered.lean · verified 2026-07-14:
+   "Build completed successfully (3 jobs)."  Axiom footprints below are
+   copied verbatim from the lake build log. Typing is presentational. */
+var THEOREMS=[
+ {lines:[
+  [['cm',"/-- Sum of the first `n` odd numbers. -/"]],
+  [['kw','def'],['fn',' sumOdds'],['op',' : '],['ty','Nat'],['op',' → '],['ty','Nat']],
+  [['op','  | '],['st','0'],['op','     => '],['st','0']],
+  [['op','  | '],['fn','n'],['op',' + '],['st','1'],['op',' => '],['fn','sumOdds n'],['op',' + ('],['st','2'],['op',' * '],['fn','n'],['op',' + '],['st','1'],['op',')']],
+  [],
+  [['cm',"/-- The sum of the first `n` odd numbers is `n²`. -/"]],
+  [['kw','theorem'],['fn',' sumOdds_eq_sq'],['op',' (n : '],['ty','Nat'],['op',') : '],['fn','sumOdds n = n * n'],['op',' := '],['kw','by']],
+  [['kw','  induction'],['fn',' n '],['kw','with']],
+  [['op','  | '],['fn','zero'],['op',' => '],['kw','rfl']],
+  [['op','  | '],['fn','succ k ih'],['op',' => '],['kw','simp'],['op',' ['],['fn','sumOdds, ih, Nat.succ_mul, Nat.mul_succ'],['op','] ; '],['kw','omega']]
+ ],
+ ax:"#print axioms sumOdds_eq_sq → [propext, Quot.sound]  — constructive ✓"},
+ {lines:[
+  [['cm',"/-- 2¹⁰ ≡ 1 (mod 11) — an instance of Fermat's little theorem. -/"]],
+  [['kw','theorem'],['fn',' two_pow_ten_mod_eleven'],['op',' : '],['st','2'],['op',' ^ '],['st','10'],['op',' % '],['st','11'],['op',' = '],['st','1'],['op',' := '],['kw','by decide']]
+ ],
+ ax:"#print axioms two_pow_ten_mod_eleven → depends on NO axioms — pure kernel computation ✓"},
+ {lines:[
+  [['cm',"/-- The product of two consecutive naturals is even. -/"]],
+  [['kw','theorem'],['fn',' even_consec_prod'],['op',' (n : '],['ty','Nat'],['op',') : '],['fn','n * (n + 1) % 2 = 0'],['op',' := '],['kw','by']],
+  [['kw','  rw'],['op',' ['],['fn','Nat.mul_mod'],['op',']']],
+  [['kw','  have'],['fn',' h'],['op',' : '],['fn','n % 2 = 0 ∨ n % 2 = 1'],['op',' := '],['kw','by omega']],
+  [['kw','  cases'],['fn',' h '],['kw','with']],
+  [['op','  | '],['fn','inl h0'],['op',' => '],['kw','simp'],['op',' ['],['fn','h0'],['op',']']],
+  [['op','  | '],['fn','inr h1'],['op',' => '],['kw','have'],['fn',' h2'],['op',' : '],['fn','(n+1) % 2 = 0'],['op',' := '],['kw','by omega'],['op','; '],['kw','simp'],['op',' ['],['fn','h1, h2'],['op',']']]
+ ],
+ ax:"#print axioms even_consec_prod → [propext, Quot.sound]  — constructive ✓"}
+];
+var codeEl=document.getElementById('code'), gutEl=document.getElementById('gutter'), stEl=document.getElementById('edstatus');
+function esc2(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function renderCode(lines,partialLine,partialChars,caret){
+  var html='',ln=0,gut='';
+  for(var li=0;li<lines.length;li++){
+    ln++; gut+='<div>'+ln+'</div>';
+    var line=lines[li], full=(li<partialLine);
+    if(li>partialLine)break;
+    var out='';
+    if(full){ line.forEach(function(tk){out+='<span class="'+tk[0]+'">'+esc2(tk[1])+'</span>';}); }
+    else{
+      var left=partialChars;
+      for(var t=0;t<line.length&&left>0;t++){
+        var txt=line[t][1], take=Math.min(left,txt.length);
+        out+='<span class="'+line[t][0]+'">'+esc2(txt.slice(0,take))+'</span>';
+        left-=take;
+      }
+      if(caret)out+='<span class="caret"></span>';
+    }
+    html+=out+'\n';
+  }
+  codeEl.innerHTML=html; gutEl.innerHTML=gut;
+}
+function lineLen(line){return line.reduce(function(s,t){return s+t[1].length},0);}
+var ti=0;
+function playTheorem(){
+  var th=THEOREMS[ti%THEOREMS.length]; ti++;
+  var li=0, ch=0;
+  stEl.innerHTML='';
+  if(reduce){ /* static: show full code + real result at once */
+    renderCode(th.lines, th.lines.length, 0, false);
+    stEl.innerHTML='<div class="cmd">$ lake build</div><div class="oks">✓ Build completed successfully (3 jobs).</div><div class="ax">'+esc2(th.ax)+'</div>';
+    return;
+  }
+  (function typeStep(){
+    if(li>=th.lines.length){
+      stEl.innerHTML='<div class="cmd">$ lake build<span class="dots"></span></div>';
+      setTimeout(function(){
+        stEl.innerHTML='<div class="cmd">$ lake build</div>'+
+          '<div class="oks">✓ Build completed successfully (3 jobs).</div>'+
+          '<div class="ax">'+esc2(th.ax)+'</div>';
+        kernelEvent();
+        setTimeout(playTheorem, 5200);
+      }, 1300);
+      return;
+    }
+    var L=th.lines[li], len=lineLen(L);
+    if(ch>=len){ li++; ch=0; renderCode(th.lines,li,0,li<th.lines.length); setTimeout(typeStep, 60); return; }
+    ch+=1+(Math.random()<.3?1:0);
+    renderCode(th.lines,li,ch,true);
+    setTimeout(typeStep, 14+Math.random()*36);
+  })();
+}
+playTheorem();
+
+/* ============ INTRO — dither reveal + one glitch ============ */
 var boot=document.getElementById('boot');
 if(reduce){ boot.remove(); }
 else{(function(){
@@ -606,13 +670,12 @@ else{(function(){
     boot.width=bw; boot.height=bh;
     boot.style.width=bw*CELL+'px'; boot.style.height=bh*CELL+'px';
   }
-  function paint(p){ /* p: 0 = full cover, 1 = gone; dithered iris from title */
+  function paint(p){
     bcx.clearRect(0,0,bw,bh);
-    var cx0=bw/2, cy0=bh*.42, maxd=Math.hypot(Math.max(cx0,bw-cx0),Math.max(cy0,bh-cy0));
+    var cx0=bw/2, cy0=bh*.4, maxd=Math.hypot(Math.max(cx0,bw-cx0),Math.max(cy0,bh-cy0));
     for(var y=0;y<bh;y++)for(var x=0;x<bw;x++){
-      var d=Math.hypot(x-cx0,y-cy0)/maxd;
-      var t=BAYER[y%4][x%4]/16;
-      if(d + t*.22 > p*1.25){
+      var d=Math.hypot(x-cx0,y-cy0)/maxd, t=BAYER[y%4][x%4]/16;
+      if(d+t*.22>p*1.25){
         bcx.fillStyle=((x+y)%2)?'#04060a':'#020304';
         if(((x*7+y*13)%149)===0)bcx.fillStyle='#0a2836';
         bcx.fillRect(x,y,1,1);
@@ -622,10 +685,8 @@ else{(function(){
   bootSize(); paint(0);
   addEventListener('resize',function(){if(boot.parentNode){bootSize();paint(0);}});
   var h1=document.getElementById('mainTitle');
-  function burst(){ if(!h1)return;
-    h1.classList.remove('zap'); void h1.offsetWidth; h1.classList.add('zap');
-    setTimeout(function(){h1.classList.remove('zap');},420);
-  }
+  function burst(){h1.classList.remove('zap');void h1.offsetWidth;h1.classList.add('zap');
+    setTimeout(function(){h1.classList.remove('zap');},420);}
   var started=false;
   function startIntro(){
     if(started)return; started=true;
@@ -633,31 +694,26 @@ else{(function(){
     var t0=performance.now();
     (function diss(){
       var p=(performance.now()-t0)/1500;
-      if(p>=1){ boot.remove();
-        burst(); setTimeout(burst,450); setTimeout(burst,950);
-        (function micro(){ setTimeout(function(){burst();micro();},9000+Math.random()*6000); })();
-        return;
-      }
+      if(p>=1){boot.remove();burst();setTimeout(burst,500);
+        (function micro(){setTimeout(function(){burst();micro();},11000+Math.random()*7000);})();
+        return;}
       paint(p); requestAnimationFrame(diss);
     })();
   }
-  if(document.visibilityState==='visible') startIntro();
+  if(document.visibilityState==='visible')startIntro();
   else document.addEventListener('visibilitychange',function h(){
-    if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',h);startIntro();}
-  });
-  setTimeout(function(){ if(boot.parentNode&&started) boot.remove(); },8000);
+    if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',h);startIntro();}});
+  setTimeout(function(){if(boot.parentNode&&started)boot.remove();},8000);
 })();}
 
-/* ============================================================
-   SWARM SIMULATION — counters driven ONLY by sim events
-   ============================================================ */
+/* ============ SWARM SIM (labeled synthetic) ============ */
 var term=document.getElementById('term');
 var P={pop:24,mut:.25,ep:40,tri:.35};
 var running=true,simThm=4892,simPsi=142,epoch=9,verdicts=0,gen=214,timer=null;
-var domains=['Univalent Structures','∞-Topos Descent','Modal HoTT','Reflection Schemata','Ordinal Notations','Bounded Trust','Synthetic Homotopy','Universe Principles','Generalization Invariants','Directed Types'];
+var domains=['Univalent Structures','Descent Conditions','Modal Structures','Reflection Schemata','Ordinal Notations','Bounded Trust','Synthetic Homotopy','Universe Principles','Generalization Invariants','Directed Types'];
 var names=['univalence_transport_rank','descent_modal_bound','rfn_step_conservation','loop_space_parity_inv','sheaf_reflect_factor','trust_budget_monotone','ordinal_rank_le_eps','modality_comp_assoc','universe_lift_coherence','transfer_invariant_min'];
 var checkers=['cubical','lean4','cubical','agda'];
-var fails=['universe inconsistency at level 2','normalization timeout in cubical evaluator','counterexample model found (2-element frame)','axiom candidate implies LEM — rejected','coherence obligation unresolved','transport term fails to normalize'];
+var fails=['universe inconsistency at level 2','normalization timeout in evaluator','counterexample model found (2-element frame)','axiom candidate implies LEM — rejected','coherence obligation unresolved','transport term fails to normalize'];
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 var cur=document.createElement('div');cur.className='ln cursorline';
 function line(cls,txt){var d=document.createElement('div');d.className='ln '+cls;d.innerHTML=txt;
@@ -715,7 +771,7 @@ function step(){
     phase=3;
   } else {
     line('in','BLACKBOARD  <span class="cy">[GROW]</span>   result indexed · '+job.ag+' fitness += reach · evaluators recalibrated');
-    simThm++;setThm();setPsi(-1);verdictTick();kernelPulse();
+    simThm++;setThm();setPsi(-1);verdictTick();
     job=null;
   }
   schedule();
@@ -728,9 +784,9 @@ function verdictTick(){
     setPop();
   }
 }
-function schedule(){ timer=setTimeout(step, 540+Math.random()*640); }
+function schedule(){ timer=setTimeout(step, 560+Math.random()*660); }
 line('in','SC_ENGINE   [BOOT]    swarm monitor attached · <span class="wr">SIMULATION — synthetic telemetry · no backend</span>');
-line('in','SC_ENGINE   [BOOT]    ground-truth counters wired separately · they read 0');
+line('in','SC_ENGINE   [BOOT]    the only real artifacts on this page are in §01 and §05');
 schedule();
 
 function $(id){return document.getElementById(id);}
@@ -747,72 +803,6 @@ $('resetbtn').addEventListener('click',function(){
   setThm();setPsi(0);setPop();
   line('in','SC_ENGINE   [BOOT]    simulation reset · synthetic telemetry re-seeded');
   schedule();
-});
-
-/* ============================================================
-   DARK AMBIENT — synthesized live; original; no recordings
-   ============================================================ */
-var btn=$('musicbtn'),actx=null;
-function makeIR(ctx,secs,decay){
-  var rate=ctx.sampleRate,len=rate*secs,ir=ctx.createBuffer(2,len,rate);
-  for(var c=0;c<2;c++){var ch=ir.getChannelData(c);
-    for(var i=0;i<len;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);}
-  return ir;
-}
-function startAudio(){
-  actx=new (window.AudioContext||window.webkitAudioContext)();
-  var master=actx.createGain();master.gain.value=.15;master.connect(actx.destination);
-  var verb=actx.createConvolver();verb.buffer=makeIR(actx,5.5,3.2);
-  var vg=actx.createGain();vg.gain.value=.55;verb.connect(vg);vg.connect(master);
-  var dry=actx.createGain();dry.gain.value=.5;dry.connect(master);
-  function out(node,wet){node.connect(dry);var g=actx.createGain();g.gain.value=wet;node.connect(g);g.connect(verb);}
-  [[36.71,.07],[55,.05]].forEach(function(fq){
-    var o=actx.createOscillator();o.type='sine';o.frequency.value=fq[0];
-    var g=actx.createGain();g.gain.value=fq[1];
-    var lfo=actx.createOscillator();lfo.frequency.value=.03+Math.random()*.02;
-    var lg=actx.createGain();lg.gain.value=fq[1]*.4;
-    lfo.connect(lg);lg.connect(g.gain);lfo.start();
-    o.connect(g);out(g,.6);o.start();
-  });
-  var lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=260;lp.Q.value=.9;
-  out(lp,.9);
-  [73.42,110,146.83,174.61].forEach(function(f){
-    [-6,5].forEach(function(det){
-      var o=actx.createOscillator();o.type='sawtooth';o.frequency.value=f;o.detune.value=det;
-      var g=actx.createGain();g.gain.value=.012;o.connect(g);g.connect(lp);o.start();
-    });
-  });
-  var swp=actx.createOscillator();swp.frequency.value=.017;
-  var sg=actx.createGain();sg.gain.value=170;swp.connect(sg);sg.connect(lp.frequency);swp.start();
-  var nb=actx.createBuffer(1,actx.sampleRate*3,actx.sampleRate);
-  var nd=nb.getChannelData(0);for(var i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
-  var noise=actx.createBufferSource();noise.buffer=nb;noise.loop=true;
-  var nf=actx.createBiquadFilter();nf.type='lowpass';nf.frequency.value=650;
-  var ng=actx.createGain();ng.gain.value=.014;
-  var nlfo=actx.createOscillator();nlfo.frequency.value=.07;
-  var nlg=actx.createGain();nlg.gain.value=.007;nlfo.connect(nlg);nlg.connect(ng.gain);nlfo.start();
-  noise.connect(nf);nf.connect(ng);out(ng,.4);noise.start();
-  function swell(){
-    if(!actx||actx.state!=='running'){setTimeout(swell,4000);return;}
-    if(Math.random()<.75){
-      [146.83,155.56].forEach(function(f,ix){
-        var o=actx.createOscillator();o.type='triangle';o.frequency.value=f;
-        var g=actx.createGain();var t0=actx.currentTime;
-        g.gain.setValueAtTime(.0001,t0);
-        g.gain.exponentialRampToValueAtTime(ix?.015:.022,t0+4);
-        g.gain.exponentialRampToValueAtTime(.0001,t0+9);
-        o.connect(g);var w=actx.createGain();w.gain.value=1;g.connect(w);w.connect(verb);
-        o.start(t0);o.stop(t0+9.5);
-      });
-    }
-    setTimeout(swell,11000+Math.random()*9000);
-  }
-  setTimeout(swell,6000);
-}
-btn.addEventListener('click',function(){
-  if(!actx){startAudio();btn.classList.add('on');return;}
-  if(actx.state==='running'){actx.suspend();btn.classList.remove('on');}
-  else{actx.resume();btn.classList.add('on');}
 });
 })();
 </script>
