@@ -3,15 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Schrödinger's Cat — kernel-verified mathematical discovery</title>
+<title>Schrödinger's Cat — evolution that cannot cheat</title>
 <meta name="author" content="Schrödinger's Cat">
-<meta name="description" content="Schrödinger's Cat: a recursive self-improvement loop for mathematical discovery in which the Lean 4 kernel is the only referee. Conjectures are superpositions; verification is measurement; verified theorems feed the next round's search.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2304070b'/%3E%3Cpath d='M8 26 L8 13 L11 5.5 L14.5 10 Q16 9.3 17.5 10 L21 5.5 L24 13 L24 26 Z' stroke='%2300e676' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<meta name="description" content="SC·ENGINE v2 — a population of communicating researcher agents, spliced by selection, judged by co-evolving evaluators, anchored to the one referee that cannot be gamed: the Lean 4 kernel. An evolutionary machine hunting the theorem of its own ascent.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23030507'/%3E%3Cpath d='M8 26 L8 13 L11 5.5 L14.5 10 Q16 9.3 17.5 10 L21 5.5 L24 13 L24 26 Z' stroke='%2339d0ff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#04070b; --bg2:#070b11; --card:#0a0f16; --line:#1a222d; --line2:#243040;
-  --ink:#edf2f7; --txt:#aeb9c6; --mut:#7c8898; --dim:#55606e;
-  --grn:#00e676; --grn2:#86ffbe; --vio:#b388ff; --amb:#ffc857; --cyn:#39d0ff; --ros:#ff5e8e;
+  --bg:#030507; --bg2:#05080d; --card:rgba(8,12,18,.82); --cardS:#080c12;
+  --line:#141c26; --line2:#1e2936;
+  --ink:#e8eef4; --txt:#a8b4c2; --mut:#75818f; --dim:#4d5866;
+  --cyn:#39d0ff; --cyn2:#8fe4ff; --grn:#00e676; --grn2:#86ffbe;
+  --amb:#ffb347; --vio:#b388ff; --ros:#ff5e8e;
   --mono:"Cascadia Code",Consolas,Menlo,monospace;
   --sans:"Segoe UI",Inter,system-ui,sans-serif;
   --math:Georgia,"Times New Roman",serif;
@@ -20,216 +22,194 @@
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:16px;line-height:1.75;overflow-x:hidden}
-a{color:var(--grn2);text-decoration:none}
-a:hover{color:var(--grn)}
+/* --- atmosphere stack: CA world → fog/vignette → content --- */
+#ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.55}
+#fog{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+   radial-gradient(ellipse 120% 90% at 50% 110%,rgba(3,5,7,.94) 20%,rgba(3,5,7,.55) 55%,transparent 100%),
+   radial-gradient(ellipse 140% 100% at 50% -20%,rgba(57,208,255,.05),transparent 55%),
+   radial-gradient(ellipse 80% 60% at 85% 20%,rgba(255,179,71,.035),transparent 60%),
+   linear-gradient(180deg,rgba(3,5,7,.35),rgba(3,5,7,.68) 40%,rgba(3,5,7,.8))}
+#grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E")}
+a{color:var(--cyn2);text-decoration:none}
+a:hover{color:var(--cyn)}
 .m{font-family:var(--math);font-style:italic}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px;position:relative;z-index:3}
 
-/* ---------- nav (kraken-style: slim, hairline gradient under) ---------- */
-header{position:sticky;top:0;z-index:70;background:rgba(4,7,11,.9);backdrop-filter:blur(10px)}
+/* nav */
+header{position:sticky;top:0;z-index:70;background:rgba(3,5,7,.82);backdrop-filter:blur(14px)}
 header .row{max-width:1180px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:16px}
-.hairline{height:1px;background:linear-gradient(90deg,#ff5e8e,#b388ff 30%,#00e676 65%,#39d0ff)}
+.hairline{height:1px;background:linear-gradient(90deg,transparent,#39d0ff 25%,#b388ff 55%,#ffb347 80%,transparent);opacity:.6}
 .brand{display:flex;align-items:center;gap:9px;white-space:nowrap}
 .brand svg{width:22px;height:22px;flex:none}
 .brand b{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink);font-weight:700}
-@media(max-width:480px){.brand b{font-size:10.5px;letter-spacing:.12em}}
-nav{margin-left:auto;display:flex;gap:22px;align-items:center}
+.brand small{font-family:var(--mono);font-size:9px;color:var(--cyn);letter-spacing:.14em;border:1px solid rgba(57,208,255,.35);padding:2px 7px;border-radius:99px}
+@media(max-width:520px){.brand b{font-size:10px;letter-spacing:.1em}.brand small{display:none}}
+nav{margin-left:auto;display:flex;gap:20px;align-items:center}
 nav a.lnk{font-size:13px;color:var(--mut)}
 nav a.lnk:hover{color:var(--ink)}
-@media(max-width:860px){nav a.lnk{display:none}}
-.btn-o{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--grn);border:1px solid rgba(0,230,118,.55);border-radius:4px;padding:8px 16px;text-transform:uppercase}
-.btn-o:hover{background:rgba(0,230,118,.08);color:var(--grn2)}
+@media(max-width:880px){nav a.lnk{display:none}}
+.btn-o{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--grn);border:1px solid rgba(0,230,118,.5);border-radius:4px;padding:8px 15px;text-transform:uppercase}
+.btn-o:hover{background:rgba(0,230,118,.07)}
 #musicbtn{background:none;border:1px solid var(--line2);border-radius:4px;cursor:pointer;color:var(--mut);padding:7px 8px;display:flex}
-#musicbtn.on{color:var(--grn);border-color:rgba(0,230,118,.5)}
+#musicbtn.on{color:var(--cyn);border-color:rgba(57,208,255,.5);box-shadow:0 0 16px rgba(57,208,255,.15)}
 #musicbtn svg{width:14px;height:14px}
 #musicbtn .waves{opacity:0;transition:opacity .3s}
 #musicbtn.on .waves{opacity:1}
 
-/* ---------- hero ---------- */
-.hero{position:relative;overflow:hidden}
-.hero .grid2{max-width:1180px;margin:0 auto;padding:86px 24px 70px;display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center}
-@media(max-width:900px){.hero .grid2{grid-template-columns:1fr;padding-top:56px}}
-.kick{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--grn);text-transform:uppercase;margin-bottom:22px}
-h1{font-size:clamp(38px,5.6vw,66px);font-weight:800;color:var(--ink);letter-spacing:-.025em;line-height:1.06}
-h1 .g{color:var(--grn);text-shadow:0 0 34px rgba(0,230,118,.35)}
-.hero .sub{margin:26px 0 8px;max-width:34em;font-size:16.5px;color:var(--txt)}
+/* hero */
+.hero{position:relative;z-index:3;min-height:88vh;display:flex;align-items:center}
+.hero .inner{max-width:1180px;margin:0 auto;padding:70px 24px 40px;width:100%}
+.kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;color:var(--cyn);text-transform:uppercase;margin-bottom:24px;text-shadow:0 0 20px rgba(57,208,255,.5)}
+h1{font-size:clamp(40px,6.2vw,78px);font-weight:800;color:var(--ink);letter-spacing:-.028em;line-height:1.04;max-width:14ch;
+  text-shadow:0 0 60px rgba(57,208,255,.18)}
+h1 .g{color:var(--grn);text-shadow:0 0 40px rgba(0,230,118,.4)}
+.hero .sub{margin:28px 0 10px;max-width:36em;font-size:16.5px;color:var(--txt)}
 .hero .sub b{color:var(--ink)}
-.psi{font-family:var(--math);font-style:italic;font-size:17px;color:var(--mut);margin:14px 0 30px}
+.psi{font-family:var(--math);font-style:italic;font-size:16.5px;color:var(--mut);margin:12px 0 34px}
 .psi .pu{color:var(--vio);font-style:normal}.psi .gg{color:var(--grn2);font-style:normal}
 .cta{display:flex;gap:14px;flex-wrap:wrap}
-.btn-s{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#04110a;background:var(--grn);border-radius:4px;padding:11px 20px;font-weight:700}
-.btn-s:hover{background:var(--grn2);color:#04110a}
-.btn-g{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);border:1px solid var(--line2);border-radius:4px;padding:11px 20px}
+.btn-s{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#02120c;background:var(--grn);border-radius:4px;padding:12px 22px;font-weight:700}
+.btn-s:hover{background:var(--grn2)}
+.btn-g{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);border:1px solid var(--line2);border-radius:4px;padding:12px 22px;background:rgba(3,5,7,.5)}
 .btn-g:hover{border-color:var(--mut);color:var(--ink)}
-.globewrap{position:relative;min-height:340px}
-#globe{display:block;width:100%;height:430px;cursor:crosshair}
-@media(max-width:900px){#globe{height:clamp(300px,52vh,380px)}}
-.globecap{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--mut);text-align:center;margin-top:2px}
-.globecap i{color:var(--vio);font-style:normal}
-.globecap b{color:var(--grn);font-weight:400}
+.worldcap{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mut);text-align:center;z-index:3;background:rgba(3,5,7,.55);padding:5px 14px;border-radius:99px;border:1px solid var(--line)}
+.worldcap i{font-style:normal;color:var(--cyn)}
+.worldcap b{font-weight:400;color:var(--grn)}
 
-/* ---------- sections ---------- */
-section{padding:96px 0 8px}
-.slab{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--grn);text-transform:uppercase;margin-bottom:14px}
-h2{font-size:clamp(26px,3.8vw,42px);font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.15;margin-bottom:18px;max-width:22em}
-h2 .g{color:var(--grn)}
-.lede{color:var(--txt);max-width:730px;font-size:16.5px;margin-bottom:40px}
+/* sections */
+section{padding:100px 0 10px;position:relative;z-index:3}
+.slab{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;color:var(--cyn);text-transform:uppercase;margin-bottom:14px}
+h2{font-size:clamp(26px,3.8vw,42px);font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.12;margin-bottom:18px;max-width:23em}
+h2 .g{color:var(--grn)}h2 .c{color:var(--cyn)}
+.lede{color:var(--txt);max-width:740px;font-size:16.5px;margin-bottom:40px}
 .lede b{color:var(--ink)}
-.divider{height:1px;background:var(--line);margin-top:86px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line2),transparent);margin-top:90px}
 
-/* chain */
-.chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:44px}
-.chip-step{padding:22px 22px;background:var(--card);border-right:1px solid var(--line);position:relative}
-.chip-step:last-child{border-right:none}
-.chip-step .n{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.16em}
-.chip-step .t{color:var(--ink);font-weight:700;font-size:15.5px;margin:6px 0 4px}
-.chip-step .d{font-size:13px;color:var(--mut);line-height:1.6}
-.chip-step::after{content:"→";position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--grn);z-index:2;font-size:15px}
-.chip-step:last-child::after{content:"⟲";right:12px;top:16px;transform:none;color:var(--grn)}
-@media(max-width:700px){.chip-step{border-right:none;border-bottom:1px solid var(--line)}.chip-step::after{display:none}}
-.gain{border-left:2px solid var(--grn);background:linear-gradient(90deg,rgba(0,230,118,.06),transparent 65%);padding:18px 24px;max-width:760px;margin-bottom:46px}
-.gain p{font-size:15.5px;color:var(--txt)}
-.gain p b{color:var(--ink)}
-.gain .fals{font-family:var(--mono);font-size:12px;color:var(--amb);margin-top:10px;letter-spacing:.04em}
-
-/* tiers */
-.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-.tier{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:26px;transition:border-color .25s}
-.tier:hover{border-color:rgba(0,230,118,.45)}
-.tier .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.tier .tno{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--grn)}
-.tier .chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--amb);border:1px solid rgba(255,200,87,.4);padding:2px 8px;border-radius:99px;white-space:nowrap}
-.tier h3{color:var(--ink);font-size:18px;font-weight:700;margin-bottom:2px}
-.tier .alias{font-family:var(--math);font-style:italic;color:var(--mut);font-size:14px;margin-bottom:14px}
-.tier p{font-size:14px;color:var(--mut);margin-bottom:10px;line-height:1.7}
-.tier p b{color:var(--txt);font-weight:600}
-.tier code{font-family:var(--mono);font-size:.86em;color:var(--grn2);background:rgba(0,230,118,.07);padding:1px 6px;border-radius:3px}
+/* swarm cards */
+.swarm{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:15px}
+.agentcard{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:8px;padding:24px;transition:border-color .25s,transform .25s}
+.agentcard:hover{border-color:rgba(57,208,255,.4);transform:translateY(-3px)}
+.agentcard .no{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--cyn)}
+.agentcard .chip{float:right;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--amb);border:1px solid rgba(255,179,71,.4);padding:2px 8px;border-radius:99px}
+.agentcard h3{color:var(--ink);font-size:17px;font-weight:700;margin:10px 0 3px;clear:none}
+.agentcard .alias{font-family:var(--math);font-style:italic;color:var(--mut);font-size:13.5px;margin-bottom:12px}
+.agentcard p{font-size:13.5px;color:var(--mut);line-height:1.7;margin-bottom:8px}
+.agentcard p b{color:var(--txt)}
+.agentcard code{font-family:var(--mono);font-size:.86em;color:var(--cyn2);background:rgba(57,208,255,.07);padding:1px 5px;border-radius:3px}
+.anchor{border-left:2px solid var(--grn);background:linear-gradient(90deg,rgba(0,230,118,.06),transparent 70%);padding:18px 24px;max-width:780px;margin:38px 0 0}
+.anchor p{font-size:15px;color:var(--txt)}
+.anchor p b{color:var(--grn2)}
+.anchor .fals{font-family:var(--mono);font-size:11.5px;color:var(--amb);margin-top:10px;letter-spacing:.04em}
 
 /* sim */
-.simpanel{background:var(--bg2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.simpanel{background:rgba(4,7,11,.92);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .simhead{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .dots span{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
 .simhead .ttl{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;color:var(--txt)}
-.badge-sim{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--amb);border:1px solid rgba(255,200,87,.5);background:rgba(255,200,87,.06);padding:3px 10px;border-radius:99px}
+.badge-sim{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--amb);border:1px solid rgba(255,179,71,.5);background:rgba(255,179,71,.06);padding:3px 10px;border-radius:99px}
 .simbtns{margin-left:auto;display:flex;gap:8px}
-.simbtns button{font-family:var(--mono);font-size:10.5px;color:var(--txt);background:var(--card);border:1px solid var(--line2);border-radius:4px;padding:5px 12px;cursor:pointer;letter-spacing:.08em}
-.simbtns button:hover{border-color:var(--grn);color:var(--grn2)}
+.simbtns button{font-family:var(--mono);font-size:10.5px;color:var(--txt);background:var(--cardS);border:1px solid var(--line2);border-radius:4px;padding:5px 12px;cursor:pointer;letter-spacing:.08em}
+.simbtns button:hover{border-color:var(--cyn);color:var(--cyn2)}
 .simgrid{display:grid;grid-template-columns:1.5fr 1fr}
 @media(max-width:900px){.simgrid{grid-template-columns:1fr}}
-#term{height:370px;overflow-y:auto;padding:15px 17px;font-family:var(--mono);font-size:11.8px;line-height:1.8;background:#030507;border-right:1px solid var(--line)}
+#term{height:380px;overflow-y:auto;padding:15px 17px;font-family:var(--mono);font-size:11.6px;line-height:1.85;background:#020305;border-right:1px solid var(--line)}
 #term .ln{white-space:pre-wrap;word-break:break-all}
 #term .in{color:var(--mut)} #term .ok{color:var(--grn2)} #term .er{color:var(--ros)}
-#term .wr{color:var(--amb)} #term .sy{color:var(--vio)} #term .cy{color:var(--cyn)}
-.simside{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
-.counters{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.cnt{background:var(--card);border:1px solid var(--line);border-radius:7px;padding:12px 14px;position:relative}
-.cnt .k{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--mut);text-transform:uppercase}
-.cnt .v{font-family:var(--mono);font-size:24px;font-weight:700;margin-top:4px}
-.cnt .v.pu{color:var(--vio)} .cnt .v.em{color:var(--grn2)}
-.cnt .simtag{position:absolute;top:7px;right:9px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--amb)}
-.ord{background:var(--card);border:1px solid var(--line);border-radius:7px;padding:12px 14px}
-.ord .k{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--mut);text-transform:uppercase}
-.ordbar{height:6px;background:var(--line);border-radius:99px;margin:9px 0 7px;overflow:hidden}
-.ordfill{height:100%;width:8%;background:linear-gradient(90deg,var(--cyn),var(--grn));border-radius:99px;transition:width .6s}
-.ordscale{display:flex;justify-content:space-between;font-family:var(--math);font-style:italic;font-size:12.5px;color:var(--mut)}
-.ord .note{font-family:var(--mono);font-size:9px;color:var(--amb);margin-top:7px;letter-spacing:.05em}
-.sliders{display:flex;flex-direction:column;gap:12px}
-.sl label{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase;margin-bottom:5px}
-.sl label b{color:var(--grn2);font-weight:400;text-align:right}
-.sl input[type=range]{width:100%;accent-color:#00e676}
+#term .wr{color:var(--amb)} #term .sy{color:var(--vio)} #term .cy{color:var(--cyn2)}
+.simside{padding:18px 20px;display:flex;flex-direction:column;gap:13px}
+.counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:1020px){.counters{grid-template-columns:1fr 1fr}}
+.cnt{background:var(--cardS);border:1px solid var(--line);border-radius:7px;padding:11px 13px;position:relative}
+.cnt .k{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;color:var(--mut);text-transform:uppercase}
+.cnt .v{font-family:var(--mono);font-size:22px;font-weight:700;margin-top:4px}
+.cnt .v.pu{color:var(--vio)} .cnt .v.em{color:var(--grn2)} .cnt .v.cy{color:var(--cyn2)}
+.cnt .simtag{position:absolute;top:6px;right:8px;font-family:var(--mono);font-size:8px;color:var(--amb)}
+.sliders{display:flex;flex-direction:column;gap:11px}
+.sl label{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
+.sl label b{color:var(--cyn2);font-weight:400;text-align:right}
+.sl input[type=range]{width:100%;accent-color:#39d0ff}
 .groundtruth{display:flex;align-items:center;gap:13px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.4);border-radius:7px;padding:11px 14px}
 .groundtruth .z{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--grn2)}
 .groundtruth p{font-size:11.5px;color:var(--mut);line-height:1.55}
 .groundtruth p b{color:var(--grn2)}
 
 /* constraints */
-.safe{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
-.scard{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:26px}
-.scard h3{color:var(--ink);font-size:17.5px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-weight:700}
-.scard h3 svg{width:19px;height:19px;flex:none}
-.scard p{font-size:14px;color:var(--mut);margin-bottom:12px;line-height:1.7}
+.safe{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:15px}
+.scard{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:8px;padding:25px}
+.scard h3{color:var(--ink);font-size:17px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-weight:700}
+.scard h3 svg{width:18px;height:18px;flex:none}
+.scard p{font-size:13.8px;color:var(--mut);margin-bottom:11px;line-height:1.7}
 .scard p b{color:var(--txt)}
 .scard .m{color:var(--txt)}
-pre.ax{background:#030507;border:1px solid var(--line);border-left:2px solid var(--grn);border-radius:6px;padding:13px 15px;font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--txt);overflow-x:auto}
+pre.ax{background:#020305;border:1px solid var(--line);border-left:2px solid var(--grn);border-radius:6px;padding:12px 14px;font-family:var(--mono);font-size:10.8px;line-height:1.7;color:var(--txt);overflow-x:auto}
 pre.ax .ok{color:var(--grn2)} pre.ax .cm{color:var(--dim)}
-.ladder{display:flex;flex-direction:column-reverse;gap:6px;margin:14px 0 6px}
-.ladder .lv{border:1px solid var(--line2);border-radius:5px;padding:7px 12px;font-family:var(--mono);font-size:10.5px;color:var(--txt);display:flex;justify-content:space-between;gap:10px}
+.ladder{display:flex;flex-direction:column-reverse;gap:6px;margin:13px 0 6px}
+.ladder .lv{border:1px solid var(--line2);border-radius:5px;padding:7px 12px;font-family:var(--mono);font-size:10px;color:var(--txt);display:flex;justify-content:space-between;gap:10px}
 .ladder .lv span{color:var(--mut)}
 .ladder .lv.hot{border-color:rgba(0,230,118,.5);color:var(--grn2)}
 
-/* ground truth strip */
-.statusbar{display:flex;flex-wrap:wrap;gap:20px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px 26px}
+/* ground truth */
+.statusbar{display:flex;flex-wrap:wrap;gap:20px;align-items:center;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:8px;padding:20px 26px}
 .statusbar .item{font-family:var(--mono);font-size:11.5px;color:var(--mut)}
 .statusbar .item b{color:var(--grn2);font-size:17px;margin-right:6px}
 .statusbar .pledge{margin-left:auto;font-size:12px;color:var(--mut);max-width:430px;line-height:1.6}
-.found{font-size:12px;color:var(--dim);line-height:2;font-family:var(--mono);margin-top:30px}
+.found{font-size:11.5px;color:var(--dim);line-height:2.1;font-family:var(--mono);margin-top:30px}
 .found b{color:var(--mut);font-weight:400}
 
-footer{border-top:1px solid var(--line);margin-top:84px;padding:32px 0 56px}
+footer{border-top:1px solid var(--line);margin-top:86px;padding:32px 0 56px;position:relative;z-index:3;background:rgba(3,5,7,.7)}
 footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 .sig{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
-.sig b{color:var(--grn)}
-.js .rv{opacity:0;transform:translateY(14px);transition:opacity .7s,transform .7s}
+.sig b{color:var(--cyn)}
+.js .rv{opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s}
 .js .rv.on{opacity:1;transform:none}
 
-/* ---------- motion pack (fully disabled under reduced motion) ---------- */
+/* motion pack (disabled under reduced motion) */
 @media (prefers-reduced-motion: no-preference){
-  .hairline{background-size:220% 100%;animation:hueflow 16s linear infinite}
-  @keyframes hueflow{0%{background-position:0% 0}100%{background-position:220% 0}}
-  .js .stag{opacity:0;transform:translateY(18px);animation:rise .85s cubic-bezier(.2,.7,.3,1) forwards}
-  .js .d1{animation-delay:.05s}.js .d2{animation-delay:.16s}.js .d3{animation-delay:.32s}
-  .js .d4{animation-delay:.48s}.js .d5{animation-delay:.64s}
+  .js .stag{opacity:0;transform:translateY(18px);animation:rise .9s cubic-bezier(.2,.7,.3,1) forwards}
+  .js .d1{animation-delay:.05s}.js .d2{animation-delay:.18s}.js .d3{animation-delay:.36s}
+  .js .d4{animation-delay:.52s}.js .d5{animation-delay:.68s}
   @keyframes rise{to{opacity:1;transform:none}}
-  h1 .g{animation:breathe 5.5s ease-in-out infinite}
-  @keyframes breathe{0%,100%{text-shadow:0 0 34px rgba(0,230,118,.3)}50%{text-shadow:0 0 52px rgba(0,230,118,.6)}}
-  .chip-step{overflow:hidden}
-  .chip-step::before{content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(100deg,transparent 32%,rgba(0,230,118,.07) 50%,transparent 68%);
-    transform:translateX(-130%);animation:sweep 7s ease-in-out infinite}
-  .chip-step:nth-child(2)::before{animation-delay:.5s}
-  .chip-step:nth-child(3)::before{animation-delay:1s}
-  .chip-step:nth-child(4)::before{animation-delay:1.5s}
-  @keyframes sweep{0%,58%{transform:translateX(-130%)}82%,100%{transform:translateX(130%)}}
-  .chip-step::after{animation:arrowpulse 2.8s ease-in-out infinite}
-  @keyframes arrowpulse{0%,100%{opacity:.45}50%{opacity:1;text-shadow:0 0 12px rgba(0,230,118,.9)}}
-  .btn-s{position:relative;overflow:hidden}
-  .btn-s::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-58%;
-    background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);
-    transform:skewX(-20deg);animation:sheen 5s ease-in-out infinite}
-  @keyframes sheen{0%,72%{left:-58%}92%,100%{left:135%}}
-  .ordfill{position:relative;overflow:hidden}
-  .ordfill::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
-    animation:shimmer 3.4s linear infinite}
-  @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(240%)}}
+  h1 .g{animation:breathe 6s ease-in-out infinite}
+  @keyframes breathe{0%,100%{text-shadow:0 0 40px rgba(0,230,118,.35)}50%{text-shadow:0 0 60px rgba(0,230,118,.65)}}
+  .hairline{background-size:220% 100%;animation:hueflow 18s linear infinite}
+  @keyframes hueflow{0%{background-position:0 0}100%{background-position:220% 0}}
   .cnt .v.tick{animation:tickpop .4s cubic-bezier(.2,1.7,.4,1)}
   @keyframes tickpop{0%{transform:scale(1.22)}100%{transform:scale(1)}}
-  .tier{transition:border-color .25s,transform .25s}
-  .tier:hover{transform:translateY(-3px)}
   #term .ln{animation:lfade .3s ease}
   @keyframes lfade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
-  .cursorline::after{content:"▍";color:var(--grn);animation:blink 1.1s steps(1) infinite}
+  .cursorline::after{content:"▍";color:var(--cyn);animation:blink 1.1s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
+  .btn-s{position:relative;overflow:hidden}
+  .btn-s::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-58%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+    transform:skewX(-20deg);animation:sheen 6s ease-in-out infinite}
+  @keyframes sheen{0%,74%{left:-58%}92%,100%{left:135%}}
 }
 </style>
 </head>
 <body>
+<canvas id="ca" aria-hidden="true"></canvas>
+<div id="fog" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
 
 <header>
   <div class="row">
     <span class="brand">
-      <svg viewBox="0 0 32 32" fill="none" stroke="#00e676" stroke-width="1.6" stroke-linejoin="round">
+      <svg viewBox="0 0 32 32" fill="none" stroke="#39d0ff" stroke-width="1.6" stroke-linejoin="round">
         <path d="M8 26 L8 13 L11 5.5 L14.5 10 Q16 9.3 17.5 10 L21 5.5 L24 13 L24 26 Z"/>
         <path d="M12.2 17.5 L14.6 18.6 M19.8 17.5 L17.4 18.6" stroke-width="1.3"/>
       </svg>
       <b>SCHRÖDINGER'S CAT</b>
+      <small>SC·ENGINE v2</small>
     </span>
     <nav>
-      <a class="lnk" href="#loop">The loop</a>
+      <a class="lnk" href="#swarm">The swarm</a>
       <a class="lnk" href="#sim">Simulation</a>
       <a class="lnk" href="#rules">Constraints</a>
       <a class="btn-o" href="#truth">Ground truth: 0</a>
-      <button id="musicbtn" aria-label="ambient audio — synthesized live in-browser, original, no recordings" title="ambient audio (generated live — original)">
+      <button id="musicbtn" aria-label="dark ambient audio — synthesized live in-browser, original, no recordings" title="ambient (generated live — original, no copyright)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
         </svg>
@@ -241,79 +221,84 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <!-- ================= HERO ================= -->
 <div class="hero">
-  <div class="grid2">
-    <div>
-      <div class="kick stag d1">Recursive self-improvement · for mathematical discovery</div>
-      <h1 class="stag d2">Turning conjectures into <span class="g">kernel-verified</span> theorems.</h1>
-      <p class="sub stag d3">A discovery loop in which the <b>Lean&nbsp;4 kernel is the only referee</b>.
-      Conjectures are generated, filtered, and attacked by a hybrid prover; whatever compiles joins a
-      growing DAG of verified mathematics — and that DAG is precisely what the next round searches with.
-      Improvement claims ship as certificates, never as scores.</p>
-      <div class="psi stag d4">|ψ⟩ = α<span class="pu">|proved⟩</span> + β<span class="gg">|refuted⟩</span> — verification is the measurement</div>
-      <div class="cta stag d5">
-        <a class="btn-s" href="#loop">Why it self-improves</a>
-        <a class="btn-g" href="#sim">Watch the loop (simulation)</a>
-      </div>
-    </div>
-    <div class="globewrap">
-      <canvas id="globe" aria-label="Wireframe sphere of the knowledge DAG: verified theorems are green nodes; open conjectures pulse violet; hover or tap a violet node to run the kernel-verification animation"></canvas>
-      <div class="globecap">THE VERIFIED DAG · <i>violet = |ψ⟩ open conjecture</i> · <b>green = kernel-verified</b> · HOVER / TAP TO COLLAPSE</div>
+  <div class="inner">
+    <div class="kick stag d1">SC·ENGINE v2 — population-based neuro-symbolic discovery</div>
+    <h1 class="stag d2">Evolution that <span class="g">cannot cheat</span>.</h1>
+    <p class="sub stag d3">A population of researcher agents that communicate, compete, and
+    <b>splice</b>. Evaluator agents that co-evolve with them — the Red Queen dynamic. And beneath it
+    all, the one judge no lineage can game: <b>the Lean&nbsp;4 kernel</b>. Fitness is
+    kernel-verified output; everything else is selection pressure. The swarm's mission: hunt the
+    mathematics of the RSI→ASI gap — <b>the theorem of its own ascent</b>.</p>
+    <div class="psi stag d4">|ψ⟩ = α<span class="pu">|proved⟩</span> + β<span class="gg">|refuted⟩</span> — the kernel is the measurement</div>
+    <div class="cta stag d5">
+      <a class="btn-s" href="#swarm">The architecture</a>
+      <a class="btn-g" href="#sim">Watch the swarm (simulation)</a>
     </div>
   </div>
-  <div class="hairline"></div>
+  <div class="worldcap">BACKGROUND: LIVE CELLULAR AUTOMATON · <i>lineages = hue</i> · births splice parent genomes · <b>green pulses = kernel events (ambient visual, not data)</b></div>
 </div>
 
-<!-- ================= 01 THE LOOP ================= -->
-<section id="loop"><div class="wrap rv">
-  <div class="slab">01 · The loop</div>
-  <h2>Why feeding theorems back is <span class="g">self-improvement</span>, not a slogan.</h2>
-  <p class="lede">The claim has a causal chain, each link measurable. More verified nodes give the
-  retriever more true premises; better premises raise the prover's close-rate; a higher close-rate
-  yields more verified nodes. That is the loop gain — and it is falsifiable:</p>
+<!-- ================= 01 SWARM ================= -->
+<section id="swarm"><div class="wrap rv">
+  <div class="slab">01 · The swarm</div>
+  <h2>Five organs. One <span class="c">unfakeable</span> fitness function.</h2>
+  <p class="lede">Population-based search with co-evolving evaluators is the 2026 frontier — and its
+  known failure mode is drift: when the judge evolves too, what stops the population from gaming the
+  judge? Here, nothing evolves its way around the referee: <b>every fitness signal is anchored to
+  kernel verdicts.</b> Status of every organ: design — this page simulates the assembly and says so.</p>
 
-  <div class="chain">
-    <div class="chip-step"><div class="n">STAGE A</div><div class="t">Verified DAG grows</div><div class="d">every kernel-accepted theorem becomes a retrievable premise — growth is monotone by construction</div></div>
-    <div class="chip-step"><div class="n">STAGE B</div><div class="t">Retrieval sharpens</div><div class="d">premise selection draws on a strictly larger set of true, machine-checked lemmas</div></div>
-    <div class="chip-step"><div class="n">STAGE C</div><div class="t">Close-rate rises</div><div class="d">more proofs terminate within budget; certified procedures compress whole statement classes</div></div>
-    <div class="chip-step"><div class="n">STAGE D</div><div class="t">Loop closes</div><div class="d">new theorems re-enter as premises and tactics — the search space of round t+1 is shaped by round t</div></div>
+  <div class="swarm">
+    <div class="agentcard">
+      <span class="chip">DESIGN</span><div class="no">ORGAN 1 · POPULATION</div>
+      <h3>Researcher Agents R₁…Rₙ</h3>
+      <div class="alias">the conjecture swarm</div>
+      <p><b>Genome:</b> heuristic profile + tactic portfolio + domain focus. Agents post and answer
+      lemma requests on a shared blackboard — the verified DAG plus the failure ledger. Communication
+      is stigmergic: every proof and every failure reshapes the terrain the others search.</p>
+    </div>
+    <div class="agentcard">
+      <span class="chip">DESIGN</span><div class="no">ORGAN 2 · REPRODUCTION</div>
+      <h3>Splice Engine</h3>
+      <div class="alias">selection · crossover · mutation</div>
+      <p><b>Fitness = verified reach per unit compute</b> — computed from build logs only. Top genomes
+      recombine (portfolio ⊕ heuristics), mutants explore, an archive preserves stepping stones so the
+      population can re-branch from any ancestor (the Darwin-Gödel-Machine lesson).</p>
+    </div>
+    <div class="agentcard">
+      <span class="chip">DESIGN</span><div class="no">ORGAN 3 · JUDGMENT</div>
+      <h3>Dynamic Evaluators E₁…Eₘ</h3>
+      <div class="alias">the Red Queen, anchored</div>
+      <p>Evaluators triage what deserves prover compute: predicted provability, expected reach.
+      They co-evolve with the population — but their own fitness is <b>calibration against actual
+      kernel verdicts</b> (Brier score). An evaluator that drifts from ground truth dies. The Red
+      Queen runs; the anchor holds.</p>
+    </div>
+    <div class="agentcard">
+      <span class="chip">DESIGN</span><div class="no">ORGAN 4 · MEASUREMENT</div>
+      <h3>Lean 4 Pipeline</h3>
+      <div class="alias">the fixed referee</div>
+      <p>Unchanged and untouchable: candidates compile through <code>lake build</code> or they do not
+      exist. Axiom audit on every acceptance — no <code>sorry</code>, no
+      <code>Classical.choice</code>. The only organ that never evolves, because Löb says it must
+      not judge itself (§03).</p>
+    </div>
+    <div class="agentcard">
+      <span class="chip">DESIGN</span><div class="no">ORGAN 5 · MISSION</div>
+      <h3>The Quest List</h3>
+      <div class="alias">foundations of the ascent</div>
+      <p>The swarm is aimed, not aimless: formalize reflection steps, bounded-trust theorems,
+      ordinal-measured strength growth — the open conjunction at the heart of RSI→ASI. AlphaProof-class
+      systems hunt Erdős problems; this population hunts <b>the mathematics of self-improvement
+      itself</b>.</p>
+    </div>
   </div>
 
-  <div class="gain">
-    <p><b>The metric that cannot be gamed:</b> <i>reach</i> — the number of conjectures per round that
-    fail under the previous library and succeed under the current one, where "succeed" means the kernel
-    compiled the proof. Reach is computed from build logs alone.</p>
-    <p class="fals">FALSIFIER — if reach stays 0 across rounds, the loop is dead and this page will report exactly that.</p>
-  </div>
-
-  <div class="tiers">
-    <div class="tier">
-      <div class="head"><span class="tno">TIER 1 — SUPERPOSITION GENERATOR</span><span class="chip">STATUS: DESIGN</span></div>
-      <h3>Neural Conjecture Generator</h3>
-      <p><b>Spec.</b> An LLM proposal head (to be fine-tuned on the <code>Mathlib4</code> corpus) under
-      MCTS over statement space, emitting candidate statements in Lean 4 syntax; a fast numeric
-      counterexample search kills refutable candidates before any prover time is spent.</p>
-      <p><b>Function in the loop.</b> Populates the state space with open conjectures — boxes with
-      unmeasured cats. Temperature controls distance from the training distribution.</p>
-    </div>
-    <div class="tier">
-      <div class="head"><span class="tno">TIER 2 — OBSERVATION OPERATOR</span><span class="chip">STATUS: DESIGN</span></div>
-      <h3>Hybrid Proof Searcher</h3>
-      <p><b>Spec.</b> Neural premise selection over the verified DAG feeding a portfolio of symbolic
-      backends — <code>duper</code>, <code>aesop</code>, <code>omega</code>, <code>norm_num</code>,
-      <code>decide</code>, tactic scripts — racing to close each proof term.</p>
-      <p><b>Function in the loop.</b> Attempted measurement. Only <code>lake build</code> collapses
-      |ψ⟩: kernel acceptance or nothing. A benchmark can be gamed by its own contestant; the kernel
-      cannot.</p>
-    </div>
-    <div class="tier">
-      <div class="head"><span class="tno">TIER 3 — EPISTEMIC ASCENT</span><span class="chip">STATUS: DESIGN</span></div>
-      <h3>Reflective Self-Improvement</h3>
-      <p><b>Spec.</b> Each new theorem is compiled, vectorized, and injected into the retrieval store
-      and premise-selection model; discovered decision procedures are installed as tactics only with a
-      kernel-checked soundness certificate (proof by reflection).</p>
-      <p><b>Function in the loop.</b> The system grows its own vocabulary; each round reshapes the
-      next round's search. The changelog is a sequence of theorems.</p>
-    </div>
+  <div class="anchor">
+    <p><b>The loop gain, population edition:</b> a bigger verified DAG sharpens every agent's
+    retrieval and every evaluator's calibration; better triage raises the kernel-success rate; every
+    success feeds the DAG. <b>Metric: reach</b> — conjectures per epoch that fail under the previous
+    DAG and compile under the current one. From build logs, nothing else.</p>
+    <p class="fals">FALSIFIER — if reach flatlines at 0 across epochs, the swarm is dead, and this page will say so.</p>
   </div>
 </div></section>
 
@@ -321,39 +306,36 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <!-- ================= 02 SIMULATION ================= -->
 <section id="sim"><div class="wrap rv">
-  <div class="slab">02 · Pipeline simulation</div>
-  <h2>The runtime, end to end — <span class="g">labeled</span> as what it is.</h2>
-  <p class="lede">An interactive model of one RSI cycle: generate → filter → retrieve → search →
-  kernel verdict → re-inject. <b>Synthetic telemetry; no backend attached.</b> Amber numbers are
-  simulated; the emerald panel is the only real one. The sliders retune the simulated engine live.</p>
+  <div class="slab">02 · Swarm simulation</div>
+  <h2>One epoch, end to end — <span class="g">labeled</span> as what it is.</h2>
+  <p class="lede">Inter-agent messages, splice events, evaluator calibration, kernel verdicts.
+  <b>Synthetic telemetry — no backend.</b> Amber numbers are simulated; the emerald panel is the only
+  real one. Sliders retune the simulated population live.</p>
 
   <div class="simpanel">
     <div class="simhead">
-      <span class="dots"><span style="background:#ff5e8e"></span><span style="background:#ffc857"></span><span style="background:#00e676"></span></span>
-      <span class="ttl">sc-engine · pipeline monitor</span>
+      <span class="dots"><span style="background:#ff5e8e"></span><span style="background:#ffb347"></span><span style="background:#00e676"></span></span>
+      <span class="ttl">sc-engine v2 · swarm monitor</span>
       <span class="badge-sim">SIMULATION · SYNTHETIC TELEMETRY</span>
       <div class="simbtns"><button id="pausebtn">PAUSE</button><button id="resetbtn">RESET</button></div>
     </div>
     <div class="simgrid">
-      <div id="term" aria-label="simulated engine log"></div>
+      <div id="term" aria-label="simulated swarm log"></div>
       <div class="simside">
         <div class="counters">
-          <div class="cnt"><span class="simtag">SIM</span><div class="k">Open conjectures |ψ⟩</div><div class="v pu" id="c_psi">142</div></div>
-          <div class="cnt"><span class="simtag">SIM</span><div class="k">Kernel-verified theorems</div><div class="v em" id="c_thm">4,892</div></div>
-        </div>
-        <div class="ord">
-          <div class="k">Ordinal depth — simulated ascent</div>
-          <div class="ordbar"><div class="ordfill" id="ordfill"></div></div>
-          <div class="ordscale"><span>ω</span><span>ω²</span><span>ω^ω</span><span>ε₀</span></div>
-          <div class="note">REAL ORDINAL: UNCHANGED — v1 runs at fixed logical strength (§03)</div>
+          <div class="cnt"><span class="simtag">SIM</span><div class="k">Population · epoch</div><div class="v cy" id="c_pop">24 · e9</div></div>
+          <div class="cnt"><span class="simtag">SIM</span><div class="k">Open |ψ⟩</div><div class="v pu" id="c_psi">142</div></div>
+          <div class="cnt"><span class="simtag">SIM</span><div class="k">Kernel-verified</div><div class="v em" id="c_thm">4,892</div></div>
         </div>
         <div class="sliders">
-          <div class="sl"><label><span>LLM temperature · creativity</span><b id="v_temp">0.70</b></label>
-            <input type="range" id="s_temp" min="10" max="150" value="70"></div>
-          <div class="sl"><label><span>Search depth · MCTS iters</span><b id="v_depth">2,000</b></label>
-            <input type="range" id="s_depth" min="100" max="10000" step="100" value="2000"></div>
-          <div class="sl"><label><span>Guardrails · strictness</span><b id="v_guard">L2 · axiom audit</b></label>
-            <input type="range" id="s_guard" min="1" max="3" value="2"></div>
+          <div class="sl"><label><span>Population size N</span><b id="v_pop">24</b></label>
+            <input type="range" id="s_pop" min="8" max="64" value="24"></div>
+          <div class="sl"><label><span>Splice / mutation rate</span><b id="v_mut">0.25</b></label>
+            <input type="range" id="s_mut" min="5" max="60" value="25"></div>
+          <div class="sl"><label><span>Epoch length · Red Queen pressure</span><b id="v_ep">40 verdicts</b></label>
+            <input type="range" id="s_ep" min="10" max="120" step="5" value="40"></div>
+          <div class="sl"><label><span>Lean triage budget</span><b id="v_tri">0.35</b></label>
+            <input type="range" id="s_tri" min="10" max="90" value="35"></div>
         </div>
         <div class="groundtruth">
           <span class="z">0</span>
@@ -370,27 +352,25 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <!-- ================= 03 CONSTRAINTS ================= -->
 <section id="rules"><div class="wrap rv">
-  <div class="slab">03 · Design constraints</div>
-  <h2>Gödel and Löb are the <span class="g">specification</span>.</h2>
-  <p class="lede">Two invariants hold at every iteration, by construction — they are why the loop's
-  claims can be strict where everyone else's are statistical.</p>
+  <div class="slab">03 · Constraints</div>
+  <h2>Why the Red Queen <span class="c">cannot drift</span> here.</h2>
+  <p class="lede">Everything may evolve except two things: the referee, and the honesty of this page.</p>
   <div class="safe">
     <div class="scard">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="#39d0ff" stroke-width="1.7"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>
-        Löb invariance — the fixed referee</h3>
-      <p>Blanket self-trust is inconsistent, not merely hard: if <span class="m">T ⊢ □⌜φ⌝→φ</span>
-      then <span class="m">T ⊢ φ</span> (Löb 1955; Gödel II is the <span class="m">φ=⊥</span> corollary).
-      So no level here ever certifies itself. Discovered proofs and installed procedures live at L0,
-      certified by theorems of L1 — Lean's logic, fixed and external. Trust in L1 is an explicitly
-      stated <b>assumption</b>, one honest level above what any system can prove about itself.</p>
+        Löb invariance — the immutable referee</h3>
+      <p>Blanket self-trust is inconsistent, not merely hard: <span class="m">T ⊢ □⌜φ⌝→φ</span>
+      forces <span class="m">T ⊢ φ</span> (Löb 1955; Gödel II is the <span class="m">φ=⊥</span>
+      corollary). So no organ of the swarm ever certifies itself — and the kernel is excluded from
+      evolution <b>by theorem, not by taste</b>. Evaluators may get smarter forever; their verdicts
+      are forever provisional next to the kernel's.</p>
       <div class="ladder">
-        <div class="lv hot">L0 · discovered proofs &amp; installed tactics <span>certified at L1</span></div>
-        <div class="lv hot">L1 · Lean 4 kernel <span>fixed · external · immutable</span></div>
+        <div class="lv hot">L0 · swarm output — proofs, procedures, genomes <span>judged at L1</span></div>
+        <div class="lv hot">L1 · Lean 4 kernel <span>fixed · external · non-evolving</span></div>
         <div class="lv">L2 · kernel soundness <span>assumed — stated, never claimed proved</span></div>
       </div>
-      <p style="margin-top:10px">Self-modification never touches the kernel. The one fatal failure —
-      installing a change that admits a false theorem — is structurally unreachable: every change
-      enters through the gate or not at all.</p>
+      <p style="margin-top:10px">The one fatal failure — a lineage that installs a false theorem — is
+      structurally unreachable: everything enters through the gate or not at all.</p>
     </div>
     <div class="scard">
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg>
@@ -402,12 +382,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 #print axioms SC.discovered_theorem_00000
 <span class="ok">⊢ [propext, Quot.sound]   -- constructive ✓ admitted</span>
 <span class="cm">-- Classical.choice present → discarded, logged,</span>
-<span class="cm">-- and fed back to Tier 1 as training signal</span></pre>
-      <p style="margin-top:12px">Failures are first-class: counterexamples, kernel errors and audit
-      rejections are published with the same fidelity as theorems. And one scope line, stated rather
-      than hidden: <b>v1 improves capability at fixed logical strength</b> — the ambient theory never
-      changes, so no ordinal moves; any future reflection step that would change that will arrive as a
-      machine-checked artifact or not at all.</p>
+<span class="cm">-- and returned to the swarm as selection pressure</span></pre>
+      <p style="margin-top:12px">Failures are first-class: counterexamples, kernel errors, audit
+      rejections and culled genomes are published with the same fidelity as theorems. Scope, stated
+      plainly: <b>v1 improves capability at fixed logical strength</b> — no ordinal moves until a
+      machine-checked reflection step exists, and none is claimed.</p>
     </div>
   </div>
 </div></section>
@@ -421,16 +400,19 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   <div class="statusbar">
     <span class="item"><b>0</b> theorems verified by the running engine</span>
     <span class="item"><b>0</b> certified procedures installed</span>
+    <span class="item"><b>0</b> epochs of real evolution run</span>
     <span class="item"><b>✓</b> Lean 4.32.0 pinned · scaffold compiles</span>
     <span class="pledge">Status 2026-07-13. Everything above that moves is simulation and says so.
-    When these numbers move, the Lean sources and build logs that moved them will be published beside
-    them — the only counters this program will ever ask you to believe.</span>
+    When these numbers move, the Lean sources, build logs and genome archives that moved them will be
+    published beside them — the only counters this program will ever ask you to believe.</span>
   </div>
   <p class="found"><b>Foundations (primary sources):</b> Gödel 1931 · Löb 1955 (JSL 20) · Turing 1939 (Proc. LMS) ·
   Feferman 1962 &amp; Feferman–Spector 1962 (JSL 27) · Kleene 1952 · Blum 1967/1971 (JACM 14/18) ·
   Schmidhuber 2003 (cs/0309048) · Yudkowsky–Herreshoff 2013 (MIRI) · Davis–Myreen 2015 (JAR) ·
   Pakhomov–Walsh 2021 (JSL 86 · arXiv:1805.02095) · de Moura–Ullrich 2021 (CADE-28) ·
-  Genewein et al. 2026 (arXiv:2606.12683) · Zhang et al. 2025 (arXiv:2505.22954) · arXiv:2607.04277.</p>
+  Zhang et al. 2025, Darwin Gödel Machine (arXiv:2505.22954) · Genewein et al. 2026, From AGI to ASI
+  (arXiv:2606.12683) · Iacob et al. 2026, Red Queen Gödel Machine (arXiv:2606.26294) ·
+  MA-LoT (arXiv:2503.03205) · arXiv:2607.04277.</p>
 </div></section>
 
 <footer><div class="wrap">
@@ -450,104 +432,100 @@ if(!reduce && 'IntersectionObserver' in window){
   document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
 }else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('on');});}
 
-/* ---------- DAG GLOBE (visual only — never touches counters) ---------- */
-var cv=document.getElementById('globe'), cx=cv.getContext('2d');
-var W,H,DPR=Math.min(devicePixelRatio||1,2);
-function size(){W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);}
-size();addEventListener('resize',size);
-var N=110, pts=[], GA=Math.PI*(3-Math.sqrt(5));
-for(var i=0;i<N;i++){
-  var y=1-(i/(N-1))*2, r=Math.sqrt(1-y*y), th=GA*i;
-  pts.push({x:Math.cos(th)*r,y:y,z:Math.sin(th)*r,
-    st:(i%7===0)?'psi':'ok', t:0, ph:Math.random()*6.28});
+/* ============================================================
+   CELLULAR AUTOMATON WORLD — evolving agent lineages (ambient)
+   Life rules; each live cell carries a lineage hue. Births take
+   the majority parent hue (splice) with small mutation. Ambient
+   visual only — never touches any counter.
+   ============================================================ */
+var ca=document.getElementById('ca'), cxa=ca.getContext('2d');
+var CELL=9, gw,gh, grid,hue, buf,hbuf, off,ocx;
+function caSize(){
+  gw=Math.ceil(innerWidth/CELL); gh=Math.ceil(innerHeight/CELL);
+  ca.width=gw; ca.height=gh;
+  ca.style.width=gw*CELL+'px'; ca.style.height=gh*CELL+'px';
+  grid=new Uint8Array(gw*gh); hue=new Uint8Array(gw*gh);
+  buf=new Uint8Array(gw*gh); hbuf=new Uint8Array(gw*gh);
+  seed();
 }
-var edges=[];
-for(var a=0;a<N;a++){
-  var ds=[];
-  for(var b=0;b<N;b++){if(a===b)continue;
-    var p=pts[a],q=pts[b];
-    ds.push({b:b,d:(p.x-q.x)*(p.x-q.x)+(p.y-q.y)*(p.y-q.y)+(p.z-q.z)*(p.z-q.z)});}
-  ds.sort(function(u,v){return u.d-v.d});
-  for(var k=0;k<2;k++){var e=[Math.min(a,ds[k].b),Math.max(a,ds[k].b)];
-    if(!edges.some(function(x){return x[0]===e[0]&&x[1]===e[1]}))edges.push(e);}
-}
-var rot=0, mouse={x:-999,y:-999}, proj=[];
-function project(){
-  var R=Math.min(W,H)*.36, cxp=W/2, cyp=H/2;
-  proj=pts.map(function(p){
-    var x=p.x*Math.cos(rot)-p.z*Math.sin(rot), z=p.x*Math.sin(rot)+p.z*Math.cos(rot);
-    return {sx:cxp+x*R, sy:cyp+p.y*R*.92, z:z};
-  });
-}
-function tryCollapse(mx,my){
-  for(var i=0;i<N;i++){
-    if(pts[i].st==='psi'&&proj[i].z>-.15&&Math.hypot(mx-proj[i].sx,my-proj[i].sy)<15){
-      pts[i].st='verify';pts[i].t=0;return;
-    }
+var LINEAGES=[130,190,265,20,330]; /* green,cyan,violet,amber,rose hue anchors */
+function seed(){
+  for(var i=0;i<gw*gh;i++){
+    if(Math.random()<.11){grid[i]=1;hue[i]=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];}
+    else grid[i]=0;
   }
 }
-cv.addEventListener('mousemove',function(e){var r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;tryCollapse(mouse.x,mouse.y);});
-cv.addEventListener('click',function(e){var r=cv.getBoundingClientRect();tryCollapse(e.clientX-r.left,e.clientY-r.top);});
-cv.addEventListener('touchstart',function(e){var r=cv.getBoundingClientRect(),t=e.touches[0];tryCollapse(t.clientX-r.left,t.clientY-r.top);},{passive:true});
-var T=0;
-function frame(){
-  T+=.016; if(!reduce) rot+=.0035;
-  project();
-  cx.clearRect(0,0,W,H);
-  edges.forEach(function(e){
-    var p=proj[e[0]],q=proj[e[1]];
-    var vis=(p.z+q.z)/2;
-    var al=vis>0? .16+vis*.12 : .05;
-    cx.strokeStyle='rgba(0,230,118,'+al.toFixed(3)+')';
-    cx.lineWidth=1;
-    cx.beginPath();cx.moveTo(p.sx,p.sy);cx.lineTo(q.sx,q.sy);cx.stroke();
-  });
-  for(var i=0;i<N;i++){
-    var p=pts[i], s=proj[i], front=s.z>0;
-    var base=front?1:.35;
-    if(p.st==='ok'){
-      cx.fillStyle='rgba(0,230,118,'+(.75*base).toFixed(3)+')';
-      cx.beginPath();cx.arc(s.sx,s.sy,front?2.4:1.6,0,6.283);cx.fill();
-    } else if(p.st==='psi'){
-      var a=reduce?.7:(.4+.3*Math.sin(T*2.4+p.ph));
-      cx.fillStyle='rgba(179,136,255,'+(a*base).toFixed(3)+')';
-      cx.beginPath();cx.arc(s.sx,s.sy,front?4.4:2.6,0,6.283);cx.fill();
-      cx.strokeStyle='rgba(179,136,255,'+(.3*base).toFixed(3)+')';
-      cx.beginPath();cx.arc(s.sx,s.sy,front?7.5:4.5,0,6.283);cx.stroke();
-    } else if(p.st==='verify'){
-      p.t+=.016;
-      cx.strokeStyle='rgba(57,208,255,'+Math.max(0,.85-p.t*1.4).toFixed(3)+')';
-      cx.lineWidth=1.6;
-      cx.beginPath();cx.arc(s.sx,s.sy,4+p.t*40,0,6.283);cx.stroke();
-      cx.fillStyle='rgba(57,208,255,.95)';
-      cx.beginPath();cx.arc(s.sx,s.sy,4,0,6.283);cx.fill();
-      if(p.t>.55){p.st='flash';p.t=0;}
-    } else if(p.st==='flash'){
-      p.t+=.016;
-      cx.shadowColor='rgba(0,230,118,.9)';cx.shadowBlur=16;
-      cx.fillStyle='rgba(134,255,190,1)';
-      cx.beginPath();cx.arc(s.sx,s.sy,4.5,0,6.283);cx.fill();
-      cx.shadowBlur=0;
-      cx.strokeStyle='rgba(3,5,7,.95)';cx.lineWidth=1.6;cx.lineCap='round';
-      cx.beginPath();cx.moveTo(s.sx-2.8,s.sy+.2);cx.lineTo(s.sx-.7,s.sy+2.3);cx.lineTo(s.sx+3.1,s.sy-2.3);cx.stroke();
-      if(p.t>2.6){p.st='ok';
-        /* conservation: a new conjecture opens elsewhere */
-        var j=Math.floor(Math.random()*N);
-        if(pts[j].st==='ok'&&j!==i)pts[j].st='psi';
+function patch(){ /* keep the world alive: occasional immigration */
+  var x0=Math.floor(Math.random()*(gw-8)), y0=Math.floor(Math.random()*(gh-8));
+  var h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
+  for(var y=0;y<6;y++)for(var x=0;x<6;x++)
+    if(Math.random()<.5){var i=(y0+y)*gw+(x0+x);grid[i]=1;hue[i]=h;}
+}
+var flashes=[]; /* splice flashes: 3 distinct parent hues */
+function caStep(){
+  var births=0;
+  for(var y=0;y<gh;y++){
+    for(var x=0;x<gw;x++){
+      var i=y*gw+x, n=0, hs=[], h;
+      for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
+        if(!dx&&!dy)continue;
+        var xx=(x+dx+gw)%gw, yy=(y+dy+gh)%gh, j=yy*gw+xx;
+        if(grid[j]){n++;hs.push(hue[j]);}
       }
+      if(grid[i]){ buf[i]=(n===2||n===3)?1:0; hbuf[i]=hue[i]; }
+      else if(n===3){
+        buf[i]=1; births++;
+        /* splice: majority hue, else blend; mutation 7% */
+        if(hs[0]===hs[1]||hs[0]===hs[2])h=hs[0];
+        else if(hs[1]===hs[2])h=hs[1];
+        else {h=hs[Math.floor(Math.random()*3)];
+          if(flashes.length<24)flashes.push({x:x,y:y,t:1});}
+        if(Math.random()<.07)h=(h+30)%360;
+        hbuf[i]=h;
+      } else buf[i]=0;
     }
   }
-  if(reduce){/* single static frame */ return; }
-  requestAnimationFrame(frame);
+  var t=grid;grid=buf;buf=t; t=hue;hue=hbuf;hbuf=t;
+  if(births<gw*gh*.004) patch();
 }
-if(reduce){project();frame();}else{requestAnimationFrame(frame);}
+var pulses=[]; /* green kernel pulses (from sim events; ambient echo) */
+function caDraw(){
+  cxa.clearRect(0,0,gw,gh);
+  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
+    var i=y*gw+x;
+    if(grid[i]){
+      cxa.fillStyle='hsla('+hue[i]+',65%,55%,.34)';
+      cxa.fillRect(x,y,1,1);
+    }
+  }
+  flashes.forEach(function(f){cxa.fillStyle='hsla(0,0%,100%,'+(f.t*.8)+')';cxa.fillRect(f.x-1,f.y-1,3,3);f.t-=.12;});
+  flashes=flashes.filter(function(f){return f.t>0});
+  pulses.forEach(function(p){
+    cxa.strokeStyle='hsla(150,100%,60%,'+(p.t*.7)+')';cxa.lineWidth=.8;
+    cxa.beginPath();cxa.arc(p.x,p.y,(1-p.t)*16+2,0,6.283);cxa.stroke();p.t-=.03;});
+  pulses=pulses.filter(function(p){return p.t>0});
+}
+function kernelPulse(){ if(!reduce) pulses.push({x:Math.random()*gw,y:Math.random()*gh,t:1}); }
+caSize(); addEventListener('resize',caSize);
+if(reduce){ caStep(); caDraw(); }
+else{
+  var last=0;
+  (function loop(ts){
+    if(document.hidden){requestAnimationFrame(loop);return;}
+    if(ts-last>150){caStep();last=ts;}
+    caDraw();
+    requestAnimationFrame(loop);
+  })(0);
+}
 
-/* ---------- SIMULATION (counters driven ONLY by sim events) ---------- */
+/* ============================================================
+   SWARM SIMULATION — counters driven ONLY by sim events
+   ============================================================ */
 var term=document.getElementById('term');
-var params={temp:.7,depth:2000,guard:2};
-var running=true,simThm=4892,simPsi=142,ordinal=8,timer=null;
-var topics=['Group Theory','Number Theory','Order Theory','Lattice Theory','Finite Combinatorics','Modular Arithmetic','Monoid Homomorphisms','Divisibility Lattices','Telescoping Sums','Parity Structures'];
-var names=['subgroup_union_closure','digit_sum_mod_nine','Iic_inter_Ici_collapse','sum_range_succ_telescope','coprime_lcm_dvd_mul','orderOf_dvd_card_pow','Finset_filter_parity_card','modEq_pow_totient_lift','gcd_mul_right_cancel','lattice_inf_sup_absorb','monoidHom_ker_normal_min','divisor_antichain_bound'];
+var P={pop:24,mut:.25,ep:40,tri:.35};
+var running=true,simThm=4892,simPsi=142,epoch=9,verdicts=0,gen=214,timer=null;
+var domains=['Group Theory','Number Theory','Order Theory','Lattice Theory','Reflection Schemata','Modular Arithmetic','Ordinal Notations','Divisibility Lattices','Bounded Trust','Parity Structures'];
+var names=['subgroup_union_closure','digit_sum_mod_nine','rfn_step_conservation','sum_range_succ_telescope','coprime_lcm_dvd_mul','orderOf_dvd_card_pow','trust_budget_monotone','modEq_pow_totient_lift','gcd_mul_right_cancel','ordinal_rank_le_eps','monoidHom_ker_normal_min','divisor_antichain_bound'];
 var tactics=['aesop','duper','omega','norm_num','decide','simp_arith','induction … <;> ring','linarith'];
 var fails=['type mismatch: expected ℕ, got ℤ','tactic timeout after depth budget','unification stuck at ?m.318','counterexample found: n = 41','duper: saturation without refutation','maximum recursion depth in simp'];
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
@@ -560,104 +538,157 @@ function fmt(n){return n.toLocaleString('en-US');}
 function pop(el){if(reduce)return;el.classList.remove('tick');void el.offsetWidth;el.classList.add('tick');}
 function setThm(){var el=document.getElementById('c_thm');el.textContent=fmt(simThm);pop(el);}
 function setPsi(dn){simPsi=Math.max(60,simPsi+dn);var el=document.getElementById('c_psi');el.textContent=fmt(simPsi);pop(el);}
-function ordTick(){ordinal=Math.min(96,ordinal+.05+Math.random()*.08);
-  document.getElementById('ordfill').style.width=ordinal.toFixed(1)+'%';}
+function setPop(){var el=document.getElementById('c_pop');el.textContent=P.pop+' · e'+epoch;pop(el);}
+function R(){return 'R'+Math.floor(Math.random()*P.pop+1);}
+function E(){return 'E'+Math.floor(Math.random()*Math.max(3,P.pop>>3)+1);}
 var job=null,phase=0;
 function step(){
   if(!running)return schedule();
+  var r=Math.random();
   if(!job){
-    var t=topics[Math.floor(Math.random()*topics.length)];
-    job={topic:t,name:names[Math.floor(Math.random()*names.length)]+'_'+Math.floor(Math.random()*90+10),
-         k:Math.floor(4+Math.random()*14)};
-    phase=0;
-    line('in','SC_ENGINE  <span class="cy">[T1·GEN]</span>  sampling conjecture · domain: <span class="sy">'+esc(job.topic)+'</span> · τ='+params.temp.toFixed(2));
-    setPsi(+1);
-  } else if(phase===0){
-    if(Math.random()<Math.min(.32,.1+params.temp*.18)){
-      line('wr','NUM_FILTER <span class="wr">[REJECT]</span> counterexample at n='+Math.floor(Math.random()*97+2)+' — |ψ⟩ → |refuted⟩ · failures.jsonl');
-      setPsi(-1);job=null;
+    /* interleaved swarm events */
+    if(r<.16){
+      line('in',R()+' → '+R()+'  <span class="cy">[MSG]</span>   lemma request: bound on '+esc(['|G|','ν₂(n!)','rank(T)','chain length'][Math.floor(Math.random()*4)])+' · blackboard');
+    } else if(r<.16+P.mut*.4){
+      gen++;
+      var a=R(),b=R();
+      line('sy','SPLICE     <span class="sy">[GEN '+gen+']</span> '+a+' × '+b+' → R'+(P.pop+1)+' · crossover(tactic portfolio ⊕ domain focus) · mutation '+(Math.random()<.3?'+':'−'));
     } else {
-      line('in','NUM_FILTER [PASS]   survives 10⁴ samples · candidate: <span class="sy">'+esc(job.name)+'</span>');
+      var d=domains[Math.floor(Math.random()*domains.length)];
+      job={ag:R(),dom:d,name:names[Math.floor(Math.random()*names.length)]+'_'+Math.floor(Math.random()*90+10),k:Math.floor(4+Math.random()*14)};
+      phase=0;
+      line('in',job.ag+'         <span class="cy">[GEN]</span>   conjecture sampled · domain: <span class="sy">'+esc(d)+'</span>');
+      setPsi(+1);
+    }
+  } else if(phase===0){
+    var pv=(.3+Math.random()*.65).toFixed(2);
+    if(+pv<P.tri){
+      line('wr',E()+'         <span class="wr">[TRIAGE]</span> P(provable)='+pv+' &lt; budget '+P.tri.toFixed(2)+' — deferred, returned to blackboard');
+      job=null;setPsi(-1);
+    } else {
+      line('in',E()+'         [TRIAGE] P(provable)='+pv+' · queued to Lean · premises: '+job.k+' from verified DAG');
       phase=1;
     }
   } else if(phase===1){
-    line('in','RAG_PREMSEL [T2]    retrieved '+job.k+' premises from verified DAG (cos-sim ≥ 0.82)');
-    phase=2;
-  } else if(phase===2){
     var tac=tactics[Math.floor(Math.random()*tactics.length)];
-    var pWin=Math.min(.86,.35+Math.log10(params.depth)*.16-params.temp*.12);
-    if(Math.random()<pWin){
-      var ms=(Math.random()*(params.depth/900)+.002).toFixed(3);
-      line('ok','LEAN4_KERNEL <span class="ok">[SUCCESS]</span> <span class="sy">'+esc(job.name)+'</span> compiled via <span class="cy">'+esc(tac)+'</span> · soundness verified · '+ms+'s');
-      phase=3;
+    if(Math.random()<.62){
+      var ms=(Math.random()*3+.002).toFixed(3);
+      line('ok','LEAN4_KERNEL <span class="ok">[SUCCESS]</span> <span class="sy">'+esc(job.name)+'</span> via <span class="cy">'+esc(tac)+'</span> · soundness verified · '+ms+'s');
+      phase=2;
     } else {
-      line('er','PROOF_SEARCH <span class="er">[FAIL]</span> '+esc(tac)+' — '+esc(fails[Math.floor(Math.random()*fails.length)]));
-      if(Math.random()<.5){job=null;setPsi(-1);}
-    }
-  } else if(phase===3){
-    if(params.guard>=2){
-      if(params.guard===3&&Math.random()<.12){
-        line('wr','AXIOM_AUDIT <span class="wr">[REJECT]</span> #print axioms → Classical.choice — discarded under guardrail L3');
-        job=null;setPsi(-1);return schedule();
+      line('er','LEAN4_KERNEL <span class="er">[FAIL]</span> '+esc(tac)+' — '+esc(fails[Math.floor(Math.random()*fails.length)]));
+      if(Math.random()<.4){
+        line('in',E()+'         [CALIB] verdict absorbed · Brier '+( .12+Math.random()*.06).toFixed(2)+' → '+(.09+Math.random()*.05).toFixed(2));
       }
-      line('ok','AXIOM_AUDIT [PASS]  #print axioms → [propext, Quot.sound] — constructive ✓');
+      verdictTick(); job=null; setPsi(-1);
     }
-    phase=4;
+  } else if(phase===2){
+    line('ok','AXIOM_AUDIT  [PASS]  #print axioms → [propext, Quot.sound] — constructive ✓');
+    phase=3;
   } else {
-    line('in','RAG_INDEX  <span class="cy">[T3·RSI]</span> theorem vectorized → premise DB · search space contracted');
-    simThm++;setThm();setPsi(-1);ordTick();
-    /* visual echo on the globe — display only, counter already updated above */
-    var cand=pts.filter(function(p){return p.st==='psi'});
-    if(cand.length&&!reduce){var n=cand[Math.floor(Math.random()*cand.length)];n.st='verify';n.t=0;}
+    line('in','DAG_INDEX    <span class="cy">[RSI]</span>   theorem → premise DB · '+job.ag+' fitness += reach · evaluators recalibrated');
+    simThm++;setThm();setPsi(-1);verdictTick();kernelPulse();
     job=null;
   }
   schedule();
 }
-function schedule(){
-  var base=1400-Math.log10(params.depth)*260;
-  timer=setTimeout(step,Math.max(140,base+base*.4*Math.random()));
+function verdictTick(){
+  verdicts++;
+  if(verdicts>=P.ep){
+    verdicts=0;epoch++;
+    var culled=R();
+    line('wr','SELECTION    <span class="wr">[EPOCH '+epoch+']</span> '+culled+' culled (reach/compute ≈ 0.0'+Math.floor(Math.random()*9)+') · genome archived · evaluators re-seeded — Red Queen advances');
+    setPop();
+  }
 }
-line('in','SC_ENGINE  [BOOT]   pipeline monitor attached · <span class="wr">SIMULATION — synthetic telemetry · no backend</span>');
-line('in','SC_ENGINE  [BOOT]   ground-truth counters are wired separately and read 0');
+function schedule(){ timer=setTimeout(step, 520+Math.random()*620); }
+line('in','SC_ENGINE    [BOOT]  swarm monitor attached · <span class="wr">SIMULATION — synthetic telemetry · no backend</span>');
+line('in','SC_ENGINE    [BOOT]  ground-truth counters wired separately · they read 0');
 schedule();
 
 function $(id){return document.getElementById(id);}
-$('s_temp').addEventListener('input',function(){params.temp=this.value/100;$('v_temp').textContent=params.temp.toFixed(2);});
-$('s_depth').addEventListener('input',function(){params.depth=+this.value;$('v_depth').textContent=fmt(params.depth);});
-$('s_guard').addEventListener('input',function(){params.guard=+this.value;
-  $('v_guard').textContent=['','L1 · kernel only','L2 · axiom audit','L3 · +constructive'][params.guard];});
+$('s_pop').addEventListener('input',function(){P.pop=+this.value;$('v_pop').textContent=P.pop;setPop();});
+$('s_mut').addEventListener('input',function(){P.mut=this.value/100;$('v_mut').textContent=P.mut.toFixed(2);});
+$('s_ep').addEventListener('input',function(){P.ep=+this.value;$('v_ep').textContent=P.ep+' verdicts';});
+$('s_tri').addEventListener('input',function(){P.tri=this.value/100;$('v_tri').textContent=P.tri.toFixed(2);});
 $('pausebtn').addEventListener('click',function(){running=!running;this.textContent=running?'PAUSE':'RESUME';
-  line(running?'in':'wr','SC_ENGINE  [CTRL]   '+(running?'resumed':'paused by operator'));});
+  line(running?'in':'wr','SC_ENGINE    [CTRL]  '+(running?'resumed':'paused by operator'));});
 $('resetbtn').addEventListener('click',function(){
   clearTimeout(timer);job=null;phase=0;running=true;$('pausebtn').textContent='PAUSE';
-  term.innerHTML='';simThm=4892;simPsi=142;ordinal=8;
-  setThm();$('c_psi').textContent=fmt(simPsi);$('ordfill').style.width='8%';
-  line('in','SC_ENGINE  [BOOT]   simulation reset · synthetic telemetry re-seeded');
+  term.innerHTML='';term.appendChild(cur);
+  simThm=4892;simPsi=142;epoch=9;verdicts=0;gen=214;
+  setThm();setPsi(0);setPop();
+  line('in','SC_ENGINE    [BOOT]  simulation reset · synthetic telemetry re-seeded');
   schedule();
 });
 
-/* ---------- ambient audio (synthesized live — original, no recordings) ---------- */
+/* ============================================================
+   DARK AMBIENT — Blade-Runner-leaning, synthesized live.
+   Original composition generated in the browser: no recordings,
+   no samples, no copyright. Beatless: sub drone, detuned pad
+   through a slow filter sweep, generated-IR reverb wash, rain
+   noise, rare dark swells with a ♭2 above the root.
+   ============================================================ */
 var btn=$('musicbtn'),actx=null;
+function makeIR(ctx,secs,decay){
+  var rate=ctx.sampleRate,len=rate*secs,ir=ctx.createBuffer(2,len,rate);
+  for(var c=0;c<2;c++){var ch=ir.getChannelData(c);
+    for(var i=0;i<len;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);}
+  return ir;
+}
 function startAudio(){
   actx=new (window.AudioContext||window.webkitAudioContext)();
-  var master=actx.createGain();master.gain.value=.1;master.connect(actx.destination);
-  var lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=480;lp.Q.value=.6;lp.connect(master);
-  var dl=actx.createDelay(1.2);dl.delayTime.value=.46;var fb=actx.createGain();fb.gain.value=.32;
-  dl.connect(fb);fb.connect(dl);dl.connect(master);
-  [55,82.41,110].forEach(function(f,i){var o=actx.createOscillator();o.type='triangle';o.frequency.value=f;o.detune.value=(i-1)*4;
-    var g=actx.createGain();g.gain.value=.045;o.connect(g);g.connect(lp);o.start();});
-  var lfo=actx.createOscillator();lfo.frequency.value=.045;var lg=actx.createGain();lg.gain.value=230;
-  lfo.connect(lg);lg.connect(lp.frequency);lfo.start();
-  var notes=[220,261.63,293.66,329.63,392,440];
-  setInterval(function(){
-    if(actx.state!=='running'||Math.random()>.5)return;
-    var f=notes[Math.floor(Math.random()*notes.length)]*(Math.random()<.18?2:1);
-    var o=actx.createOscillator();o.type='sine';o.frequency.value=f;
-    var g=actx.createGain();var t0=actx.currentTime;
-    g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.07,t0+.04);
-    g.gain.exponentialRampToValueAtTime(.0001,t0+2.4);
-    o.connect(g);g.connect(lp);g.connect(dl);o.start(t0);o.stop(t0+2.6);
-  },820);
+  var master=actx.createGain();master.gain.value=.16;master.connect(actx.destination);
+  var verb=actx.createConvolver();verb.buffer=makeIR(actx,5.5,3.2);
+  var vg=actx.createGain();vg.gain.value=.55;verb.connect(vg);vg.connect(master);
+  var dry=actx.createGain();dry.gain.value=.5;dry.connect(master);
+  function out(node,wet){node.connect(dry);var g=actx.createGain();g.gain.value=wet;node.connect(g);g.connect(verb);}
+  /* sub drone: D1 + A1 */
+  [[36.71,.07],[55,.05]].forEach(function(fq){
+    var o=actx.createOscillator();o.type='sine';o.frequency.value=fq[0];
+    var g=actx.createGain();g.gain.value=fq[1];
+    var lfo=actx.createOscillator();lfo.frequency.value=.03+Math.random()*.02;
+    var lg=actx.createGain();lg.gain.value=fq[1]*.4;
+    lfo.connect(lg);lg.connect(g.gain);lfo.start();
+    o.connect(g);out(g,.6);o.start();
+  });
+  /* Vangelis pad: detuned saws D2/A2/D3/F3 through slow lowpass */
+  var lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=260;lp.Q.value=.9;
+  out(lp,.9);
+  [73.42,110,146.83,174.61].forEach(function(f){
+    [-6,5].forEach(function(det){
+      var o=actx.createOscillator();o.type='sawtooth';o.frequency.value=f;o.detune.value=det;
+      var g=actx.createGain();g.gain.value=.012;o.connect(g);g.connect(lp);o.start();
+    });
+  });
+  var swp=actx.createOscillator();swp.frequency.value=.017;
+  var sg=actx.createGain();sg.gain.value=170;swp.connect(sg);sg.connect(lp.frequency);swp.start();
+  /* rain: filtered noise bed */
+  var nb=actx.createBuffer(1,actx.sampleRate*3,actx.sampleRate);
+  var nd=nb.getChannelData(0);for(var i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+  var noise=actx.createBufferSource();noise.buffer=nb;noise.loop=true;
+  var nf=actx.createBiquadFilter();nf.type='lowpass';nf.frequency.value=650;
+  var ng=actx.createGain();ng.gain.value=.014;
+  var nlfo=actx.createOscillator();nlfo.frequency.value=.07;
+  var nlg=actx.createGain();nlg.gain.value=.007;nlfo.connect(nlg);nlg.connect(ng.gain);nlfo.start();
+  noise.connect(nf);nf.connect(ng);out(ng,.4);noise.start();
+  /* rare dark swell: root + ♭2 (D + Eb), 9s envelope, drowned in reverb */
+  function swell(){
+    if(!actx||actx.state!=='running'){setTimeout(swell,4000);return;}
+    if(Math.random()<.75){
+      [146.83,155.56].forEach(function(f,ix){
+        var o=actx.createOscillator();o.type='triangle';o.frequency.value=f;
+        var g=actx.createGain();var t0=actx.currentTime;
+        g.gain.setValueAtTime(.0001,t0);
+        g.gain.exponentialRampToValueAtTime(ix? .015:.022,t0+4);
+        g.gain.exponentialRampToValueAtTime(.0001,t0+9);
+        o.connect(g);var w=actx.createGain();w.gain.value=1;g.connect(w);w.connect(verb);
+        o.start(t0);o.stop(t0+9.5);
+      });
+    }
+    setTimeout(swell,11000+Math.random()*9000);
+  }
+  setTimeout(swell,6000);
 }
 btn.addEventListener('click',function(){
   if(!actx){startAudio();btn.classList.add('on');return;}
