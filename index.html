@@ -269,10 +269,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <b>SCHRÖDINGER'S CAT</b>
     </span>
     <nav>
-      <a class="lnk" href="#real">Code</a>
       <a class="lnk" href="#problem">Problem</a>
       <a class="lnk" href="#vision">Direction</a>
       <a class="lnk" href="#truth">Ground&nbsp;truth</a>
+      <a class="lnk" href="#real">Code</a>
       <a class="lnk" href="#sim">Telemetry</a>
       <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
@@ -294,41 +294,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
     proposed, connected, and grown, where every step must survive a constructive proof checker.
     Below: <b>real Lean 4 code, really compiled</b> — and a living picture of the organism we intend.</p>
     <div class="cta stag d4">
-      <a class="btn pri" href="#real">See the code</a>
-      <a class="btn sec" href="#problem">Why new mathematics</a>
+      <a class="btn pri" href="#problem">Why new mathematics</a>
+      <a class="btn sec" href="#real">See the real code</a>
     </div>
   </div>
 </div>
 
-<!-- ================= REAL LEAN ================= -->
-<section id="real"><div class="wrap rv">
-  <div class="slab">01 · The native language</div>
-  <div class="edwrap">
-    <div class="editor">
-      <div class="edhead">
-        <span class="eddots"><span style="background:#d16a8a"></span><span style="background:#e0a23f"></span><span style="background:#2ee584"></span></span>
-        <span class="edtab">Discovered.lean</span>
-        <span class="bdg real" title="This code really compiled with lake build on Lean 4.32.0.">✓ REAL · lake build</span>
-        <span class="edlean">LEAN 4.32.0</span>
-      </div>
-      <div class="edbody">
-        <div class="gutter" id="gutter"></div>
-        <div class="codearea"><div id="code"></div></div>
-        <div class="edscan" aria-hidden="true"></div>
-      </div>
-      <div class="edstatus" id="edstatus"></div>
-    </div>
-    <p class="edcap">Real theorems, really compiled — zero <span class="mono">sorry</span>, zero classical
-    axioms. The typing is presentational; the code and axiom footprints are verbatim from
-    <span class="mono">lake build</span>.</p>
-  </div>
-</div></section>
-
-<div class="divider"></div>
-
 <!-- ================= PROBLEM ================= -->
 <section id="problem"><div class="wrap rv">
-  <div class="slab">02 · The problem</div>
+  <div class="slab">01 · The problem</div>
   <h2>Self-improvement exists. A <span class="g">theory of it</span> does not.</h2>
   <p class="lede">Three failures define the frontier — all three are failures of missing mathematics,
   not missing compute.</p>
@@ -361,7 +335,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <!-- ================= VISION ================= -->
 <section id="vision"><div class="wrap rv">
-  <div class="slab">03 · The direction</div>
+  <div class="slab">02 · The direction</div>
   <h2>Evolve the <span class="g">theory</span>, not the weights.</h2>
   <p class="lede">One idea drives this program — stated as a research direction, not a product claim.</p>
   <div class="vision">
@@ -384,7 +358,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <!-- ================= GROUND TRUTH ================= -->
 <section id="truth"><div class="wrap rv">
-  <div class="slab">04 · Ground truth</div>
+  <div class="slab">03 · Ground truth</div>
   <h2>Real counters, wired to <span class="g">kernel logs</span>.</h2>
   <div class="statusbar">
     <span class="item"><b>0</b> theorems discovered by the engine</span>
@@ -403,6 +377,32 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   Davis–Myreen 2015 (JAR) · Pakhomov–Walsh 2021 (JSL 86) · de Moura–Ullrich 2021 (CADE-28) ·
   Zhang et al. 2025 (arXiv:2505.22954) · Genewein et al. 2026 (arXiv:2606.12683) ·
   Iacob et al. 2026 (arXiv:2606.26294) · arXiv:2607.04277.</p>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ================= REAL LEAN (bottom, real artifact) ================= -->
+<section id="real"><div class="wrap rv">
+  <div class="slab">04 · The native language — real, compiled</div>
+  <div class="edwrap">
+    <div class="editor">
+      <div class="edhead">
+        <span class="eddots"><span style="background:#d16a8a"></span><span style="background:#e0a23f"></span><span style="background:#2ee584"></span></span>
+        <span class="edtab">Discovered.lean</span>
+        <span class="bdg real" title="This code really compiled with lake build on Lean 4.32.0.">✓ REAL · lake build</span>
+        <span class="edlean">LEAN 4.32.0</span>
+      </div>
+      <div class="edbody">
+        <div class="gutter" id="gutter"></div>
+        <div class="codearea"><div id="code"></div></div>
+        <div class="edscan" aria-hidden="true"></div>
+      </div>
+      <div class="edstatus" id="edstatus"></div>
+    </div>
+    <p class="edcap">Real theorems, really compiled — zero <span class="mono">sorry</span>, zero classical
+    axioms. The typing is presentational; the code and axiom footprints are verbatim from
+    <span class="mono">lake build</span>.</p>
+  </div>
 </div></section>
 
 <div class="divider"></div>
