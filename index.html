@@ -153,8 +153,8 @@ h2 .g{color:var(--acc)}
 
 /* problems */
 .probs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:960px;margin:0 auto}
-.prob{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:24px;transition:border-color .25s;text-align:left}
-.prob:hover{border-color:rgba(86,200,242,.35)}
+.prob{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:24px;transition:border-color .25s,transform .2s;text-align:left;will-change:transform}
+.prob:hover{border-color:rgba(181,123,255,.4)}
 .prob .no{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--acc)}
 .prob h3{font-family:var(--disp);color:var(--ink);font-size:16.5px;font-weight:600;margin:11px 0 8px}
 .prob p{font-size:13.5px;color:var(--mut);line-height:1.75}
@@ -166,6 +166,34 @@ h2 .g{color:var(--acc)}
 .vision p{font-size:15px;color:var(--txt);margin-bottom:12px}
 .vision p b{color:var(--vio2);font-weight:600}
 .vision .tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--sim)}
+
+/* research agenda */
+.hypo{max-width:780px;margin:0 auto 36px;border:1px solid rgba(95,224,207,.35);border-radius:6px;background:rgba(95,224,207,.04);padding:22px 26px;text-align:left}
+.hypo .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--teal);margin-bottom:10px}
+.hypo p.hm{font-family:var(--math);font-style:italic;font-size:15.5px;color:var(--ink)}
+.hypo .fals{font-family:var(--mono);font-size:10.5px;color:var(--sim);margin-top:10px;letter-spacing:.05em}
+.rq0box{border-color:rgba(181,123,255,.4);background:rgba(181,123,255,.05)}
+.rq0box .hm .up{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--mut);display:block;margin-top:8px;letter-spacing:.04em}
+.ptreewrap{max-width:840px;margin:0 auto 40px;border:1px solid var(--line);border-radius:6px;background:rgba(3,2,6,.62);padding:10px}
+#ptree{width:100%;height:230px;display:block}
+.ptreecap{font-family:var(--mono);font-size:9px;color:var(--mut);letter-spacing:.1em;text-align:center;padding:8px 4px 2px}
+.opcard .rq0{font-family:var(--mono);font-size:9.8px;color:var(--acc2);margin-top:9px;letter-spacing:.03em;line-height:1.55}
+.ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-bottom:46px}
+.opcard{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:22px;text-align:left;transition:border-color .25s,transform .2s;will-change:transform}
+.opcard:hover{border-color:rgba(95,224,207,.4)}
+.opcard .no{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--teal)}
+.opcard h3{font-family:var(--disp);color:var(--ink);font-size:15.5px;font-weight:600;margin:10px 0 7px}
+.opcard p{font-size:12.8px;color:var(--mut);line-height:1.7}
+.opcard p b{color:var(--txt);font-weight:600}
+h3.subh{font-family:var(--disp);color:var(--ink);font-size:18px;font-weight:600;text-align:center;margin:0 0 18px}
+.chal{max-width:880px;margin:0 auto 38px;border:1px solid var(--line);border-radius:6px;overflow:hidden;text-align:left}
+.crow{display:grid;grid-template-columns:240px 1fr;border-bottom:1px solid var(--line);background:var(--card)}
+.crow:last-child{border-bottom:none}
+.crow .cl{padding:14px 18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--acc2);border-right:1px solid var(--line)}
+.crow .cr{padding:14px 18px;font-size:13px;color:var(--mut);line-height:1.65}
+@media(max-width:700px){.crow{grid-template-columns:1fr}.crow .cl{border-right:none;border-bottom:1px dashed var(--line)}}
+.lenses{max-width:840px;margin:0 auto;font-size:12.5px;color:var(--mut);line-height:1.95;border-left:2px solid var(--acc);padding-left:20px;text-align:left}
+.lenses b{color:var(--acc2);font-weight:600}
 
 /* sim terminal */
 .simpanel{background:rgba(3,5,8,.94);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:1040px;margin:0 auto}
@@ -278,6 +306,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
     <nav>
       <a class="lnk" href="#problem">Problem</a>
       <a class="lnk" href="#vision">Direction</a>
+      <a class="lnk" href="#research">Research</a>
       <a class="lnk" href="#truth">Ground&nbsp;truth</a>
       <a class="lnk" href="#real">Code</a>
       <a class="lnk" href="#sim">Telemetry</a>
@@ -296,10 +325,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   <div class="inner">
     <div class="kick stag d1">An independent research program · foundations of mathematics × AI</div>
     <h1 class="stag d2 glitch" id="mainTitle" data-text="Between RSI and ASI lies a missing mathematics.">Between RSI and ASI lies a <span class="g">missing mathematics</span>.</h1>
-    <p class="sub stag d3">Self-improving systems exist — and grade themselves on benchmarks they can
-    game. We are building the version whose substrate is <b>mathematical theory itself</b>: structures
-    proposed, connected, and grown, where every step must survive a constructive proof checker.
-    Below: <b>real Lean 4 code, really compiled</b> — and a living picture of the organism we intend.</p>
+    <p class="sub stag d3">The field's first dedicated RSI workshop names what is missing: principled
+    methods that make self-improvement <b>measurable and reliable</b>. Our answer is precise: an RSI
+    whose object of discovery is <b>the mathematics of its own improvement</b> — a theory in the
+    foundations of mathematics, reached by computation over kernel-verified theorems. The loop that
+    improves is the loop that must eventually prove <b>why</b> it improves.</p>
     <div class="cta stag d4">
       <a class="btn pri" href="#problem">Why new mathematics</a>
       <a class="btn sec" href="#real">See the real code</a>
@@ -351,11 +381,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
     rebuilt (univalent foundations, higher structures); <b>bridges between theories</b> — the maps that
     carry proofs from one world into another — are both the evolutionary operator and the measure of
     depth: a theory that connects widely is a theory that matters.</p>
-    <p><b>Fitness is verified consequence, exactly:</b> fitness(T) = reach(T) = #{ goals g : g provable
-    under L ∪ T and unprovable under L } — where L is the current verified library, counted from kernel
-    logs, nothing else. The knowledge base itself is the organism:
-    theories are its cells, verified bridges its tissue, and every compile event — like the green
-    pulses on this page — is a heartbeat.</p>
+    <p><b>TIER A — NOW.</b> The loop proves kernel-checked theorems about a formal model of itself —
+    monotone library growth, terminating filters, sound tactic procedures — and a self-modification is
+    admitted <b>only on the strength of such a theorem</b>. Self-knowledge as the admission ticket.
+    No Löbian obstruction: these are theorems about a model of the loop, not the referee certifying
+    itself.</p>
+    <p><b>TIER B — THE PRIZE.</b> The conditional scaling-law theorem: under which conditions does
+    reach(e) = #{ goals provable under L<sub>e</sub> and not under L<sub>e−1</sub> } stay positive?
+    What PAC theory did for "learning," done for verified discovery — and discovered, if at all,
+    <b>by the loop itself</b>, operating on its own telemetry turned into formal objects.</p>
+    <p><b>TIER C — THE BOUNDARY.</b> What this theory can never contain: the soundness of its own
+    referee (Löb 1955; Gödel 1931). Stated, never dodged — the ascent lives one level up, always.</p>
     <p class="tag">LOCKED DESIGN: BLACKBOARD MEMORY · PROPOSER / CRITIC / PROVER · DUAL OUTPUT (REASONING + LEAN) · UNION MERGE · KERNEL AS SOLE GATE</p>
     <p class="tag">STATUS: ENGINE UNDER CONSTRUCTION — STEP 1 (VERIFIER) BUILT &amp; TESTED · NOTHING ELSE CLAIMED</p>
   </div>
@@ -363,19 +399,100 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <div class="divider"></div>
 
+<!-- ================= RESEARCH AGENDA ================= -->
+<section id="research"><div class="wrap rv">
+  <div class="slab">03 · Research agenda — the edge</div>
+  <h2>Five open problems. One <span class="g">falsifiable</span> hypothesis.</h2>
+  <p class="lede">This is a research program, not a product. Each question below sits at the current
+  edge of the field, each carries a named obstruction — and the central hypothesis can fail in public.</p>
+
+  <div class="hypo rq0box">
+    <div class="k" style="color:var(--acc)">CENTRAL RESEARCH QUESTION · RQ0</div>
+    <p class="hm">Can an RSI system computationally discover the mathematical theory of its own
+    improvement — and which fragment of that theory is reachable at each tier?
+    <span class="up">(A: self-model theorems, now · B: the conditional scaling law, the prize ·
+    C: its referee's soundness — never, by Löb.)</span></p>
+  </div>
+
+  <div class="ptreewrap">
+    <canvas id="ptree" aria-label="Symbolic animation of proof search: branches grow, dead ends retract by backtracking, one path locks green on kernel acceptance"></canvas>
+    <div class="ptreecap">SYMBOLIC VISUAL — PROOF SEARCH: BRANCHES EXPLORED · DEAD ENDS RETRACTED (BACKTRACKING) · ONE PATH KERNEL-LOCKED</div>
+  </div>
+
+  <div class="hypo">
+    <div class="k">CENTRAL HYPOTHESIS · H1</div>
+    <p class="hm">reach(e) = #{ goals provable under L<sub>e</sub> and not under L<sub>e−1</sub> } stays
+    positive epoch after epoch — measured from kernel logs only.</p>
+    <p class="fals">FALSIFIER — if reach flatlines at 0, the loop is search, not self-improvement, and this page will say so.</p>
+  </div>
+
+  <div class="ops">
+    <div class="opcard"><div class="no">RQ1 · VALUE</div><h3>What makes a theorem worth proving?</h3>
+      <p>Triviality is cheap — <b>x + 0 = x compiles perfectly</b> — yet mathematical depth has no
+      accepted definition. Our proxy, reach, scores what a result <b>unlocks</b>, not what it says.
+      Nearest formal handle: proof-theoretic ordinal analysis (Pakhomov–Walsh, JSL 2021). Open.</p>
+      <p class="rq0">→ RQ0 needs this: without a value function, the loop cannot know which theorems about itself matter.</p></div>
+    <div class="opcard"><div class="no">RQ2 · TRANSFER</div><h3>Can generalization become a theorem?</h3>
+      <p>A provable transfer map t : Struct(A) → Struct(B) whose invariant survives the crossing —
+      today "transfer" in ML has <b>no definition precise enough to fail</b>. Functorial semantics
+      exists; machine-discovered transfer maps do not. Open.</p>
+      <p class="rq0">→ RQ0 needs this: a theory of improvement is a theory of what transfers between epochs.</p></div>
+    <div class="opcard"><div class="no">RQ3 · TRUST</div><h3>How much self-trust is affordable?</h3>
+      <p>Löb caps blanket self-trust (T ⊢ □φ→φ forces T ⊢ φ); tiling agents pay for each successor in
+      strength. The exact <b>trust budget</b> of a loop that never certifies its own referee is
+      uncharted (Yudkowsky–Herreshoff 2013). Open.</p>
+      <p class="rq0">→ RQ0's Tier-C boundary IS this budget — how close to self-reference the theory may go.</p></div>
+    <div class="opcard"><div class="no">RQ4 · LOOP GAIN</div><h3>Does a bigger library search better?</h3>
+      <p>Monotone growth is trivial; better <b>search</b> is not. Under what conditions does verified
+      memory raise the next epoch's close-rate — and when does it saturate? AIDE² showed the code-level
+      analogue empirically (2026); nothing verified, nothing mathematical. Open.</p>
+      <p class="rq0">→ RQ0's Tier-B theorem IS the loop-gain law — this question stated formally.</p></div>
+    <div class="opcard"><div class="no">RQ5 · FORMALIZATION</div><h3>Does intuition survive translation?</h3>
+      <p>Our agents emit reasoning <b>and</b> Lean (D3). When the kernel rejects, which layer failed —
+      the intuition or its translation? Faithful autoformalization at research level is unsolved;
+      the Formal Conjectures benchmark (2026) measures exactly this gap. Open.</p>
+      <p class="rq0">→ RQ0's evidence chain breaks here if the loop's self-description is not faithfully formalized.</p></div>
+  </div>
+
+  <h3 class="subh">Known obstructions — and the countermeasures we commit to</h3>
+  <div class="chal">
+    <div class="crow"><span class="cl">C1 · Well-typed terms are sparse</span><span class="cr">No free generation: pre-typed statement families, kernel-error repair loop, cheap type-only precheck — quarantined, never counted as knowledge.</span></div>
+    <div class="crow"><span class="cl">C2 · Triviality trap</span><span class="cr">Fitness = reach. Anything the old library already proves scores zero; sub-100ms simp/decide closures score zero. Value is measured by what a result unlocks.</span></div>
+    <div class="crow"><span class="cl">C3 · Kernel latency</span><span class="cr">Batched candidates per lake call, a persistent Lean server, and a three-stage funnel: numeric filter (µs) → type check → full proof only for survivors.</span></div>
+    <div class="crow"><span class="cl">C4 · Axiom escape</span><span class="cr">Structurally closed: axiom and sorryAx rejected at the gate; footprint whitelist {propext, Quot.sound}; proposed axioms live in quarantine — explorable, never knowledge.</span></div>
+    <div class="crow"><span class="cl">C5 · No intermediate concepts</span><span class="cr">Definitions are first-class records; a definition's fitness is the reach of the theorems that use it. Vocabulary no verified theorem consumes never enters the library.</span></div>
+  </div>
+
+  <p class="lenses">Positioning in the field's own coordinates — the six lenses of the
+  <a href="https://recursive-workshop.github.io/" target="_blank" rel="noopener">first dedicated RSI
+  workshop (ICLR 2026)</a>. <b>What changes</b>: their list is "parameters, world models, memory,
+  tools and skills, architectures" — <b>a mathematical theory is absent from it</b>; that is our
+  change target. <b>When</b>: "within an episode, at test time, or after deployment" — ours: discrete
+  epochs. <b>How</b>: "reward or value learning, imitation, evolutionary search" — ours: propose /
+  critique / prove over shared verified memory. <b>Where</b>: "web and UI, games, robotics, science,
+  enterprise" — ours: formal mathematics. <b>Alignment &amp; security</b>: "long horizon stability,
+  regression risk" — ours: an immutable kernel gate and axiom quarantine. <b>Evaluation</b>: the
+  workshop names the missing piece — "methods that make self-improvement measurable" — ours: kernel
+  verdicts, never benchmarks.</p>
+</div></section>
+
+<div class="divider"></div>
+
 <!-- ================= GROUND TRUTH ================= -->
 <section id="truth"><div class="wrap rv">
-  <div class="slab">03 · Ground truth</div>
+  <div class="slab">04 · Ground truth</div>
   <h2>Real counters, wired to <span class="g">kernel logs</span>.</h2>
   <div class="statusbar">
     <span class="item"><b>0</b> theorems discovered by the engine</span>
-    <span class="item"><b>3</b> theorems compiled ✓ (the §01 editor — real lake build)</span>
-    <span class="item"><b>✓</b> engine step 1 — verifier built &amp; tested: true theorem accepted (constructive), false rejected with real kernel error, <span style="font-family:var(--mono)">sorry</span> caught by honesty gate</span>
+    <span class="item"><b>4</b> theorems compiled ✓ (the editor — real lake build)</span>
+    <span class="item"><b>✓</b> guarded diagonal dichotomy (Tier-C kernel) verified — 5 theorems, <b>zero axioms</b> (not even propext)</span>
+    <span class="item"><b>✓</b> verifier hardened: two gate bypasses closed (namespace audit · <span style="font-family:var(--mono)">noncomputable axiom : False</span>)</span>
     <span class="item"><b>0</b> epochs of real evolution</span>
     <span class="item"><b>✓</b> Lean 4.32.0 pinned</span>
-    <span class="pledge">Status 2026-07-14. The §01 editor shows real, compiled code in the format the
-    engine is meant to emit. Discovery counters stay at zero until the loop itself produces a result,
-    and every number that ever moves will be published beside the kernel log that moved it.</span>
+    <span class="pledge">Status 2026-07-17. The editor shows real, compiled code in the engine's target
+    format; theorem 4 (the axiom-free guarded diagonal dichotomy) is the machine-checked Tier-C
+    boundary. Discovery counters stay at zero until the loop itself produces a result — every number
+    that ever moves is published beside the kernel log that moved it.</span>
   </div>
   <p class="found"><b>Foundations (primary sources):</b> Gödel 1931 · Löb 1955 (JSL 20) · Turing 1939 (Proc. LMS) ·
   Feferman 1962 &amp; Feferman–Spector 1962 (JSL 27) · Kleene 1952 · Blum 1967/1971 (JACM 14/18) ·
@@ -390,7 +507,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <!-- ================= REAL LEAN (bottom, real artifact) ================= -->
 <section id="real"><div class="wrap rv">
-  <div class="slab">04 · The native language — real, compiled</div>
+  <div class="slab">05 · The native language — real, compiled</div>
   <div class="edwrap">
     <div class="editor">
       <div class="edhead">
@@ -407,8 +524,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <div class="edstatus" id="edstatus"></div>
     </div>
     <p class="edcap">Real theorems, really compiled — zero <span class="mono">sorry</span>, zero classical
-    axioms. The typing is presentational; the code and axiom footprints are verbatim from
-    <span class="mono">lake build</span>.</p>
+    axioms. The typing is presentational; the code, the axiom footprints, the REJECT → repair → ACCEPT
+    cycle on theorem 3, <b>and the axiom-free guarded diagonal dichotomy (theorem 4)</b> are replayed
+    verbatim from this project's actual build log — theorem 4 is the Tier-C boundary, machine-checked.</p>
   </div>
 </div></section>
 
@@ -416,7 +534,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <!-- ================= SIMULATION (bottom of site) ================= -->
 <section id="sim"><div class="wrap rv">
-  <div class="slab">05 · Engine telemetry — simulated</div>
+  <div class="slab">06 · Engine telemetry — simulated</div>
   <h2>One epoch, end to end — <span class="g">labeled</span> as what it is.</h2>
   <p class="lede">Proposals, triage, kernel verdicts, selection pressure. <b>Synthetic telemetry — no
   backend attached.</b> Amber marks simulation; green marks the only real artifacts.</p>
@@ -629,6 +747,61 @@ function kernelEvent(){
   pulses.push({x:(n.x/innerWidth)*gw,y:(n.y/innerHeight)*gh,t:1});
 }
 
+/* ============ PROOF-SEARCH TREE — symbolic backtracking visual ============ */
+(function(){
+  var cv=document.getElementById('ptree'); if(!cv)return;
+  var px=cv.getContext('2d'), W, Hh;
+  function sz(){W=cv.width=cv.clientWidth||800; Hh=cv.height=230;}
+  sz(); addEventListener('resize',sz);
+  var nodes, cur, locked;
+  function init(){nodes=[{x:26,y:Hh/2,p:-1,st:0,a:1}];cur=0;locked=false;}
+  init();
+  function depth(i){var d=0;while(nodes[i].p>=0){i=nodes[i].p;d++;}return d;}
+  function killSubtree(i){nodes[i].st=1;for(var j=0;j<nodes.length;j++)if(nodes[j].p===i&&nodes[j].st!==1)killSubtree(j);}
+  function step(noTimer){
+    if(locked)return;
+    var n=nodes[cur], d=depth(cur);
+    if(n.x>W-70||d>=9){
+      locked=true; var i=cur;
+      while(i>=0){nodes[i].st=2;i=nodes[i].p;}
+      if(!noTimer)setTimeout(init,4600);
+      return;
+    }
+    if(d>1&&Math.random()<.3){                     /* dead end → backtrack */
+      killSubtree(cur);
+      cur=nodes[cur].p;
+      while(cur>0&&Math.random()<.35)cur=nodes[cur].p;
+      return;
+    }
+    var parent=cur;
+    if(Math.random()<.35){                          /* side branch for texture */
+      nodes.push({x:n.x+30+Math.random()*16,
+        y:Math.max(14,Math.min(Hh-14,n.y+(Math.random()*110-55))),p:parent,st:0,a:1});
+    }
+    nodes.push({x:n.x+34+Math.random()*22,
+      y:Math.max(16,Math.min(Hh-16,n.y+(Math.random()*90-45))),p:parent,st:0,a:1});
+    cur=nodes.length-1;
+  }
+  function draw(){
+    px.clearRect(0,0,W,Hh);
+    for(var i=1;i<nodes.length;i++){
+      var c=nodes[i], pn=nodes[c.p]; if(!pn)continue;
+      if(c.st===1){c.a-=.018;if(c.a<=0)continue;}
+      var col=c.st===2?'rgba(46,229,132,':c.st===1?'rgba(255,106,193,':'rgba(181,123,255,';
+      px.strokeStyle=col+(c.st===1?(c.a*.5).toFixed(2):c.st===2?'.9':'.45')+')';
+      px.lineWidth=c.st===2?2:1;
+      px.beginPath();px.moveTo(pn.x,pn.y);px.lineTo(c.x,c.y);px.stroke();
+      px.fillStyle=col+(c.st===1?(c.a*.6).toFixed(2):'.9')+')';
+      px.beginPath();px.arc(c.x,c.y,c.st===2?3:2,0,6.283);px.fill();
+    }
+    px.fillStyle='rgba(220,188,255,.95)';
+    px.beginPath();px.arc(nodes[0].x,nodes[0].y,3.4,0,6.283);px.fill();
+  }
+  if(reduce){ var it=0; while(!locked&&it++<400) step(true); draw(); return; }
+  setInterval(step,240);
+  (function loop(){ if(!document.hidden) draw(); requestAnimationFrame(loop); })();
+})();
+
 /* ============ LEAN EDITOR — REAL CODE, REAL BUILD OUTPUT ============ */
 /* Source: lean/Discovered.lean · verified 2026-07-14:
    "Build completed successfully (3 jobs)."  Axiom footprints below are
@@ -652,8 +825,19 @@ var THEOREMS=[
   [['kw','theorem'],['fn',' two_pow_ten_mod_eleven'],['op',' : '],['st','2'],['op',' ^ '],['st','10'],['op',' % '],['st','11'],['op',' = '],['st','1'],['op',' := '],['kw','by decide']]
  ],
  ax:"#print axioms two_pow_ten_mod_eleven → depends on NO axioms — pure kernel computation ✓"},
- {lines:[
+ {attempt:{lines:[
   [['cm',"/-- The product of two consecutive naturals is even. -/"]],
+  [['kw','theorem'],['fn',' even_consec_prod'],['op',' (n : '],['ty','Nat'],['op',') : '],['fn','n * (n + 1) % 2 = 0'],['op',' := '],['kw','by']],
+  [['kw','  induction'],['fn',' n '],['kw','with']],
+  [['op','  | '],['fn','zero'],['op',' => '],['kw','rfl']],
+  [['op','  | '],['fn','succ k ih'],['op',' =>']],
+  [['kw','    have'],['fn',' h'],['op',' : '],['fn','(k+1)*(k+2) = k*(k+1) + 2*(k+1)'],['op',' := '],['kw','by simp'],['op','[…]; '],['kw','omega']],
+  [['kw','    omega']]
+ ],
+ err:"omega could not prove the goal: a possible counterexample may satisfy the constraints  c ≥ 0, b ≥ 0, a ≥ 0, a + b ≥ −1  where a := ↑(k*(k+1))/2 · b := ↑k · c := ↑((k+1)*(k+1+1))/2"},
+ lines:[
+  [['cm',"/-- The product of two consecutive naturals is even. -/"]],
+  [['cm',"-- repair: omega cannot see through nonlinear atoms — case-split on parity instead"]],
   [['kw','theorem'],['fn',' even_consec_prod'],['op',' (n : '],['ty','Nat'],['op',') : '],['fn','n * (n + 1) % 2 = 0'],['op',' := '],['kw','by']],
   [['kw','  rw'],['op',' ['],['fn','Nat.mul_mod'],['op',']']],
   [['kw','  have'],['fn',' h'],['op',' : '],['fn','n % 2 = 0 ∨ n % 2 = 1'],['op',' := '],['kw','by omega']],
@@ -661,7 +845,19 @@ var THEOREMS=[
   [['op','  | '],['fn','inl h0'],['op',' => '],['kw','simp'],['op',' ['],['fn','h0'],['op',']']],
   [['op','  | '],['fn','inr h1'],['op',' => '],['kw','have'],['fn',' h2'],['op',' : '],['fn','(n+1) % 2 = 0'],['op',' := '],['kw','by omega'],['op','; '],['kw','simp'],['op',' ['],['fn','h1, h2'],['op',']']]
  ],
- ax:"#print axioms even_consec_prod → [propext, Quot.sound]  — constructive ✓"}
+ ax:"#print axioms even_consec_prod → [propext, Quot.sound]  — constructive ✓"},
+ {lines:[
+  [['cm',"/-- Tier-C boundary, machine-checked: the guarded diagonal dichotomy. -/"]],
+  [['cm',"-- unguarded self-reference x = ¬x is impossible;"]],
+  [['cm',"-- one-step-delayed x = ¬▷x has a unique solution."]],
+  [['kw','def'],['fn',' neg'],['op',' (n k : '],['ty','Nat'],['op',') : '],['ty','Nat'],['op',' := '],['kw','if'],['fn',' k = '],['st','0'],['kw',' then'],['fn',' n+'],['st','1'],['kw',' else'],['st',' 0']],
+  [['kw','theorem'],['fn',' no_unguarded_fixed'],['op',' : '],['op','¬ ∃ x, '],['fn','IsUnguardedFixed x'],['op',' := '],['kw','by']],
+  [['kw','  rintro'],['op',' ⟨x, hx⟩; '],['kw','have'],['fn',' h0 '],['op',':= '],['fn','hx '],['st','0']],
+  [['kw','  by_cases'],['fn',' h '],['op',': '],['fn','x '],['st','0'],['fn',' = '],['st','0'],['kw',' <;> '],['kw','simp'],['op',' [...] '],['kw','at'],['fn',' h0']],
+  [['kw','theorem'],['fn',' guarded_fixed_unique'],['op',' : ∀ x, '],['fn','IsGuardedFixed x'],['op',' → ∀ n, '],['fn','x n = 0'],['op',' := '],['kw','by']],
+  [['kw','  intro'],['fn',' x hx n; '],['kw','induction'],['fn',' n '],['kw','with'],['op',' ...']]
+ ],
+ ax:"#print axioms no_unguarded_fixed → does not depend on any axioms — NONE, fully constructive ✓✓"}
 ];
 var codeEl=document.getElementById('code'), gutEl=document.getElementById('gutter'), stEl=document.getElementById('edstatus');
 function esc2(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
@@ -688,33 +884,48 @@ function renderCode(lines,partialLine,partialChars,caret){
 }
 function lineLen(line){return line.reduce(function(s,t){return s+t[1].length},0);}
 var ti=0;
+function typeLines(lines, done){
+  var li=0, ch=0;
+  (function typeStep(){
+    if(li>=lines.length){ done(); return; }
+    var L=lines[li], len=lineLen(L);
+    if(ch>=len){ li++; ch=0; renderCode(lines,li,0,li<lines.length); setTimeout(typeStep, 60); return; }
+    ch+=1+(Math.random()<.3?1:0);
+    renderCode(lines,li,ch,true);
+    setTimeout(typeStep, 14+Math.random()*36);
+  })();
+}
 function playTheorem(){
   var th=THEOREMS[ti%THEOREMS.length]; ti++;
-  var li=0, ch=0;
   stEl.innerHTML='';
-  if(reduce){ /* static: show full code + real result at once */
+  if(reduce){ /* static: full code + real result at once */
     renderCode(th.lines, th.lines.length, 0, false);
     stEl.innerHTML='<div class="cmd">$ lake build</div><div class="oks">✓ Build completed successfully (3 jobs).</div><div class="ax">'+esc2(th.ax)+'</div>';
     return;
   }
-  (function typeStep(){
-    if(li>=th.lines.length){
+  function accept(){
+    stEl.innerHTML='<div class="cmd">$ lake build<span class="dots"></span></div>';
+    setTimeout(function(){
+      stEl.innerHTML='<div class="cmd">$ lake build</div>'+
+        '<div class="oks">✓ Build completed successfully (3 jobs).</div>'+
+        '<div class="ax">'+esc2(th.ax)+'</div>';
+      kernelEvent();
+      setTimeout(playTheorem, 5200);
+    }, 1300);
+  }
+  if(th.attempt){ /* the real REJECT → repair → ACCEPT cycle from this project's build log */
+    typeLines(th.attempt.lines, function(){
       stEl.innerHTML='<div class="cmd">$ lake build<span class="dots"></span></div>';
       setTimeout(function(){
         stEl.innerHTML='<div class="cmd">$ lake build</div>'+
-          '<div class="oks">✓ Build completed successfully (3 jobs).</div>'+
-          '<div class="ax">'+esc2(th.ax)+'</div>';
-        kernelEvent();
-        setTimeout(playTheorem, 5200);
+          '<div style="color:var(--ros)">✗ error: '+esc2(th.attempt.err)+'</div>'+
+          '<div class="cmd">PROVER · reading kernel error → repairing proof<span class="dots"></span></div>';
+        setTimeout(function(){ stEl.innerHTML=''; typeLines(th.lines, accept); }, 3400);
       }, 1300);
-      return;
-    }
-    var L=th.lines[li], len=lineLen(L);
-    if(ch>=len){ li++; ch=0; renderCode(th.lines,li,0,li<th.lines.length); setTimeout(typeStep, 60); return; }
-    ch+=1+(Math.random()<.3?1:0);
-    renderCode(th.lines,li,ch,true);
-    setTimeout(typeStep, 14+Math.random()*36);
-  })();
+    });
+  } else {
+    typeLines(th.lines, accept);
+  }
 }
 playTheorem();
 
@@ -753,7 +964,11 @@ else{(function(){
     var t0=performance.now();
     (function diss(){
       var p=(performance.now()-t0)/1500;
-      if(p>=1){boot.remove();burst();setTimeout(burst,500);
+      if(p>=1){boot.remove();
+        /* A1 fix: pin entrance-animated elements visible so later glitch/zap
+           animations can never override `rise`'s forwards fill back to opacity 0 */
+        document.querySelectorAll('.stag').forEach(function(el){el.classList.remove('stag','d1','d2','d3','d4');});
+        burst();setTimeout(burst,500);
         (function micro(){setTimeout(function(){burst();micro();},6000+Math.random()*6000);})();
         return;}
       paint(p); requestAnimationFrame(diss);
@@ -852,6 +1067,32 @@ line('in','SC_ENGINE   [BOOT]    the only real artifacts on this page are in §0
 schedule();
 
 function $(id){return document.getElementById(id);}
+/* 3D atmosphere: card tilt + pointer parallax + hover glitch (desktop, motion allowed) */
+if(!reduce && matchMedia('(pointer:fine)').matches){
+  document.querySelectorAll('.prob,.opcard,.agentcard').forEach(function(c){
+    c.addEventListener('mousemove',function(e){
+      var r=c.getBoundingClientRect();
+      var rx=((e.clientY-r.top)/r.height-.5)*-5, ry=((e.clientX-r.left)/r.width-.5)*5;
+      c.style.transform='perspective(700px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) translateY(-2px)';
+    });
+    c.addEventListener('mouseleave',function(){c.style.transform='';});
+  });
+  var kgel=document.getElementById('kg'), fogel=document.getElementById('fog'), pT=null;
+  addEventListener('mousemove',function(e){
+    if(pT)return;
+    pT=requestAnimationFrame(function(){
+      pT=null;
+      var dx=e.clientX/innerWidth-.5, dy=e.clientY/innerHeight-.5;
+      kgel.style.transform='translate('+(dx*-10).toFixed(1)+'px,'+(dy*-7).toFixed(1)+'px)';
+      fogel.style.transform='translate('+(dx*6).toFixed(1)+'px,'+(dy*4).toFixed(1)+'px)';
+    });
+  },{passive:true});
+  var mt=document.getElementById('mainTitle');
+  mt.addEventListener('mouseenter',function(){
+    mt.classList.remove('zap'); void mt.offsetWidth; mt.classList.add('zap');
+    setTimeout(function(){mt.classList.remove('zap');},420);
+  });
+}
 /* ambient music — Alex Morgan via Pixabay (free license), off by default */
 (function(){
   var bgm=$('bgm'), mb=$('musicbtn');
