@@ -37,7 +37,7 @@ html,body{overflow-anchor:none}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden}
-#ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.55}
+#ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.6}
 #boot{position:fixed;inset:0;z-index:80;pointer-events:none;image-rendering:pixelated}
 #fog{position:fixed;inset:0;z-index:2;pointer-events:none;
   background:
@@ -98,12 +98,11 @@ nav a.lnk.live:hover::after{background:linear-gradient(90deg,var(--ok),transpare
 .hero .inner{max-width:860px;margin:0 auto;padding:70px 24px 30px;width:100%}
 .kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;color:var(--acc);text-transform:uppercase;margin-bottom:24px}
 h1{font-family:var(--disp);font-size:clamp(36px,5.6vw,64px);font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1.07;margin:0 auto;max-width:18ch}
-h1 .g{color:var(--acc);text-shadow:0 0 44px rgba(86,200,242,.35)}
+h1 .g{color:var(--acc);text-shadow:0 0 48px rgba(181,123,255,.4)}
 .hero .sub{margin:26px auto 34px;max-width:36em;font-size:15.5px;color:var(--txt)}
 .hero .sub b{color:var(--ink);font-weight:600}
 .cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
-.btn{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:14px 30px;transition:all .22s cubic-bezier(.2,.7,.3,1);border:1px solid transparent;position:relative;font-weight:600;
-  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.btn{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:15px 30px;transition:transform .3s cubic-bezier(.22,1,.36,1),background .3s ease,box-shadow .3s ease,border-color .3s ease;border:1px solid transparent;position:relative;font-weight:600;border-radius:8px}
 .btn.pri{color:#0d021c;background:var(--acc);box-shadow:0 0 20px rgba(181,123,255,.25)}
 .btn.pri:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 4px 28px rgba(181,123,255,.45)}
 .btn.sec{color:var(--acc2);border-color:rgba(181,123,255,.35);background:rgba(6,4,12,.6)}
@@ -463,7 +462,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   .js .d1{animation-delay:.05s}.js .d2{animation-delay:.18s}.js .d3{animation-delay:.36s}.js .d4{animation-delay:.52s}
   @keyframes rise{to{opacity:1;transform:none}}
   h1 .g{animation:breathe 6.5s ease-in-out infinite}
-  @keyframes breathe{0%,100%{text-shadow:0 0 44px rgba(86,200,242,.3)}50%{text-shadow:0 0 60px rgba(86,200,242,.55)}}
+  @keyframes breathe{0%,100%{text-shadow:0 0 48px rgba(181,123,255,.32)}50%{text-shadow:0 0 66px rgba(181,123,255,.5)}}
   .cnt .v.tick{animation:tickpop .4s cubic-bezier(.2,1.7,.4,1)}
   @keyframes tickpop{0%{transform:scale(1.2)}100%{transform:scale(1)}}
   #term .ln{animation:lfade .3s ease}
@@ -933,18 +932,18 @@ if(!reduce && 'IntersectionObserver' in window){
    and dissolving, not blinking static. Sparse spacing, one restrained violet
    ramp, teal accents on birth: minimal, on-theme, advanced. */
 var ca=document.getElementById('ca'), cxa=ca.getContext('2d');
-var CELL=30, CDPR, gw,gh, grid,hue,age, buf,hbuf,abuf;
-var LINEAGES=[256,268,284];  /* narrow indigo→violet→soft-magenta ramp */
+var CELL=10, gw,gh, grid,hue,age, buf,hbuf,abuf;
+/* calm, harmonized cool ramp — indigo → violet, no loud magenta; a single
+   analogous family so the field feels quiet, not busy */
+var LINEAGES=[246,258,270];
 var bloomSeed=!reduce;
 function caSize(){
-  CDPR=Math.min(devicePixelRatio||1,2);
-  gw=Math.ceil(innerWidth/CELL)+1; gh=Math.ceil(innerHeight/CELL)+1;
-  ca.width=Math.round(innerWidth*CDPR); ca.height=Math.round(innerHeight*CDPR);
-  ca.style.width=innerWidth+'px'; ca.style.height=innerHeight+'px';
-  cxa.setTransform(CDPR,0,0,CDPR,0,0);
+  gw=Math.ceil(innerWidth/CELL); gh=Math.ceil(innerHeight/CELL);
+  ca.width=gw; ca.height=gh;
+  ca.style.width=gw*CELL+'px'; ca.style.height=gh*CELL+'px';
   grid=new Uint8Array(gw*gh); hue=new Uint16Array(gw*gh); age=new Uint8Array(gw*gh);
   buf=new Uint8Array(gw*gh); hbuf=new Uint16Array(gw*gh); abuf=new Uint8Array(gw*gh);
-  cxa.fillStyle='#020304'; cxa.fillRect(0,0,innerWidth,innerHeight);
+  cxa.fillStyle='#020304'; cxa.fillRect(0,0,gw,gh);
   seed();
 }
 function seed(){
@@ -995,51 +994,39 @@ function caStep(){
   var t=grid;grid=buf;buf=t; t=hue;hue=hbuf;hbuf=t; t=age;age=abuf;abuf=t;
   if(births<gw*gh*.004) patch();
 }
-var NB=[[1,0],[0,1],[1,1],[-1,1]];   /* draw each edge once */
 function caDraw(){
-  cxa.fillStyle='rgba(3,2,6,.26)'; cxa.fillRect(0,0,innerWidth,innerHeight);  /* soft trails */
-  /* edges — faint filaments between adjacent live cells, painted behind nodes */
-  cxa.lineWidth=1;
+  /* gentler trail fade — cells linger a touch longer, so motion reads as a
+     slow shimmer rather than a flicker */
+  cxa.fillStyle='rgba(3,2,6,.15)'; cxa.fillRect(0,0,gw,gh);
   for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
-    var i=y*gw+x; if(!grid[i])continue;
-    var px=x*CELL, py=y*CELL;
-    for(var k=0;k<4;k++){
-      var nx=x+NB[k][0], ny=y+NB[k][1];
-      if(nx<0||nx>=gw||ny<0||ny>=gh)continue;
-      var j=ny*gw+nx; if(!grid[j])continue;
-      var a=age[i]<age[j]?age[i]:age[j];
-      cxa.strokeStyle='hsla('+hue[i]+',52%,64%,'+(a<4?.16:.08)+')';
-      cxa.beginPath();cxa.moveTo(px,py);cxa.lineTo(nx*CELL,ny*CELL);cxa.stroke();
+    var i=y*gw+x;
+    if(grid[i]){
+      var a=age[i];
+      /* lower saturation + softer alpha = calm; young cells barely brighter */
+      var L=a<2?70:a<5?58:a<12?48:41, S=a<5?54:40, A=a<2?.7:a<5?.46:a<12?.3:.2;
+      cxa.fillStyle='hsla('+hue[i]+','+S+'%,'+L+'%,'+A+')';
+      cxa.fillRect(x,y,1,1);
     }
   }
-  /* nodes — soft glow + crisp core, luminance falls with age */
-  for(y=0;y<gh;y++)for(x=0;x<gw;x++){
-    i=y*gw+x; if(!grid[i])continue;
-    var ag=age[i], L=ag<2?78:ag<6?63:ag<14?51:43, A=ag<2?.92:ag<6?.62:ag<14?.4:.26, r=ag<2?2.7:ag<6?2.2:1.8;
-    cxa.fillStyle='hsla('+hue[i]+',60%,'+L+'%,'+(A*.22)+')';
-    cxa.beginPath();cxa.arc(x*CELL,y*CELL,r*2.8,0,6.283);cxa.fill();
-    cxa.fillStyle='hsla('+hue[i]+',72%,'+L+'%,'+A+')';
-    cxa.beginPath();cxa.arc(x*CELL,y*CELL,r,0,6.283);cxa.fill();
-  }
-  /* births — small teal sparks */
-  flashes.forEach(function(f){
-    cxa.fillStyle='hsla(170,72%,74%,'+(f.t*.6)+')';
-    cxa.beginPath();cxa.arc(f.x*CELL,f.y*CELL,2.6,0,6.283);cxa.fill();f.t-=.1;});
+  /* births — soft cool-teal sparks, quieter than before */
+  flashes.forEach(function(f){cxa.fillStyle='hsla(184,46%,74%,'+(f.t*.42)+')';cxa.fillRect(f.x-1,f.y-1,3,3);f.t-=.08;});
   flashes=flashes.filter(function(f){return f.t>0});
-  /* real kernel-accept blooms — expanding teal ring from a seeded node */
+  /* real kernel-accept: a slow, faint expanding ring in the same cool family */
   pulses.forEach(function(p){
-    cxa.strokeStyle='hsla(166,78%,60%,'+(p.t*.5)+')';cxa.lineWidth=1.1;
-    cxa.beginPath();cxa.arc(p.x*CELL,p.y*CELL,(1-p.t)*90+6,0,6.283);cxa.stroke();p.t-=.02;});
+    cxa.strokeStyle='hsla(180,50%,64%,'+(p.t*.4)+')';cxa.lineWidth=.6;
+    cxa.beginPath();cxa.arc(p.x,p.y,(1-p.t)*17+2,0,6.283);cxa.stroke();p.t-=.03;});
   pulses=pulses.filter(function(p){return p.t>0});
-  if(caGlow>0){ cxa.fillStyle='rgba(224,162,63,'+(caGlow*0.028)+')'; cxa.fillRect(0,0,innerWidth,innerHeight); caGlow-=0.008; }
+  /* collapse wash: a soft cool indigo instead of the old amber — stays inside
+     the harmony, reads as the field dimming, not a warning flash */
+  if(caGlow>0){ cxa.fillStyle='rgba(112,92,180,'+(caGlow*0.03)+')'; cxa.fillRect(0,0,gw,gh); caGlow-=0.01; }
 }
-/* a real compiled theorem gently blooms the lattice: seed a live patch + ring */
+/* a real compiled theorem gently blooms the field: seed a small live patch + ring */
 function caBloom(){
   if(reduce||!gw)return;
   var x=Math.floor(gw*(.3+Math.random()*.4)), y=Math.floor(gh*(.25+Math.random()*.5));
   var h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
-  for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
-    if(Math.random()<.6){var i=((y+dy+gh)%gh)*gw+((x+dx+gw)%gw);grid[i]=1;hue[i]=h;age[i]=0;}
+  for(var dy=-2;dy<=2;dy++)for(var dx=-2;dx<=2;dx++){
+    if(Math.random()<.5){var i=((y+dy+gh)%gh)*gw+((x+dx+gw)%gw);grid[i]=1;hue[i]=h;age[i]=0;}
   }
   pulses.push({x:x,y:y,t:1});
 }
@@ -1062,7 +1049,7 @@ else{
   var last=0;
   (function loop(ts){
     if(document.hidden){requestAnimationFrame(loop);return;}
-    if(ts-last>(ts<fastUntil?70:200)){caStep();last=ts;}
+    if(ts-last>(ts<fastUntil?90:240)){caStep();last=ts;}
     caDraw();
     requestAnimationFrame(loop);
   })(0);
