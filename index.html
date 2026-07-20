@@ -356,7 +356,7 @@ h2 .g{color:var(--acc)}
 .rq0box{border-color:rgba(181,123,255,.4);background:rgba(181,123,255,.05)}
 .rq0box .hm .up{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--mut);display:block;margin-top:8px;letter-spacing:.04em}
 .ptreewrap{max-width:840px;margin:0 auto 40px;border:1px solid var(--line);border-radius:6px;background:rgba(3,2,6,.62);padding:10px}
-#ptree{width:100%;height:230px;display:block}
+#ptree{width:100%;height:300px;display:block}
 .ptreecap{font-family:var(--mono);font-size:9px;color:var(--mut);letter-spacing:.1em;text-align:center;padding:8px 4px 2px}
 .opcard .rq0{font-family:var(--mono);font-size:9.8px;color:var(--acc2);margin-top:9px;letter-spacing:.03em;line-height:1.55}
 .ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-bottom:46px}
@@ -1014,15 +1014,25 @@ else{
   })(0);
 }
 
-/* ============ THEORY GRAPH (subtle, lit by real compile events) ============ */
+/* ============ THEORY GRAPH — the REAL goal families as a constellation ============ */
+/* v2: the node layer used to float invented domain names. It now renders the
+   engine's actual goal families from state.json — brightness and size scale
+   with each family's kernel-verified count. Until the snapshot loads (or if
+   it can't — file://), the layer is simply empty: honest absence. */
 var kg=document.getElementById('kg'), kx=kg.getContext('2d');
-var KW,KH,knodes=[],kedges=[];
-var KNAMES=['Nat.Arith','Parity','ModArith','SumIdent','Induction','Order','Lattice','GroupCore','Univalent.Frag','Descent','Modality','Ordinal'];
+var KW,KH,knodes=[],kedges=[],kgFams=null;
+function kgSetFamilies(fams){
+  kgFams=fams; kgSize();
+  /* reduced-motion draws exactly once at load — before the snapshot fetch
+     resolves — so a data arrival must repaint or the layer stays blank */
+  if(reduce) kgDraw();
+}
 function kgSize(){
   KW=kg.width=innerWidth; KH=kg.height=innerHeight;
-  knodes=KNAMES.map(function(n,i){
+  if(!kgFams){ knodes=[]; kedges=[]; return; }
+  knodes=kgFams.map(function(f,i){
     var col=i%4, row=Math.floor(i/4);
-    return {n:n,
+    return {n:f.n, w:f.w,
       x:KW*(.12+col*.25)+(Math.random()*60-30),
       y:KH*(.2+row*.28)+(Math.random()*50-25),
       ph:Math.random()*6.28, lit:0};
@@ -1050,17 +1060,20 @@ function kgDraw(){
   });
   knodes.forEach(function(n){
     if(!reduce){n.x+=Math.sin(KT*.3+n.ph)*.08;n.y+=Math.cos(KT*.23+n.ph)*.06;}
+    /* verified count drives presence: brighter, larger stars for families
+       that have actually produced kernel-verified results */
+    var baseA=Math.min(.62,.26+n.w*.09), r=Math.min(4.2,1.8+n.w*.38);
     if(n.lit>0){
       kx.strokeStyle='rgba(46,229,132,'+(n.lit*.7)+')';kx.lineWidth=1.2;
       kx.beginPath();kx.arc(n.x,n.y,(1-n.lit)*26+4,0,6.283);kx.stroke();
       kx.fillStyle='rgba(143,255,196,'+(.5+n.lit*.5)+')';
       n.lit-=.012;
     } else {
-      kx.fillStyle='rgba(181,123,255,.42)';
+      kx.fillStyle='rgba(181,123,255,'+baseA+')';
     }
-    kx.beginPath();kx.arc(n.x,n.y,2.2,0,6.283);kx.fill();
-    kx.fillStyle=n.lit>0?'rgba(143,255,196,'+(.35+n.lit*.5)+')':'rgba(150,130,180,.32)';
-    kx.fillText(n.n,n.x+7,n.y+3);
+    kx.beginPath();kx.arc(n.x,n.y,r,0,6.283);kx.fill();
+    kx.fillStyle=n.lit>0?'rgba(143,255,196,'+(.35+n.lit*.5)+')':'rgba(150,130,180,'+Math.min(.5,.2+n.w*.06)+')';
+    kx.fillText(n.n+(n.w?' ·'+n.w:''),n.x+7,n.y+3);
   });
   if(!reduce)requestAnimationFrame(kgDraw);
 }
@@ -1068,65 +1081,164 @@ if(reduce){kgDraw();}else{requestAnimationFrame(kgDraw);}
 
 /* the organism reacts: real compile event → graph node lights + CA pulse */
 function kernelEvent(){
-  if(reduce)return;
+  if(reduce||!knodes.length)return;
   var n=knodes[Math.floor(Math.random()*knodes.length)];
   n.lit=1;
   pulses.push({x:(n.x/innerWidth)*gw,y:(n.y/innerHeight)*gh,t:1});
 }
 
-/* ============ PROOF-SEARCH TREE — symbolic backtracking visual ============ */
+/* ============ PROOF-SEARCH ORGANISM v2 ============ */
+/* The old tree drew straight 1px segments that popped in — sticks, not search.
+   This one grows CURVES: every edge is a quadratic bezier continuing its
+   parent's tangent, drawn twice (wide faint bloom + crisp core) with width
+   tapering by depth. Growth animates tip-forward along the curve; dead ends
+   turn rose and RETRACT tip-to-root (backtracking made watchable); on kernel
+   lock a light pulse travels root→tip along the winning path — the same
+   travelling-light vocabulary as the dashboard's pipeline connectors — and
+   the path settles teal with a persistent bloom before the field resets.
+   DPR-aware. Reduced motion: one static, fully-grown final frame. */
 (function(){
   var cv=document.getElementById('ptree'); if(!cv)return;
-  var px=cv.getContext('2d'), W, Hh;
-  function sz(){W=cv.width=cv.clientWidth||800; Hh=cv.height=230;}
-  sz(); addEventListener('resize',sz);
-  var nodes, cur, locked;
-  function init(){nodes=[{x:26,y:Hh/2,p:-1,st:0,a:1}];cur=0;locked=false;}
-  init();
-  function depth(i){var d=0;while(nodes[i].p>=0){i=nodes[i].p;d++;}return d;}
-  function killSubtree(i){nodes[i].st=1;for(var j=0;j<nodes.length;j++)if(nodes[j].p===i&&nodes[j].st!==1)killSubtree(j);}
-  function step(noTimer){
-    if(locked)return;
-    var n=nodes[cur], d=depth(cur);
-    if(n.x>W-70||d>=9){
-      locked=true; var i=cur;
-      while(i>=0){nodes[i].st=2;i=nodes[i].p;}
-      if(!noTimer)setTimeout(init,4600);
-      return;
-    }
-    if(d>1&&Math.random()<.3){                     /* dead end → backtrack */
-      killSubtree(cur);
-      cur=nodes[cur].p;
-      while(cur>0&&Math.random()<.35)cur=nodes[cur].p;
-      return;
-    }
-    var parent=cur;
-    if(Math.random()<.35){                          /* side branch for texture */
-      nodes.push({x:n.x+30+Math.random()*16,
-        y:Math.max(14,Math.min(Hh-14,n.y+(Math.random()*110-55))),p:parent,st:0,a:1});
-    }
-    nodes.push({x:n.x+34+Math.random()*22,
-      y:Math.max(16,Math.min(Hh-16,n.y+(Math.random()*90-45))),p:parent,st:0,a:1});
-    cur=nodes.length-1;
+  var px=cv.getContext('2d'), W,Hh,DPR;
+  function sz(){
+    DPR=Math.min(devicePixelRatio||1,2);
+    W=cv.clientWidth||800; Hh=300;
+    cv.width=Math.round(W*DPR); cv.height=Math.round(Hh*DPR);
+    px.setTransform(DPR,0,0,DPR,0,0);
+    init();
   }
-  function draw(){
+  var edges,frontier,phase,pulseT,holdT,fade,chain,chainLen;
+  function init(){
+    edges=[];frontier=[];phase='grow';pulseT=0;holdT=0;fade=0;chain=null;chainLen=0;
+    /* seed trunk from bottom-left, aiming up-right */
+    spawn(-1, 26, Hh-26, -0.62, 30);
+  }
+  function spawn(parent,x0,y0,ang,len){
+    var x1=x0+Math.cos(ang)*len, y1=y0+Math.sin(ang)*len;
+    /* control point continues the incoming tangent for a smooth joint */
+    var pa=parent>=0?edges[parent].ang:ang;
+    var cx=x0+Math.cos(pa)*len*0.55, cy=y0+Math.sin(pa)*len*0.55;
+    var d=parent>=0?edges[parent].depth+1:0;
+    edges.push({p:parent,x0:x0,y0:y0,cx:cx,cy:cy,x1:x1,y1:y1,ang:ang,
+      len:len*1.04,depth:d,prog:0,st:0,die:0});
+    frontier.push(edges.length-1);
+    return edges.length-1;
+  }
+  function qpoint(e,t){
+    var u=1-t;
+    return [u*u*e.x0+2*u*t*e.cx+t*t*e.x1, u*u*e.y0+2*u*t*e.cy+t*t*e.y1];
+  }
+  function killSubtree(root){
+    var maxd=root.depth||0, sub=[];
+    (function walk(i){
+      sub.push(i); if(edges[i].depth>maxd)maxd=edges[i].depth;
+      for(var j=0;j<edges.length;j++) if(edges[j].p===i&&edges[j].st===0) walk(j);
+    })(root);
+    sub.forEach(function(i){
+      edges[i].st=1;
+      edges[i].die=(maxd-edges[i].depth)*95;      /* tips retract first */
+      var fi=frontier.indexOf(i); if(fi>=0)frontier.splice(fi,1);
+    });
+  }
+  function step(){
+    if(phase!=='grow'||!frontier.length){ if(!frontier.length&&phase==='grow')init(); return; }
+    var fi=Math.floor(Math.random()*frontier.length), ei=frontier[fi], e=edges[ei];
+    if(e.prog<1)return;                            /* only extend finished tips */
+    /* lock: reached the right edge or full depth — the kernel accepts */
+    if(e.x1>W-56||e.depth>=8){
+      phase='pulse'; pulseT=0; chain=[]; chainLen=0;
+      var i=ei; while(i>=0){edges[i].st=2;chain.unshift(i);chainLen+=edges[i].len;i=edges[i].p;}
+      edges.forEach(function(ed,k){ if(ed.st===0) killSubtree(k); });
+      frontier.length=0;
+      return;
+    }
+    if(e.depth>1&&Math.random()<.27){ killSubtree(ei); return; }  /* dead end */
+    frontier.splice(fi,1);
+    var kids=1+((Math.random()<.3&&e.depth<6)?1:0);
+    for(var k=0;k<kids;k++){
+      var bias=(Hh*0.42-e.y1)*0.0016;             /* gentle pull toward the midline */
+      var na=e.ang+(Math.random()-0.5)*0.9+bias;
+      na=Math.max(-1.25,Math.min(0.95,na));
+      spawn(ei,e.x1,e.y1,na,24+Math.random()*20);
+    }
+    if(Math.random()<.2)frontier.push(ei);         /* occasionally keep the joint fertile */
+  }
+  function drawEdge(e){
+    if(e.prog<=0)return;
+    var w=Math.max(0.7,3.1*Math.pow(0.84,e.depth));
+    var core,bloom;
+    if(e.st===2){core='rgba(143,255,196,.92)';bloom='rgba(46,229,132,.20)';w+=0.5;}
+    else if(e.st===1){core='rgba(255,106,193,.5)';bloom='rgba(255,106,193,.09)';}
+    else{var a=(.34+.05*Math.min(e.depth,5)).toFixed(2);
+      core='rgba(199,166,255,'+a+')';bloom='rgba(160,110,255,.10)';}
+    px.setLineDash([e.prog*e.len,10000]);
+    px.lineCap='round';
+    px.strokeStyle=bloom; px.lineWidth=w*3.4;
+    px.beginPath();px.moveTo(e.x0,e.y0);px.quadraticCurveTo(e.cx,e.cy,e.x1,e.y1);px.stroke();
+    px.strokeStyle=core; px.lineWidth=w;
+    px.beginPath();px.moveTo(e.x0,e.y0);px.quadraticCurveTo(e.cx,e.cy,e.x1,e.y1);px.stroke();
+    px.setLineDash([]);
+    if(e.st===0&&e.prog<1){                        /* luminous growth head */
+      var pt=qpoint(e,e.prog);
+      px.fillStyle='rgba(220,188,255,.9)';
+      px.beginPath();px.arc(pt[0],pt[1],1.8,0,6.283);px.fill();
+    }
+  }
+  function draw(dt){
     px.clearRect(0,0,W,Hh);
-    for(var i=1;i<nodes.length;i++){
-      var c=nodes[i], pn=nodes[c.p]; if(!pn)continue;
-      if(c.st===1){c.a-=.018;if(c.a<=0)continue;}
-      var col=c.st===2?'rgba(46,229,132,':c.st===1?'rgba(255,106,193,':'rgba(181,123,255,';
-      px.strokeStyle=col+(c.st===1?(c.a*.5).toFixed(2):c.st===2?'.9':'.45')+')';
-      px.lineWidth=c.st===2?2:1;
-      px.beginPath();px.moveTo(pn.x,pn.y);px.lineTo(c.x,c.y);px.stroke();
-      px.fillStyle=col+(c.st===1?(c.a*.6).toFixed(2):'.9')+')';
-      px.beginPath();px.arc(c.x,c.y,c.st===2?3:2,0,6.283);px.fill();
+    if(fade>0)px.globalAlpha=Math.max(0,1-fade);
+    for(var i=0;i<edges.length;i++){
+      var e=edges[i];
+      if(e.st===0&&e.prog<1)e.prog=Math.min(1,e.prog+dt/330);
+      if(e.st===1){ if(e.die>0)e.die-=dt; else e.prog=Math.max(0,e.prog-dt/260); }
+      drawEdge(e);
     }
+    /* root node */
     px.fillStyle='rgba(220,188,255,.95)';
-    px.beginPath();px.arc(nodes[0].x,nodes[0].y,3.4,0,6.283);px.fill();
+    px.beginPath();px.arc(26,Hh-26,3.2,0,6.283);px.fill();
+    /* lock ceremony: light travels the winning path */
+    if(phase==='pulse'&&chain){
+      pulseT+=dt/1100;
+      var pos=pulseT*chainLen, acc=0;
+      for(var c=0;c<chain.length;c++){
+        var ce=edges[chain[c]];
+        if(pos>=acc&&pos<=acc+ce.len){
+          var t=(pos-acc)/ce.len, pt2=qpoint(ce,t);
+          px.fillStyle='rgba(230,255,244,.95)';
+          px.shadowColor='rgba(46,229,132,.9)';px.shadowBlur=14;
+          px.beginPath();px.arc(pt2[0],pt2[1],3,0,6.283);px.fill();
+          px.shadowBlur=0;
+        }
+        acc+=ce.len;
+      }
+      if(pulseT>=1){phase='hold';holdT=0;}
+    } else if(phase==='hold'){
+      holdT+=dt; if(holdT>3600)phase='fade';
+    } else if(phase==='fade'){
+      fade+=dt/650; if(fade>=1)init();
+    }
+    px.globalAlpha=1;
   }
-  if(reduce){ var it=0; while(!locked&&it++<400) step(true); draw(); return; }
-  setInterval(step,240);
-  (function loop(){ if(!document.hidden) draw(); requestAnimationFrame(loop); })();
+  sz(); addEventListener('resize',sz);
+  if(reduce){
+    var guard=0;
+    while(phase==='grow'&&guard++<600){
+      edges.forEach(function(e){e.prog=1;});
+      step();
+    }
+    edges.forEach(function(e){if(e.st===1)e.prog=0;else e.prog=1;});
+    draw(0);
+    return;
+  }
+  var sAcc=0,tPrev=performance.now();
+  (function loop(ts){
+    requestAnimationFrame(loop);
+    if(document.hidden){tPrev=ts;return;}
+    var dt=Math.min(50,ts-tPrev);tPrev=ts;
+    sAcc+=dt;
+    if(phase==='grow'&&sAcc>210){step();sAcc=0;}
+    draw(dt);
+  })(tPrev);
 })();
 
 /* ============ LEAN EDITOR — REAL CODE, REAL BUILD OUTPUT ============ */
@@ -1556,6 +1668,16 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
       chip.textContent='e'+s.latest.epoch+' · '+st.replace(/_/g,' ');
       chip.className=st==='MERGED'?'ok':(st==='REJECT'?'sim':'bad');
       chip.style.display='inline-block';
+    }
+    /* constellation: real goal families, weighted by verified count */
+    if(s.epochs){
+      var fam={};
+      s.epochs.forEach(function(e){(e.records||[]).forEach(function(r){
+        if(!(r.family in fam))fam[r.family]=0;
+        if(r.status==='verified')fam[r.family]++;
+      });});
+      var fams=Object.keys(fam).map(function(k){return {n:k,w:fam[k]};});
+      if(fams.length)kgSetFamilies(fams);
     }
     /* ticker: every kernel-verified record on the board */
     var row=document.getElementById('tickerrow'), tick=document.getElementById('ticker');
