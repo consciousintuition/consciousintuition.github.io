@@ -37,9 +37,6 @@ html,body{overflow-anchor:none}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden}
-#ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.72}
-#kg{position:fixed;inset:0;z-index:1;width:100vw;height:100vh;pointer-events:none}
-#boot{position:fixed;inset:0;z-index:80;pointer-events:none;image-rendering:pixelated}
 #fog{position:fixed;inset:0;z-index:2;pointer-events:none;
   background:
    radial-gradient(ellipse 130% 95% at 50% 112%,rgba(2,3,4,.96) 22%,rgba(2,3,4,.6) 58%,transparent 100%),
@@ -95,7 +92,7 @@ nav a.lnk.live:hover::after{background:linear-gradient(90deg,var(--ok),transpare
 }
 
 /* hero — centered */
-.hero{position:relative;z-index:4;min-height:72vh;display:flex;align-items:center;text-align:center}
+.hero{position:relative;z-index:4;min-height:86vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:34px}
 .hero .inner{max-width:860px;margin:0 auto;padding:70px 24px 30px;width:100%}
 .kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;color:var(--acc);text-transform:uppercase;margin-bottom:24px}
 h1{font-family:var(--disp);font-size:clamp(36px,5.6vw,64px);font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1.07;margin:0 auto;max-width:18ch}
@@ -359,7 +356,20 @@ h2 .g{color:var(--acc)}
 .hypo .fals{font-family:var(--mono);font-size:10.5px;color:var(--sim);margin-top:10px;letter-spacing:.05em}
 .rq0box{border-color:rgba(181,123,255,.4);background:rgba(181,123,255,.05)}
 .rq0box .hm .up{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--mut);display:block;margin-top:8px;letter-spacing:.04em}
-.ptreewrap{max-width:840px;margin:0 auto 40px;border:1px solid var(--line);border-radius:6px;background:rgba(3,2,6,.62);padding:10px}
+/* hero signature visual — the organism, center stage */
+.heroorg{max-width:1020px;margin:8px auto 0;padding:0 24px;width:100%}
+.heroorg .ptreecap{padding-top:10px}
+/* folded simulator — the labeled toy steps back behind a disclosure */
+.simfold{max-width:1040px;margin:0 auto}
+.simfold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mut);border:1px dashed var(--line2);border-radius:6px;padding:14px 18px;
+  transition:color .2s,border-color .2s}
+.simfold>summary:hover{color:var(--sim);border-color:rgba(224,162,63,.45)}
+.simfold>summary::-webkit-details-marker{display:none}
+.simfold>summary::before{content:"▸";color:var(--sim);transition:transform .2s}
+.simfold[open]>summary::before{transform:rotate(90deg)}
+.simfold[open]>summary{margin-bottom:16px}
 #ptree{width:100%;height:300px;display:block;
   -webkit-mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
   mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
@@ -482,17 +492,6 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   @keyframes lfade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
   .cursorline::after{content:"▍";color:var(--acc);animation:blink 1.1s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
-  .glitch{position:relative}
-  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;right:0;top:0;
-    font:inherit;letter-spacing:inherit;line-height:inherit;pointer-events:none;opacity:0}
-  .glitch::before{color:var(--acc)}
-  .glitch::after{color:var(--ros)}
-  .js .glitch.zap::before{opacity:.7;animation:gl1 .38s steps(2,end) forwards}
-  .js .glitch.zap::after{opacity:.7;animation:gl2 .38s steps(2,end) forwards}
-  .js .glitch.zap{animation:glshake .38s steps(2,end)}
-  @keyframes gl1{0%{transform:translate(-10px,0) skewX(-2deg);clip-path:inset(8% 0 64% 0)}25%{transform:translate(7px,-3px);clip-path:inset(50% 0 20% 0)}50%{transform:translate(-5px,2px) skewX(1.5deg);clip-path:inset(78% 0 2% 0)}75%{transform:translate(4px,-1px);clip-path:inset(28% 0 58% 0)}100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
-  @keyframes gl2{0%{transform:translate(9px,2px) skewX(2deg);clip-path:inset(58% 0 18% 0)}25%{transform:translate(-8px,3px);clip-path:inset(4% 0 76% 0)}50%{transform:translate(6px,-2px) skewX(-1.5deg);clip-path:inset(34% 0 40% 0)}75%{transform:translate(-4px,1px);clip-path:inset(66% 0 12% 0)}100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
-  @keyframes glshake{25%{transform:translate(2px,0)}55%{transform:translate(-2px,1px)}80%{transform:translate(1px,0)}}
 }
 
 /* ===== TYPE & COMPONENT DISCIPLINE (appended overrides — later rules win) =====
@@ -524,17 +523,14 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
 .chal .crow{background:transparent}
 .plog .pl .body{padding:14px 17px}
 /* breathing room around the two heaviest bands */
-.ptreewrap{margin-bottom:52px}
+
 .divider{margin-top:104px}
 </style>
 </head>
 <body>
-<canvas id="ca" aria-hidden="true"></canvas>
-<canvas id="kg" aria-hidden="true"></canvas>
 <div id="fog" aria-hidden="true"></div>
 <div id="mistwrap" aria-hidden="true"><div id="mist"></div></div>
 <div id="grain" aria-hidden="true"></div>
-<canvas id="boot" aria-hidden="true"></canvas>
 
 <div id="progress" aria-hidden="true"></div>
 <div id="cursorglow" aria-hidden="true"></div>
@@ -577,13 +573,7 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
       <a class="lnk" href="#sim">Simulator</a>
       <a class="lnk live" href="dashboard.html"><span class="ld"></span>Dashboard</a>
       <span id="navstatus" title="Latest engine terminal status — read from state.json"></span>
-      <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-          <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
-        </svg>
-      </button>
     </nav>
-    <audio id="bgm" src="assets/ambient.mp3" loop preload="none"></audio>
   </div>
 </header>
 
@@ -591,7 +581,7 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
 <div class="hero">
   <div class="inner">
     <div class="kick stag d1">An independent research program · foundations of mathematics × AI</div>
-    <h1 class="stag d2 glitch" id="mainTitle" data-text="Between RSI and ASI lies a missing mathematics.">Between RSI and ASI lies a <span class="g">missing mathematics</span>.</h1>
+    <h1 class="stag d2" id="mainTitle">Between RSI and ASI lies a <span class="g">missing mathematics</span>.</h1>
     <p class="sub stag d3">The field's first dedicated RSI workshop names what is missing: principled
     methods that make self-improvement <b>measurable and reliable</b>. Our answer is precise: an RSI
     whose object of discovery is <b>the mathematics of its own improvement</b> — a theory in the
@@ -601,6 +591,10 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
       <a class="btn pri" href="#problem">Why new mathematics</a>
       <a class="btn sec" href="#real">See the real code</a>
     </div>
+  </div>
+  <div class="heroorg stag d4">
+    <canvas id="ptree" aria-label="Signature visual — proof search as a living organism: branches explored in 3D, dead ends retracted, one path kernel-locked"></canvas>
+    <div class="ptreecap">PROOF SEARCH, LIVE GRAMMAR — BRANCHES EXPLORED · DEAD ENDS RETRACTED · ONE PATH KERNEL-LOCKED</div>
   </div>
 </div>
 
@@ -681,10 +675,6 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
     C: its referee's soundness — never, by Löb.)</span></p>
   </div>
 
-  <div class="ptreewrap">
-    <canvas id="ptree" aria-label="Symbolic animation of proof search: branches grow, dead ends retract by backtracking, one path locks green on kernel acceptance"></canvas>
-    <div class="ptreecap">SYMBOLIC VISUAL — PROOF SEARCH: BRANCHES EXPLORED · DEAD ENDS RETRACTED (BACKTRACKING) · ONE PATH KERNEL-LOCKED</div>
-  </div>
 
   <div class="hypo">
     <div class="k">CENTRAL HYPOTHESIS · H1</div>
@@ -776,6 +766,7 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
     <div class="crow"><span class="cl">Published baseline<br>(frozen open set)</span><span class="cr"><b>0%.</b> On <span style="font-family:var(--mono)">FC100OpenSet1</span> — 100 open research conjectures — no evaluated system had resolved a single statement at release. One kernel-verified proof <i>or disproof</i> beats every published system.</span></div>
     <div class="crow"><span class="cl">Our harness<br>(built, running)</span><span class="cr">Pinned to the frozen snapshot <span style="font-family:var(--mono)">bench-v1-lean4.27.0</span> — the exact conditions of the published baselines, so any number we ever report is comparable. All 200 frozen-set statements extracted and validated (200/200, categories matching the paper's composition).</span></div>
     <div class="crow"><span class="cl">Pre-registered<br>criteria</span><span class="cr"><b>Stated before results exist.</b> SUCCESS: ≥1 kernel-verified resolution of an open-marked statement, or ≥1 misformalization report accepted upstream (the paper itself names AI disproofs as its auditing mechanism). FAILURE: zero hits — published as a negative sweep log, stated plainly as not beating the 0% baseline. No reframing either way.</span></div>
+    <div class="crow"><span class="cl">First sweep<br>2026-07-20 · RESULT</span><span class="cr"><b>FAILURE, per the criteria above — stated plainly.</b> The cheap-refutation battery (decide / simp / omega / norm_num triviality probes + <span style="font-family:var(--mono)">type_of%</span> negation probes) ran over all 40 directly-probeable open statements: 80 kernel-checked probes, every one a genuine attempt, <b>0 hits</b>. This program has not beaten the 0% baseline. The 60 answer-construction statements were not attempted — that harder lane is the next stage, and this row will change only if a verified number changes it.</span></div>
   </div>
   <p class="lenses"><b>What we do not claim:</b> no SOTA claim at any number below the published
   baselines; no result reported that is not kernel-verified, axiom-audited, and reproducible from the
@@ -883,6 +874,8 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
   <p class="lede">Proposals, triage, kernel verdicts, selection pressure — at a scale the engine has not
   reached. <b>Synthetic telemetry — no backend attached.</b> Amber marks simulation. For the engine's
   <b>real</b> numbers, epoch by epoch, see the <a href="dashboard.html">live dashboard →</a></p>
+  <details class="simfold" id="simfold">
+  <summary>Open the simulation — synthetic swarm, labeled, no backend</summary>
   <div class="simpanel">
     <div class="simhead">
       <span class="dots"><span style="background:#d16a8a"></span><span style="background:#e0a23f"></span><span style="background:#2ee584"></span></span>
@@ -919,6 +912,7 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
       </div>
     </div>
   </div>
+  </details>
 </div></section>
 
 <div id="ticker" aria-label="Kernel-verified results from the engine board">
@@ -928,6 +922,12 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
 
 <footer><div class="wrap">
   <span class="sig">AUTHOR: <b>SCHRÖDINGER'S CAT</b></span>
+  <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+      <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
+    </svg>
+  </button>
+  <audio id="bgm" src="assets/ambient.mp3" loop preload="none"></audio>
   <a class="xlink" href="https://x.com/consciousnessbo" target="_blank" rel="noopener" aria-label="Schrödinger's Cat on X">
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.2l7.3-8.3L1.6 2h6.5l4.4 5.9L18.9 2zm-1.1 18h1.7L7.1 3.9H5.3L17.8 20z"/></svg>
     <span>@consciousnessbo</span>
@@ -945,185 +945,6 @@ if(!reduce && 'IntersectionObserver' in window){
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}})},{threshold:.08});
   document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
 }else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('on');});}
-
-/* ============ CA WORLD ============ */
-var ca=document.getElementById('ca'), cxa=ca.getContext('2d');
-var CELL=9, gw,gh, grid,hue,age, buf,hbuf,abuf;
-var LINEAGES=[275,290,258,315];  /* violet · purple · indigo · magenta — evolving lineages */
-var bloomSeed=!reduce;
-function caSize(){
-  gw=Math.ceil(innerWidth/CELL); gh=Math.ceil(innerHeight/CELL);
-  ca.width=gw; ca.height=gh;
-  ca.style.width=gw*CELL+'px'; ca.style.height=gh*CELL+'px';
-  grid=new Uint8Array(gw*gh); hue=new Uint16Array(gw*gh); age=new Uint8Array(gw*gh);
-  buf=new Uint8Array(gw*gh); hbuf=new Uint16Array(gw*gh); abuf=new Uint8Array(gw*gh);
-  cxa.fillStyle='#020304'; cxa.fillRect(0,0,gw,gh);
-  seed();
-}
-function seed(){
-  var i;
-  if(!bloomSeed){
-    for(i=0;i<gw*gh;i++){
-      if(Math.random()<.11){grid[i]=1;hue[i]=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];age[i]=0;}
-      else grid[i]=0;
-    }
-    return;
-  }
-  bloomSeed=false;
-  var cx0=gw/2, cy0=gh*.4, r0=Math.max(7,Math.min(gw,gh)*.17);
-  for(i=0;i<gw*gh;i++)grid[i]=0;
-  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
-    var d=Math.hypot(x-cx0,y-cy0);
-    if(d<r0&&Math.random()<.6*(1-d/r0)+.08){i=y*gw+x;grid[i]=1;
-      hue[i]=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];age[i]=0;}
-  }
-}
-function patch(){
-  var x0=Math.floor(Math.random()*(gw-8)), y0=Math.floor(Math.random()*(gh-8));
-  var h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
-  for(var y=0;y<6;y++)for(var x=0;x<6;x++)
-    if(Math.random()<.5){var i=(y0+y)*gw+(x0+x);grid[i]=1;hue[i]=h;age[i]=0;}
-}
-var flashes=[],pulses=[];
-function caStep(){
-  var births=0;
-  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
-    var i=y*gw+x, n=0, hs=[], h;
-    for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
-      if(!dx&&!dy)continue;
-      var j=((y+dy+gh)%gh)*gw+((x+dx+gw)%gw);
-      if(grid[j]){n++;hs.push(hue[j]);}
-    }
-    if(grid[i]){buf[i]=(n===2||n===3)?1:0;hbuf[i]=hue[i];abuf[i]=Math.min(250,age[i]+1);}
-    else if(n===3){
-      buf[i]=1;births++;abuf[i]=0;
-      if(hs[0]===hs[1]||hs[0]===hs[2])h=hs[0];
-      else if(hs[1]===hs[2])h=hs[1];
-      else{h=hs[Math.floor(Math.random()*3)];
-        if(flashes.length<20)flashes.push({x:x,y:y,t:1});}
-      if(Math.random()<.06)h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
-      hbuf[i]=h;
-    } else buf[i]=0;
-  }
-  var t=grid;grid=buf;buf=t; t=hue;hue=hbuf;hbuf=t; t=age;age=abuf;abuf=t;
-  if(births<gw*gh*.004) patch();
-}
-function caDraw(){
-  cxa.fillStyle='rgba(3,2,6,.2)'; cxa.fillRect(0,0,gw,gh);  /* long trails = evolution feel */
-  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
-    var i=y*gw+x;
-    if(grid[i]){
-      var a=age[i];
-      var L=a<2?78:a<5?62:a<12?50:40, S=a<5?78:60, A=a<2?.85:a<5?.55:a<12?.4:.28;
-      cxa.fillStyle='hsla('+hue[i]+','+S+'%,'+L+'%,'+A+')';
-      cxa.fillRect(x,y,1,1);
-    }
-  }
-  flashes.forEach(function(f){cxa.fillStyle='hsla(200,30%,95%,'+(f.t*.7)+')';cxa.fillRect(f.x-1,f.y-1,3,3);f.t-=.1;});
-  flashes=flashes.filter(function(f){return f.t>0});
-  pulses.forEach(function(p){
-    cxa.strokeStyle='hsla(150,80%,58%,'+(p.t*.65)+')';cxa.lineWidth=.8;
-    cxa.beginPath();cxa.arc(p.x,p.y,(1-p.t)*18+2,0,6.283);cxa.stroke();p.t-=.024;});
-  pulses=pulses.filter(function(p){return p.t>0});
-  if(caGlow>0){ cxa.fillStyle='rgba(224,162,63,'+(caGlow*0.05)+')'; cxa.fillRect(0,0,gw,gh); caGlow-=0.008; }
-}
-var fastUntil=0, caGlow=0;
-/* phase progression: the field builds, then a COLLAPSE — cells die back, echoing
-   dead-end epochs / model collapse — then it rebuilds denser. Varied timing so it
-   never reads as an obvious loop. Amber marks the collapse, within existing tokens. */
-function caCollapseNow(){ for(var i=0;i<gw*gh;i++){ if(grid[i]&&Math.random()<0.62) grid[i]=0; } caGlow=1; }
-function caRebuild(){ for(var k=0,m=6+Math.floor(Math.random()*5);k<m;k++) patch(); }
-(function phaseCycle(){
-  if(reduce) return;
-  setTimeout(function(){
-    caCollapseNow();
-    setTimeout(function(){ caRebuild(); phaseCycle(); }, 1600+Math.random()*1500);
-  }, 24000+Math.random()*32000);
-})();
-caSize(); addEventListener('resize',caSize);
-if(reduce){ caStep(); caDraw(); }
-else{
-  var last=0;
-  (function loop(ts){
-    if(document.hidden){requestAnimationFrame(loop);return;}
-    if(ts-last>(ts<fastUntil?70:160)){caStep();last=ts;}
-    caDraw();
-    requestAnimationFrame(loop);
-  })(0);
-}
-
-/* ============ THEORY GRAPH — the REAL goal families as a constellation ============ */
-/* v2: the node layer used to float invented domain names. It now renders the
-   engine's actual goal families from state.json — brightness and size scale
-   with each family's kernel-verified count. Until the snapshot loads (or if
-   it can't — file://), the layer is simply empty: honest absence. */
-var kg=document.getElementById('kg'), kx=kg.getContext('2d');
-var KW,KH,knodes=[],kedges=[],kgFams=null;
-function kgSetFamilies(fams){
-  kgFams=fams; kgSize();
-  /* reduced-motion draws exactly once at load — before the snapshot fetch
-     resolves — so a data arrival must repaint or the layer stays blank */
-  if(reduce) kgDraw();
-}
-function kgSize(){
-  KW=kg.width=innerWidth; KH=kg.height=innerHeight;
-  if(!kgFams){ knodes=[]; kedges=[]; return; }
-  knodes=kgFams.map(function(f,i){
-    var col=i%4, row=Math.floor(i/4);
-    return {n:f.n, w:f.w,
-      x:KW*(.12+col*.25)+(Math.random()*60-30),
-      y:KH*(.2+row*.28)+(Math.random()*50-25),
-      ph:Math.random()*6.28, lit:0};
-  });
-  kedges=[];
-  knodes.forEach(function(a,i){
-    var ds=knodes.map(function(b,j){return{j:j,d:Math.hypot(a.x-b.x,a.y-b.y)}})
-      .filter(function(o){return o.j!==i}).sort(function(u,v){return u.d-v.d});
-    for(var k=0;k<2;k++){var e=[Math.min(i,ds[k].j),Math.max(i,ds[k].j)];
-      if(!kedges.some(function(x){return x[0]===e[0]&&x[1]===e[1]}))kedges.push(e);}
-  });
-}
-kgSize(); addEventListener('resize',kgSize);
-var KT=0;
-function kgDraw(){
-  KT+=.016;
-  kx.clearRect(0,0,KW,KH);
-  kx.font='9px "JetBrains Mono",monospace';
-  kedges.forEach(function(e){
-    var a=knodes[e[0]],b=knodes[e[1]];
-    var hot=Math.max(a.lit,b.lit);
-    kx.strokeStyle='rgba(181,123,255,'+(.06+hot*.28)+')';
-    kx.lineWidth=hot>0?1.3:.7;
-    kx.beginPath();kx.moveTo(a.x,a.y);kx.lineTo(b.x,b.y);kx.stroke();
-  });
-  knodes.forEach(function(n){
-    if(!reduce){n.x+=Math.sin(KT*.3+n.ph)*.08;n.y+=Math.cos(KT*.23+n.ph)*.06;}
-    /* verified count drives presence: brighter, larger stars for families
-       that have actually produced kernel-verified results */
-    var baseA=Math.min(.62,.26+n.w*.09), r=Math.min(4.2,1.8+n.w*.38);
-    if(n.lit>0){
-      kx.strokeStyle='rgba(46,229,132,'+(n.lit*.7)+')';kx.lineWidth=1.2;
-      kx.beginPath();kx.arc(n.x,n.y,(1-n.lit)*26+4,0,6.283);kx.stroke();
-      kx.fillStyle='rgba(143,255,196,'+(.5+n.lit*.5)+')';
-      n.lit-=.012;
-    } else {
-      kx.fillStyle='rgba(181,123,255,'+baseA+')';
-    }
-    kx.beginPath();kx.arc(n.x,n.y,r,0,6.283);kx.fill();
-    kx.fillStyle=n.lit>0?'rgba(143,255,196,'+(.35+n.lit*.5)+')':'rgba(150,130,180,'+Math.min(.5,.2+n.w*.06)+')';
-    kx.fillText(n.n+(n.w?' ·'+n.w:''),n.x+7,n.y+3);
-  });
-  if(!reduce)requestAnimationFrame(kgDraw);
-}
-if(reduce){kgDraw();}else{requestAnimationFrame(kgDraw);}
-
-/* the organism reacts: real compile event → graph node lights + CA pulse */
-function kernelEvent(){
-  if(reduce||!knodes.length)return;
-  var n=knodes[Math.floor(Math.random()*knodes.length)];
-  n.lit=1;
-  pulses.push({x:(n.x/innerWidth)*gw,y:(n.y/innerHeight)*gh,t:1});
-}
 
 /* ============ PROOF-SEARCH ORGANISM v3 — rotating 3D growth ============ */
 /* v2 grew up-right and crowded the top edge. v3 grows through a true 3D
@@ -1409,7 +1230,6 @@ function playTheorem(){
       stEl.innerHTML='<div class="cmd">$ lake build</div>'+
         '<div class="oks">✓ Build completed successfully (3 jobs).</div>'+
         '<div class="ax">'+esc2(th.ax)+'</div>';
-      kernelEvent();
       setTimeout(playTheorem, 5200);
     }, 1300);
   }
@@ -1428,57 +1248,6 @@ function playTheorem(){
   }
 }
 playTheorem();
-
-/* ============ INTRO — dither reveal + one glitch ============ */
-var boot=document.getElementById('boot');
-if(reduce){ boot.remove(); }
-else{(function(){
-  var bcx=boot.getContext('2d'), bw,bh;
-  var BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
-  function bootSize(){
-    bw=Math.ceil(innerWidth/CELL); bh=Math.ceil(innerHeight/CELL);
-    boot.width=bw; boot.height=bh;
-    boot.style.width=bw*CELL+'px'; boot.style.height=bh*CELL+'px';
-  }
-  function paint(p){
-    bcx.clearRect(0,0,bw,bh);
-    var cx0=bw/2, cy0=bh*.4, maxd=Math.hypot(Math.max(cx0,bw-cx0),Math.max(cy0,bh-cy0));
-    for(var y=0;y<bh;y++)for(var x=0;x<bw;x++){
-      var d=Math.hypot(x-cx0,y-cy0)/maxd, t=BAYER[y%4][x%4]/16;
-      if(d+t*.22>p*1.25){
-        bcx.fillStyle=((x+y)%2)?'#04060a':'#020304';
-        if(((x*7+y*13)%149)===0)bcx.fillStyle='#0a2836';
-        bcx.fillRect(x,y,1,1);
-      }
-    }
-  }
-  bootSize(); paint(0);
-  addEventListener('resize',function(){if(boot.parentNode){bootSize();paint(0);}});
-  var h1=document.getElementById('mainTitle');
-  function burst(){h1.classList.remove('zap');void h1.offsetWidth;h1.classList.add('zap');
-    setTimeout(function(){h1.classList.remove('zap');},420);}
-  var started=false;
-  function startIntro(){
-    if(started)return; started=true;
-    fastUntil=performance.now()+3800;
-    var t0=performance.now();
-    (function diss(){
-      var p=(performance.now()-t0)/1500;
-      if(p>=1){boot.remove();
-        /* A1 fix: pin entrance-animated elements visible so later glitch/zap
-           animations can never override `rise`'s forwards fill back to opacity 0 */
-        document.querySelectorAll('.stag').forEach(function(el){el.classList.remove('stag','d1','d2','d3','d4');});
-        burst();setTimeout(burst,500);
-        (function micro(){setTimeout(function(){burst();micro();},6000+Math.random()*6000);})();
-        return;}
-      paint(p); requestAnimationFrame(diss);
-    })();
-  }
-  if(document.visibilityState==='visible')startIntro();
-  else document.addEventListener('visibilitychange',function h(){
-    if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',h);startIntro();}});
-  setTimeout(function(){if(boot.parentNode&&started)boot.remove();},8000);
-})();}
 
 /* ============ SWARM SIM (labeled synthetic) ============ */
 var term=document.getElementById('term');
@@ -1562,9 +1331,19 @@ function verdictTick(){
   }
 }
 function schedule(){ timer=setTimeout(step, 560+Math.random()*660); }
-line('in','SC_ENGINE   [BOOT]    swarm monitor attached · <span class="wr">SIMULATION — synthetic telemetry · no backend</span>');
-line('in','SC_ENGINE   [BOOT]    the only real artifacts on this page are in §01 and §05');
-schedule();
+/* folded behind a disclosure — the sim only boots (and only spends cycles)
+   once someone actually opens it */
+(function(){
+  var fold=document.getElementById('simfold'), started=false;
+  function startSim(){
+    if(started)return; started=true;
+    line('in','SC_ENGINE   [BOOT]    swarm monitor attached · <span class="wr">SIMULATION — synthetic telemetry · no backend</span>');
+    line('in','SC_ENGINE   [BOOT]    the only real artifacts on this page are in §01 and §05');
+    schedule();
+  }
+  if(fold)fold.addEventListener('toggle',function(){if(fold.open)startSim();});
+  else startSim();
+})();
 
 function $(id){return document.getElementById(id);}
 /* ============ DEPTH — layered parallax + card tilt ============ */
@@ -1583,10 +1362,10 @@ function $(id){return document.getElementById(id);}
    is cheaper than shipping jank to phones. */
 var DEPTH_OK = !reduce && innerWidth>=900;
 if(DEPTH_OK){(function(){
-  var Lkg=$('kg'), Lmist=$('mistwrap'), Lfog=$('fog');
+  var Lmist=$('mistwrap'), Lfog=$('fog');
   var mx=0,my=0,sp=0,queued=false;
   /* px of travel across the full page scroll · px of travel across the pointer */
-  var AMP={kg:[26,-11,-8], mist:[40,-15,-10], fog:[10,7,5]};
+  var AMP={mist:[40,-15,-10], fog:[10,7,5]};
   function progress(){
     var max=document.documentElement.scrollHeight-innerHeight;
     return max>0 ? Math.min(1,Math.max(0,scrollY/max))-.5 : 0;   /* -0.5 .. +0.5 */
@@ -1594,7 +1373,6 @@ if(DEPTH_OK){(function(){
   function apply(){
     queued=false;
     var a;
-    a=AMP.kg;   if(Lkg)   Lkg.style.transform  ='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*-2+my*a[2]).toFixed(1)+'px,0)';
     a=AMP.mist; if(Lmist) Lmist.style.transform='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*-2+my*a[2]).toFixed(1)+'px,0)';
     a=AMP.fog;  if(Lfog)  Lfog.style.transform ='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*2+my*a[2]).toFixed(1)+'px,0)';
   }
@@ -1629,11 +1407,6 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
       });
     },{passive:true});
     c.addEventListener('mouseleave',function(){c.style.transform='';});
-  });
-  var mt=document.getElementById('mainTitle');
-  mt.addEventListener('mouseenter',function(){
-    mt.classList.remove('zap'); void mt.offsetWidth; mt.classList.add('zap');
-    setTimeout(function(){mt.classList.remove('zap');},420);
   });
 }
 /* ============ READING PROGRESS + CURSOR GLOW ============ */
@@ -1729,16 +1502,6 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
       chip.textContent='e'+s.latest.epoch+' · '+st.replace(/_/g,' ');
       chip.className=st==='MERGED'?'ok':(st==='REJECT'?'sim':'bad');
       chip.style.display='inline-block';
-    }
-    /* constellation: real goal families, weighted by verified count */
-    if(s.epochs){
-      var fam={};
-      s.epochs.forEach(function(e){(e.records||[]).forEach(function(r){
-        if(!(r.family in fam))fam[r.family]=0;
-        if(r.status==='verified')fam[r.family]++;
-      });});
-      var fams=Object.keys(fam).map(function(k){return {n:k,w:fam[k]};});
-      if(fams.length)kgSetFamilies(fams);
     }
     /* ticker: every kernel-verified record on the board */
     var row=document.getElementById('tickerrow'), tick=document.getElementById('ticker');
