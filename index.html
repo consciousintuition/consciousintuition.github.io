@@ -352,6 +352,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <a class="lnk" href="#problem">Problem</a>
       <a class="lnk" href="#vision">Direction</a>
       <a class="lnk" href="#research">Research</a>
+      <a class="lnk" href="#benchmark">Benchmark</a>
       <a class="lnk" href="#truth">Ground&nbsp;truth</a>
       <a class="lnk" href="#real">Code</a>
       <a class="lnk" href="#sim">Simulator</a>
@@ -470,6 +471,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
     <p class="hm">reach(e) = #{ goals provable under L<sub>e</sub> and not under L<sub>e−1</sub> } stays
     positive epoch after epoch — measured from kernel logs only.</p>
     <p class="fals">FALSIFIER — if reach flatlines at 0, the loop is search, not self-improvement, and this page will say so.</p>
+    <p class="fals" style="color:var(--mut)">PROPOSED INSTRUMENT (not yet in force) — reach counted mechanically,
+    no self-judgment: a result scores only if library search (<span style="font-family:var(--mono)">exact?</span>)
+    cannot derive it in one step, the tactic battery cannot close it instantly, and the prover closes it
+    within a fixed budget. Applied retroactively, this is expected to demote most of epochs 1–4 — and the
+    dashboard will show the demotions.</p>
   </div>
 
   <div class="ops">
@@ -495,8 +501,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <p class="rq0">→ RQ0's Tier-B theorem IS the loop-gain law — this question stated formally.</p></div>
     <div class="opcard"><div class="no">RQ5 · FORMALIZATION</div><h3>Does intuition survive translation?</h3>
       <p>Our agents emit reasoning <b>and</b> Lean (D3). When the kernel rejects, which layer failed —
-      the intuition or its translation? Faithful autoformalization at research level is unsolved;
-      the Formal Conjectures benchmark (2026) measures exactly this gap. Open.</p>
+      the intuition or its translation? Faithful autoformalization at research level is unsolved; the
+      <a href="https://arxiv.org/abs/2605.13171" target="_blank" rel="noopener">Formal Conjectures
+      benchmark</a> (Firsching et al. 2026) measures exactly this gap — and this program no longer just
+      cites it: we run a harness against its frozen evaluation sets, pinned to the exact snapshot its
+      published baselines used (§03·B below). Open.</p>
       <p class="rq0">→ RQ0's evidence chain breaks here if the loop's self-description is not faithfully formalized.</p></div>
   </div>
 
@@ -524,6 +533,32 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <div class="divider"></div>
 
+<!-- ================= BENCHMARK GROUNDING ================= -->
+<section id="benchmark"><div class="wrap rv">
+  <div class="slab">03·B · Measured against the field</div>
+  <h2>The same referee, <span class="g">the field's</span> problems.</h2>
+  <p class="lede">In May 2026 Google DeepMind released
+  <a href="https://arxiv.org/abs/2605.13171" target="_blank" rel="noopener">Formal Conjectures</a>
+  (Firsching et al.) — 2,615 research-level statements formalized in Lean 4, among them
+  <b>1,029 open conjectures</b>. Its success criterion is ours, verbatim: <b>the kernel accepts,
+  no <span style="font-family:var(--mono)">sorry</span>, no forbidden axioms</b>. That makes it the
+  one public benchmark this program can face without changing referees.</p>
+  <div class="chal" style="margin-bottom:26px">
+    <div class="crow"><span class="cl">Published baselines<br>(frozen solved set)</span><span class="cr">AlphaProof: 45% at 1k simulations, 50% at 16k · DeepMind's dev prover agent: 66% — on <span style="font-family:var(--mono)">FC100SolvedSet1</span>, 100 research-level solved problems.</span></div>
+    <div class="crow"><span class="cl">Published baseline<br>(frozen open set)</span><span class="cr"><b>0%.</b> On <span style="font-family:var(--mono)">FC100OpenSet1</span> — 100 open research conjectures — no evaluated system had resolved a single statement at release. One kernel-verified proof <i>or disproof</i> beats every published system.</span></div>
+    <div class="crow"><span class="cl">Our harness<br>(built, running)</span><span class="cr">Pinned to the frozen snapshot <span style="font-family:var(--mono)">bench-v1-lean4.27.0</span> — the exact conditions of the published baselines, so any number we ever report is comparable. All 200 frozen-set statements extracted and validated (200/200, categories matching the paper's composition).</span></div>
+    <div class="crow"><span class="cl">Pre-registered<br>criteria</span><span class="cr"><b>Stated before results exist.</b> SUCCESS: ≥1 kernel-verified resolution of an open-marked statement, or ≥1 misformalization report accepted upstream (the paper itself names AI disproofs as its auditing mechanism). FAILURE: zero hits — published as a negative sweep log, stated plainly as not beating the 0% baseline. No reframing either way.</span></div>
+  </div>
+  <p class="lenses"><b>What we do not claim:</b> no SOTA claim at any number below the published
+  baselines; no result reported that is not kernel-verified, axiom-audited, and reproducible from the
+  pinned harness. The sweep is in progress; its outcome — hit or null — lands on the
+  <a href="dashboard.html">dashboard</a> when it exists, not before.
+  Sources: <a href="https://arxiv.org/abs/2605.13171" target="_blank" rel="noopener">arXiv:2605.13171</a> ·
+  <a href="https://github.com/google-deepmind/formal-conjectures" target="_blank" rel="noopener">google-deepmind/formal-conjectures</a>.</p>
+</div></section>
+
+<div class="divider"></div>
+
 <!-- ================= GROUND TRUTH ================= -->
 <section id="truth"><div class="wrap rv">
   <div class="slab">04 · Ground truth</div>
@@ -531,14 +566,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   <div class="statusbar">
     <span class="item"><b>11</b> theorems kernel-verified by the engine loop</span>
     <span class="item"><b>2</b> proofs caught cheating at the honesty gate (<span style="font-family:var(--mono)">sorryAx</span> footprint — rejected, logged)</span>
-    <span class="item"><b>5</b> epochs run — including a full pass through the isolated propose→critic→verify→lint→merge pipeline</span>
+    <span class="item"><b>6</b> epochs attempted — 4 produced board records; the latest was <b>halted by our own kernel gate</b> at verify, full trace public</span>
     <span class="item"><b>✓</b> guarded diagonal dichotomy (Tier-C kernel) verified — <b>zero axioms</b> (not even propext)</span>
     <span class="item"><b>✓</b> verifier hardened: gate bypasses closed (namespace audit · <span style="font-family:var(--mono)">noncomputable axiom : False</span>)</span>
-    <span class="item"><b>✓</b> Lean 4.32.0 pinned</span>
-    <span class="pledge">Status 2026-07-18. The loop has produced results: 11 theorems now sit in
+    <span class="item"><b>✓</b> Lean 4.32.0 (engine) · 4.27.0 (frozen benchmark pin)</span>
+    <span class="pledge">Status 2026-07-20. The loop has produced results: 11 theorems sit in
     <span style="font-family:var(--mono)">Discovered.lean</span>, each with its axiom footprint; the two
-    failures are shown, not hidden — the honesty gate caught them faking a proof. Every number here is
-    read from <span style="font-family:var(--mono)">board.jsonl</span> and the kernel logs that moved it.
+    failures are shown, not hidden — the honesty gate caught them faking a proof. Epoch 6 is the system
+    working as designed from the other side: the Critic passed a candidate, <b>the kernel rejected it,
+    nothing merged</b> — the referee outranking the judge, on the record. Every number here is read from
+    <span style="font-family:var(--mono)">board.jsonl</span> and the kernel logs that moved it.
     The full per-epoch breakdown, live, is on the <a href="dashboard.html">telemetry dashboard →</a></span>
   </div>
   <p class="found"><b>Foundations (primary sources):</b> Gödel 1931 · Löb 1955 (JSL 20) · Turing 1939 (Proc. LMS) ·
@@ -546,8 +583,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   Lambek–Scott 1986 · Hutter, Universal AI (2005); Legg–Hutter 2007 · Schmidhuber 2003 (cs/0309048) ·
   Lurie, Higher Topos Theory (2009) · Univalent Foundations Program, HoTT (2013) · Yudkowsky–Herreshoff 2013 (MIRI) ·
   Davis–Myreen 2015 (JAR) · Pakhomov–Walsh 2021 (JSL 86) · de Moura–Ullrich 2021 (CADE-28) ·
-  Zhang et al. 2025 (arXiv:2505.22954) · Genewein et al. 2026 (arXiv:2606.12683) ·
-  Iacob et al. 2026 (arXiv:2606.26294) · arXiv:2607.04277.</p>
+  Zhang et al. 2025 (arXiv:2505.22954) · Firsching et al. 2026 (arXiv:2605.13171) ·
+  Genewein et al. 2026 (arXiv:2606.12683) · Iacob et al. 2026 (arXiv:2606.26294) ·
+  J. Zhang et al. 2026 (arXiv:2607.04277).</p>
 </div></section>
 
 <div class="divider"></div>
@@ -615,7 +653,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
         <div class="groundtruth">
           <span class="z" style="color:var(--ok2)">11</span>
           <p><b>GROUND TRUTH — REAL.</b> Theorems the actual engine has kernel-verified: <b>11</b>, across
-          5 epochs. Read from <span style="font-family:var(--mono)">board.jsonl</span>, not from this
+          6 attempted epochs — every failure on the record. Read from
+          <span style="font-family:var(--mono)">board.jsonl</span>, not from this
           simulation — the <a href="dashboard.html">dashboard</a> has the breakdown.</p>
         </div>
       </div>

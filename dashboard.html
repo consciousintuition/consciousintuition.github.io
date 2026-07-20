@@ -364,6 +364,28 @@ footer .row b{color:var(--txt);font-weight:500}
       <div class="ledgernote" id="ledgernote"></div>
     </section>
 
+    <div class="wrap" style="padding:0"><div class="divider"></div></div>
+
+    <section>
+      <div class="slab">Benchmark grounding · Formal Conjectures</div>
+      <h2>Facing the field's open set — criteria stated before results</h2>
+      <div class="sub">This engine now runs a harness against
+      <a href="https://arxiv.org/abs/2605.13171" target="_blank" rel="noopener">Formal Conjectures</a>
+      (Firsching et al. 2026, Google DeepMind): 100 open research conjectures
+      (<b>published baseline: 0%</b> — no evaluated system has resolved one) and 100 solved problems
+      (AlphaProof 45–50%, DeepMind dev prover 66%). Same referee as everything on this page: kernel
+      accepts, no <b>sorry</b>, no forbidden axioms.</div>
+      <div class="pipenote" style="margin-top:14px">
+        Pinned snapshot: <b>bench-v1-lean4.27.0</b> — the exact conditions of the published baselines ·
+        harness extraction: <b>200/200</b> frozen-set statements ·
+        status: <b>cheap-refutation sweep of the open set in progress</b>.<br><br>
+        Pre-registered, before any result exists — SUCCESS: ≥1 kernel-verified resolution of an
+        open-marked statement, or ≥1 misformalization report accepted upstream. FAILURE: zero hits,
+        published here as a negative sweep log, stated plainly as not beating the 0% baseline.
+        <b>Whatever happens lands on this page.</b>
+      </div>
+    </section>
+
     <section class="nextstep">
       <div class="ns-k">Not abstractions</div>
       <div class="ns-t">Every verified theorem above compiles — really — in <span>Discovered.lean</span>.</div>
