@@ -26,6 +26,14 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
+::selection{background:rgba(181,123,255,.35);color:#f2f4f8}
+html{scrollbar-width:thin;scrollbar-color:#241c3a #05040a}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#05040a}
+::-webkit-scrollbar-thumb{background:#241c3a;border-radius:5px;border:2px solid #05040a}
+::-webkit-scrollbar-thumb:hover{background:#3a2d5e}
+#progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:95;pointer-events:none;
+  background:linear-gradient(90deg,var(--acc),var(--teal));box-shadow:0 0 10px rgba(181,123,255,.55)}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.75;overflow-x:hidden;min-height:100vh}
 
 /* signature background: an evolving proof-search / neural field (see script) */
@@ -298,6 +306,7 @@ footer .row b{color:var(--txt);font-weight:500}
 </style>
 </head>
 <body>
+<div id="progress" aria-hidden="true"></div>
 <canvas id="field" aria-hidden="true"></canvas>
 <div id="scrim"></div>
 <div id="fog"></div>
@@ -601,6 +610,15 @@ footer .row b{color:var(--txt);font-weight:500}
       cur.style.setProperty('--my',(cy0*100).toFixed(1)+'%');
     });
   },{passive:true});
+})();
+
+/* reading progress bar */
+(function(){
+  const bar=document.getElementById('progress');let q=false;
+  function paint(){q=false;const m=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(m>0?(scrollY/m)*100:0)+'%';}
+  addEventListener('scroll',()=>{if(!q){q=true;requestAnimationFrame(paint);}},{passive:true});
+  paint();
 })();
 
 const $=(id)=>document.getElementById(id);

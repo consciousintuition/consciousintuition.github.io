@@ -122,6 +122,101 @@ nav a.lnk:active{color:var(--acc)}
 section{padding:96px 0 10px;position:relative;z-index:4;scroll-margin-top:76px}
 h1,h2{text-wrap:balance}
 
+/* ===== MICRO-POLISH ===== */
+::selection{background:rgba(181,123,255,.35);color:var(--ink2)}
+html{scrollbar-width:thin;scrollbar-color:#241c3a #05040a}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#05040a}
+::-webkit-scrollbar-thumb{background:#241c3a;border-radius:5px;border:2px solid #05040a}
+::-webkit-scrollbar-thumb:hover{background:#3a2d5e}
+
+/* ===== READING PROGRESS BAR ===== */
+#progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:95;pointer-events:none;
+  background:linear-gradient(90deg,var(--acc),var(--teal));
+  box-shadow:0 0 10px rgba(181,123,255,.55)}
+
+/* ===== CURSOR GLOW — restrained ambient luminance (fine pointer only) ===== */
+#cursorglow{position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(360px circle at var(--cx,-600px) var(--cy,-600px),
+    rgba(181,123,255,.055),rgba(181,123,255,.018) 45%,transparent 70%)}
+
+/* ===== SECTION WATERMARKS — editorial numerals behind headers ===== */
+section[data-num]{overflow:hidden}
+section[data-num]::before{content:attr(data-num);position:absolute;top:26px;right:2vw;
+  font-family:var(--mono);font-weight:700;font-size:clamp(110px,17vw,230px);line-height:1;
+  color:rgba(181,123,255,.045);letter-spacing:-.04em;z-index:0;pointer-events:none;user-select:none}
+@media(max-width:640px){section[data-num]::before{font-size:96px;right:-8px}}
+
+/* ===== NAV STATUS CHIP — real terminal status from state.json ===== */
+#navstatus{display:none;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;
+  padding:3px 9px;border-radius:99px;border:1px solid;text-transform:uppercase;white-space:nowrap}
+#navstatus.bad{color:#ff9daa;border-color:rgba(255,92,114,.45);background:rgba(255,92,114,.07)}
+#navstatus.ok{color:var(--ok2);border-color:rgba(46,229,132,.45);background:rgba(46,229,132,.07)}
+#navstatus.sim{color:var(--sim);border-color:rgba(224,162,63,.45);background:rgba(224,162,63,.07)}
+
+/* ===== COMMAND PALETTE (Ctrl/⌘-K) ===== */
+#kbtn{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.1em;color:var(--mut);border:1px solid var(--line2);border-radius:4px;
+  background:rgba(255,255,255,.02);padding:5px 9px;cursor:pointer;transition:all .2s}
+#kbtn:hover{color:var(--acc2);border-color:rgba(181,123,255,.5)}
+#kbtn kbd{font-family:inherit;font-size:8.5px;border:1px solid var(--line2);border-radius:3px;
+  padding:1px 4px;background:rgba(255,255,255,.03)}
+#palette{position:fixed;inset:0;z-index:120;display:none;align-items:flex-start;justify-content:center;
+  background:rgba(2,3,4,.72);backdrop-filter:blur(6px);padding:14vh 20px 0}
+#palette.open{display:flex}
+.palbox{width:min(560px,100%);border:1px solid transparent;border-radius:10px;overflow:hidden;
+  background:linear-gradient(rgba(10,8,20,.97),rgba(10,8,20,.97)) padding-box,
+    linear-gradient(155deg,rgba(181,123,255,.5),rgba(36,28,58,.7) 45%,rgba(95,224,207,.3)) border-box;
+  box-shadow:0 40px 120px rgba(0,0,0,.7),0 0 60px rgba(181,123,255,.12)}
+.palbox input{width:100%;background:none;border:none;outline:none;color:var(--ink);
+  font-family:var(--mono);font-size:14px;padding:16px 18px;border-bottom:1px solid var(--line2)}
+.palbox input::placeholder{color:var(--dim)}
+#pallist{max-height:44vh;overflow-y:auto;padding:6px}
+.palitem{display:flex;align-items:center;gap:12px;padding:10px 13px;border-radius:6px;cursor:pointer;
+  font-size:13px;color:var(--txt)}
+.palitem .pk{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;color:var(--dim);
+  text-transform:uppercase;min-width:64px}
+.palitem.sel{background:rgba(181,123,255,.12);color:var(--ink)}
+.palitem.sel .pk{color:var(--acc)}
+.palhint{padding:9px 16px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.1em;color:var(--dim);display:flex;gap:16px}
+
+/* ===== VERIFIED-THEOREM TICKER — real board data ===== */
+#ticker{display:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:rgba(3,2,6,.7);overflow:hidden;position:relative;z-index:4;padding:13px 0;margin-top:90px}
+#ticker .tlabel{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;z-index:2;
+  padding:0 16px 0 22px;background:linear-gradient(90deg,var(--bg) 55%,transparent);
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;color:var(--ok2)}
+#tickerrow{display:flex;gap:44px;width:max-content;white-space:nowrap;padding-left:170px}
+.tk{display:inline-flex;align-items:baseline;gap:9px;font-family:var(--mono);font-size:11px;color:var(--txt)}
+.tk .tchk{color:var(--ok)}
+.tk .tax{font-size:9px;color:var(--vio2);opacity:.75}
+@media(prefers-reduced-motion:no-preference){
+  #tickerrow{animation:tickscroll var(--tdur,60s) linear infinite}
+  #ticker:hover #tickerrow{animation-play-state:paused}
+  @keyframes tickscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+}
+@media(prefers-reduced-motion:reduce){#ticker{overflow-x:auto}}
+
+/* ===== PROGRAM LOG — dated milestones, ported timeline language ===== */
+.plog{position:relative;max-width:720px;margin:0 auto;padding-left:34px}
+.plog::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(180deg,rgba(181,123,255,.5),rgba(95,224,207,.3),rgba(181,123,255,.1))}
+.pl{position:relative;margin-bottom:20px}
+.pl .mk{position:absolute;left:-34px;top:2px;width:24px;height:24px;border-radius:50%;
+  background:var(--cardS);border:1.5px solid var(--line2);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9px;font-weight:700;color:var(--acc2);z-index:2}
+.pl.ok .mk{border-color:rgba(46,229,132,.5);color:var(--ok2)}
+.pl.bad .mk{border-color:rgba(255,92,114,.5);color:#ff9daa}
+.pl.now .mk{border-color:rgba(95,224,207,.6);color:var(--teal);box-shadow:0 0 12px rgba(95,224,207,.3)}
+.pl .body{border:1px solid transparent;border-radius:6px;padding:13px 16px;text-align:left;
+  background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(155deg,rgba(181,123,255,.22),rgba(36,28,58,.5) 45%,rgba(95,224,207,.1)) border-box}
+.pl .d{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
+.pl .t{font-family:var(--disp);font-size:14.5px;font-weight:600;color:var(--ink)}
+.pl .s{font-size:12.5px;color:var(--mut);line-height:1.65;margin-top:4px}
+.pl .s b{color:var(--txt);font-weight:600}
+
 /* ===== SECTION PROGRESS RAIL — scrollspy (desktop only) ===== */
 #rail{position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:60;
   display:flex;flex-direction:column;gap:13px}
@@ -409,11 +504,23 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <div id="grain" aria-hidden="true"></div>
 <canvas id="boot" aria-hidden="true"></canvas>
 
+<div id="progress" aria-hidden="true"></div>
+<div id="cursorglow" aria-hidden="true"></div>
+
+<div id="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="palbox">
+    <input id="palinput" type="text" placeholder="Jump to… (sections, dashboard, papers)" autocomplete="off" spellcheck="false">
+    <div id="pallist" role="listbox"></div>
+    <div class="palhint"><span>↑↓ navigate</span><span>↵ open</span><span>esc close</span></div>
+  </div>
+</div>
+
 <nav id="rail" aria-label="Section progress">
   <a href="#problem" data-label="01 · PROBLEM"></a>
   <a href="#vision" data-label="02 · DIRECTION"></a>
   <a href="#research" data-label="03 · RESEARCH"></a>
   <a href="#benchmark" data-label="03·B · BENCHMARK"></a>
+  <a href="#log" data-label="03·C · PROGRAM LOG"></a>
   <a href="#truth" data-label="04 · GROUND TRUTH"></a>
   <a href="#real" data-label="05 · CODE"></a>
   <a href="#sim" data-label="06 · SIMULATOR"></a>
@@ -437,6 +544,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <a class="lnk" href="#real">Code</a>
       <a class="lnk" href="#sim">Simulator</a>
       <a class="lnk live" href="dashboard.html"><span class="ld"></span>Dashboard</a>
+      <span id="navstatus" title="Latest engine terminal status — read from state.json"></span>
+      <button id="kbtn" aria-label="Open command palette" title="Command palette"><kbd>Ctrl</kbd><kbd>K</kbd></button>
       <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
@@ -465,7 +574,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 </div>
 
 <!-- ================= PROBLEM ================= -->
-<section id="problem"><div class="wrap rv">
+<section id="problem" data-num="01"><div class="wrap rv">
   <div class="slab">01 · The problem</div>
   <h2>Self-improvement exists. A <span class="g">theory of it</span> does not.</h2>
   <p class="lede">Three failures define the frontier — all three are failures of missing mathematics,
@@ -498,7 +607,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <div class="divider"></div>
 
 <!-- ================= VISION ================= -->
-<section id="vision"><div class="wrap rv">
+<section id="vision" data-num="02"><div class="wrap rv">
   <div class="slab">02 · The direction</div>
   <h2>Evolve the <span class="g">theory</span>, not the weights.</h2>
   <p class="lede">One idea drives this program — stated as a research direction, not a product claim.</p>
@@ -527,7 +636,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <div class="divider"></div>
 
 <!-- ================= RESEARCH AGENDA ================= -->
-<section id="research"><div class="wrap rv">
+<section id="research" data-num="03"><div class="wrap rv">
   <div class="slab">03 · Research agenda — the edge</div>
   <h2>Five open problems. One <span class="g">falsifiable</span> hypothesis.</h2>
   <p class="lede">This is a research program, not a product. Each question below sits at the current
@@ -614,7 +723,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <div class="divider"></div>
 
 <!-- ================= BENCHMARK GROUNDING ================= -->
-<section id="benchmark"><div class="wrap rv">
+<section id="benchmark" data-num="3B"><div class="wrap rv">
   <div class="slab">03·B · Measured against the field</div>
   <h2>The same referee, <span class="g">the field's</span> problems.</h2>
   <p class="lede">In May 2026 Google DeepMind released
@@ -647,8 +756,39 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 
 <div class="divider"></div>
 
+<!-- ================= PROGRAM LOG ================= -->
+<section id="log" data-num="LOG"><div class="wrap rv">
+  <div class="slab">03·C · Program log</div>
+  <h2>The record, <span class="g">dated</span> — failures included.</h2>
+  <p class="lede">Milestones as they happened. Epoch numbers are the engine's own; every entry is
+  backed by a kernel log, a board record, or a public trace on the
+  <a href="dashboard.html">dashboard</a>.</p>
+  <div class="plog">
+    <div class="pl ok"><span class="mk">E1</span><div class="body">
+      <div class="d">Epoch 1</div><div class="t">First kernel-verified results</div>
+      <div class="s"><b>6 theorems</b> across three goal families (linear, multiplicative, power residues) — the loop closes end to end for the first time.</div></div></div>
+    <div class="pl bad"><span class="mk">E3</span><div class="body">
+      <div class="d">Epoch 3</div><div class="t">First honest failures on the board</div>
+      <div class="s">Two proofs caught with a <b>sorryAx footprint</b> at the honesty gate — rejected, logged, and kept visible. 1 theorem verified alongside them.</div></div></div>
+    <div class="pl ok"><span class="mk">E4</span><div class="body">
+      <div class="d">Epoch 4</div><div class="t">LLM-CLI proposer wired</div>
+      <div class="s">The proposer becomes a live language-model subprocess; <b>3 verified results</b>, one axiom-free.</div></div></div>
+    <div class="pl ok"><span class="mk">E5</span><div class="body">
+      <div class="d">Epoch 5</div><div class="t">Kolakoski self-description verified</div>
+      <div class="s">The two-pointer generator's sustainability invariant, machine-checked — the board's first result with genuine structural content.</div></div></div>
+    <div class="pl bad"><span class="mk">E6</span><div class="body">
+      <div class="d">2026-07-18 · Epoch 6</div><div class="t">The kernel gate halts its own pipeline</div>
+      <div class="s">Isolated propose→critic→verify→lint→merge architecture goes live; the Critic passes a candidate, <b>the kernel rejects it, nothing merges</b>. The referee outranking the judge — trace public.</div></div></div>
+    <div class="pl now"><span class="mk">FC</span><div class="body">
+      <div class="d">2026-07-20 · Benchmark</div><div class="t">Formal Conjectures harness, pinned &amp; pre-registered</div>
+      <div class="s">Frozen snapshot <b>bench-v1-lean4.27.0</b>, 200/200 statements extracted, success/failure criteria stated before results exist. Sweep in progress.</div></div></div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
 <!-- ================= GROUND TRUTH ================= -->
-<section id="truth"><div class="wrap rv">
+<section id="truth" data-num="04"><div class="wrap rv">
   <div class="slab">04 · Ground truth</div>
   <h2>Real counters, wired to <span class="g">kernel logs</span>.</h2>
   <div class="statusbar">
@@ -679,7 +819,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <div class="divider"></div>
 
 <!-- ================= REAL LEAN (bottom, real artifact) ================= -->
-<section id="real"><div class="wrap rv">
+<section id="real" data-num="05"><div class="wrap rv">
   <div class="slab">05 · The native language — real, compiled</div>
   <div class="edwrap">
     <div class="editor">
@@ -706,7 +846,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <div class="divider"></div>
 
 <!-- ================= SIMULATION (bottom of site) ================= -->
-<section id="sim"><div class="wrap rv">
+<section id="sim" data-num="06"><div class="wrap rv">
   <div class="slab">06 · Engine telemetry — simulated</div>
   <h2>One epoch, end to end — <span class="g">labeled</span> as what it is.</h2>
   <p class="lede">Proposals, triage, kernel verdicts, selection pressure — at a scale the engine has not
@@ -749,6 +889,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
     </div>
   </div>
 </div></section>
+
+<div id="ticker" aria-label="Kernel-verified results from the engine board">
+  <span class="tlabel">REAL · BOARD</span>
+  <div id="tickerrow"></div>
+</div>
 
 <footer><div class="wrap">
   <span class="sig">AUTHOR: <b>SCHRÖDINGER'S CAT</b></span>
@@ -1325,9 +1470,123 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
     setTimeout(function(){mt.classList.remove('zap');},420);
   });
 }
+/* ============ READING PROGRESS + CURSOR GLOW ============ */
+(function(){
+  var bar=document.getElementById('progress'), glow=document.getElementById('cursorglow');
+  var queued=false;
+  function paint(){
+    queued=false;
+    var max=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(max>0?(scrollY/max)*100:0)+'%';
+  }
+  addEventListener('scroll',function(){if(!queued){queued=true;requestAnimationFrame(paint);}},{passive:true});
+  paint();
+  if(reduce||!matchMedia('(pointer:fine)').matches){ if(glow)glow.remove(); return; }
+  var gq=false,gx=0,gy=0;
+  addEventListener('mousemove',function(e){
+    gx=e.clientX;gy=e.clientY;
+    if(!gq){gq=true;requestAnimationFrame(function(){
+      gq=false;glow.style.setProperty('--cx',gx+'px');glow.style.setProperty('--cy',gy+'px');});}
+  },{passive:true});
+})();
+
+/* ============ COMMAND PALETTE — Ctrl/⌘-K ============ */
+(function(){
+  var pal=document.getElementById('palette'), inp=document.getElementById('palinput'),
+      list=document.getElementById('pallist'), btn=document.getElementById('kbtn');
+  var ITEMS=[
+    {k:'section',t:'01 · The problem',go:'#problem'},
+    {k:'section',t:'02 · The direction',go:'#vision'},
+    {k:'section',t:'03 · Research agenda',go:'#research'},
+    {k:'section',t:'03·B · Benchmark — measured against the field',go:'#benchmark'},
+    {k:'section',t:'03·C · Program log',go:'#log'},
+    {k:'section',t:'04 · Ground truth',go:'#truth'},
+    {k:'section',t:'05 · Real Lean code',go:'#real'},
+    {k:'section',t:'06 · Simulator (labeled)',go:'#sim'},
+    {k:'page',t:'Engine telemetry dashboard',go:'dashboard.html'},
+    {k:'paper',t:'Formal Conjectures — arXiv:2605.13171',go:'https://arxiv.org/abs/2605.13171',ext:1},
+    {k:'repo',t:'google-deepmind/formal-conjectures',go:'https://github.com/google-deepmind/formal-conjectures',ext:1},
+    {k:'field',t:'RSI workshop — ICLR 2026',go:'https://recursive-workshop.github.io/',ext:1},
+    {k:'contact',t:'@consciousnessbo on X',go:'https://x.com/consciousnessbo',ext:1}
+  ];
+  var filtered=ITEMS, sel=0, lastFocus=null;
+  function render(){
+    list.innerHTML='';
+    filtered.forEach(function(it,i){
+      var d=document.createElement('div');
+      d.className='palitem'+(i===sel?' sel':'');
+      d.setAttribute('role','option');
+      d.innerHTML='<span class="pk">'+it.k+'</span><span>'+it.t+'</span>';
+      d.addEventListener('click',function(){go(it);});
+      d.addEventListener('mousemove',function(){if(sel!==i){sel=i;render();}});
+      list.appendChild(d);
+    });
+  }
+  function open(){lastFocus=document.activeElement;pal.classList.add('open');inp.value='';filtered=ITEMS;sel=0;render();inp.focus();}
+  function close(){pal.classList.remove('open');if(lastFocus&&lastFocus.focus)lastFocus.focus();}
+  function go(it){
+    close();
+    if(it.ext){window.open(it.go,'_blank','noopener');}
+    else if(it.go[0]==='#'){var el=document.querySelector(it.go);if(el)el.scrollIntoView({behavior:reduce?'auto':'smooth'});}
+    else{location.href=it.go;}
+  }
+  inp.addEventListener('input',function(){
+    var q=inp.value.trim().toLowerCase();
+    filtered=q?ITEMS.filter(function(it){return (it.t+' '+it.k).toLowerCase().indexOf(q)>=0;}):ITEMS;
+    sel=0;render();
+  });
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){sel=Math.min(sel+1,filtered.length-1);render();e.preventDefault();}
+    else if(e.key==='ArrowUp'){sel=Math.max(sel-1,0);render();e.preventDefault();}
+    else if(e.key==='Enter'){if(filtered[sel])go(filtered[sel]);}
+    else if(e.key==='Escape'){close();}
+  });
+  pal.addEventListener('mousedown',function(e){if(e.target===pal)close();});
+  addEventListener('keydown',function(e){
+    if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();pal.classList.contains('open')?close():open();}
+    else if(e.key==='Escape'&&pal.classList.contains('open')){close();}
+  });
+  if(btn)btn.addEventListener('click',open);
+})();
+
+/* ============ REAL STATE — nav status chip + verified-theorem ticker ============ */
+/* One fetch of the same state.json the dashboard reads. Under file:// or if the
+   snapshot is missing, both features stay hidden — nothing synthetic appears. */
+(function(){
+  fetch('data/state.json',{cache:'no-store'}).then(function(r){
+    if(!r.ok)throw 0; return r.json();
+  }).then(function(s){
+    /* chip: the latest epoch's real terminal status */
+    var chip=document.getElementById('navstatus');
+    if(chip&&s.latest&&s.latest.terminal_status){
+      var st=s.latest.terminal_status;
+      chip.textContent='e'+s.latest.epoch+' · '+st.replace(/_/g,' ');
+      chip.className=st==='MERGED'?'ok':(st==='REJECT'?'sim':'bad');
+      chip.style.display='inline-block';
+    }
+    /* ticker: every kernel-verified record on the board */
+    var row=document.getElementById('tickerrow'), tick=document.getElementById('ticker');
+    if(!row||!tick||!s.epochs)return;
+    var items=[];
+    s.epochs.forEach(function(e){(e.records||[]).forEach(function(r){
+      if(r.status==='verified'){
+        var txt=r.conjecture.length>72?r.conjecture.slice(0,69)+'…':r.conjecture;
+        var ax=r.axiom_free?'axiom-free':(r.axioms||[]).join(', ');
+        items.push('<span class="tk"><span class="tchk">✓</span><span>'+
+          txt.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span><span class="tax">['+ax+']</span></span>');
+      }
+    });});
+    if(!items.length)return;
+    /* duplicate once for a seamless -50% loop; duration scales with content */
+    row.innerHTML=items.join('')+items.join('');
+    row.style.setProperty('--tdur',Math.max(40,items.length*7)+'s');
+    tick.style.display='block';
+  }).catch(function(){/* honest absence beats synthetic presence */});
+})();
+
 /* ============ SCROLLSPY — progress rail + header nav active state ============ */
 (function(){
-  var sections=['problem','vision','research','benchmark','truth','real','sim'];
+  var sections=['problem','vision','research','benchmark','log','truth','real','sim'];
   var railLinks={}, navLinks={};
   document.querySelectorAll('#rail a').forEach(function(a){railLinks[a.getAttribute('href').slice(1)]=a;});
   document.querySelectorAll('nav a.lnk[href^="#"]').forEach(function(a){navLinks[a.getAttribute('href').slice(1)]=a;});
