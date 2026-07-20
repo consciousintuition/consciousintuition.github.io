@@ -87,7 +87,11 @@ h1 .g{color:var(--acc);text-shadow:0 0 40px rgba(181,123,255,.35)}
 
 /* stat tiles */
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:34px 0 8px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 16px 14px}
+/* gradient hairline edge — matches the landing page's card language */
+.stat{border:1px solid transparent;border-radius:6px;padding:16px 16px 14px;
+  background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(155deg,rgba(181,123,255,.30),rgba(36,28,58,.55) 45%,rgba(95,224,207,.14)) border-box}
+.stat .n{font-variant-numeric:tabular-nums}
 .stat .n{font-family:var(--disp);font-size:30px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-.02em}
 .stat .n.ok{color:var(--ok2)} .stat .n.bad{color:var(--bad)} .stat .n.acc{color:var(--acc2)}
 .stat .l{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-top:8px}
@@ -684,6 +688,7 @@ addEventListener("resize",function(){
 
 function renderStats(s){
   const box=$("stats");box.innerHTML="";
+  const reduceMotion=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   const tiles=[
     ["acc", s.epochs_recorded ?? (s.records!=null?"—":0), "epochs on board"],
     ["ok", s.verified, "kernel-verified"],
@@ -693,9 +698,22 @@ function renderStats(s){
   ];
   for(const [c,n,l] of tiles){
     const t=el("div","stat");
-    t.appendChild(el("div","n "+c, n==null?"—":String(n)));
+    const num=el("div","n "+c, n==null?"—":String(n));
+    t.appendChild(num);
     t.appendChild(el("div","l",l));
     box.appendChild(t);
+    // count-up on load — enhancement only. The TRUE value is set first and
+    // the animation runs only in a visible tab: a throttled/hidden renderer
+    // must never leave a wrong number (0) on an honesty-branded page.
+    if(!reduceMotion&&Number.isFinite(+n)&&document.visibilityState==="visible"){
+      const target=+n;let t0=null;const D=850;
+      requestAnimationFrame(function tick(ts){
+        if(!t0)t0=ts;
+        const p=Math.min(1,(ts-t0)/D);
+        num.textContent=String(Math.round(target*(1-Math.pow(1-p,3))));
+        if(p<1)requestAnimationFrame(tick);else num.textContent=String(n);
+      });
+    }
   }
 }
 

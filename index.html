@@ -120,6 +120,63 @@ nav a.lnk:active{color:var(--acc)}
 @media(max-width:640px){.worldcap{display:none}}
 
 section{padding:96px 0 10px;position:relative;z-index:4;scroll-margin-top:76px}
+h1,h2{text-wrap:balance}
+
+/* ===== SECTION PROGRESS RAIL — scrollspy (desktop only) ===== */
+#rail{position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:60;
+  display:flex;flex-direction:column;gap:13px}
+#rail a{width:8px;height:8px;border-radius:50%;border:1px solid var(--line2);
+  background:rgba(255,255,255,.04);transition:background .25s,border-color .25s,box-shadow .25s;position:relative;display:block}
+#rail a.on{background:var(--acc);border-color:var(--acc);box-shadow:0 0 12px rgba(181,123,255,.65)}
+#rail a:hover::after,#rail a:focus-visible::after{content:attr(data-label);position:absolute;left:17px;top:50%;
+  transform:translateY(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+  color:var(--acc2);white-space:nowrap;background:rgba(2,3,4,.92);padding:4px 9px;
+  border:1px solid var(--line2);border-radius:3px;pointer-events:none}
+@media(max-width:1099px){#rail{display:none}}
+nav a.lnk.active{color:var(--acc2)}
+nav a.lnk.active::after{right:0}
+
+/* ===== COUNT-UP NUMBERS ===== */
+.cnum{font-variant-numeric:tabular-nums}
+
+/* ===== PUBLISHED-BASELINES BARS (§03·B) — real numbers only ===== */
+.benchbars{max-width:760px;margin:0 auto 10px;display:flex;flex-direction:column;gap:11px}
+.bb{display:grid;grid-template-columns:220px 1fr 52px;gap:14px;align-items:center}
+.bb .bl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--mut);text-align:right}
+.bb .bt{height:10px;border-radius:5px;background:rgba(255,255,255,.03);overflow:hidden;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.04);position:relative}
+.bb .bt i{display:block;height:100%;width:var(--w,0%);border-radius:5px;
+  background:linear-gradient(90deg,rgba(181,123,255,.55),var(--acc));
+  box-shadow:0 0 14px rgba(181,123,255,.35),inset 0 1px 0 rgba(255,255,255,.3)}
+.bb .bv{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--acc2);font-variant-numeric:tabular-nums}
+.bb.open .bt i{background:none;box-shadow:none}
+.bb.open .bt::after{content:"";position:absolute;left:0;top:50%;width:8px;height:8px;border-radius:50%;
+  transform:translate(-2px,-50%);background:var(--teal);box-shadow:0 0 10px rgba(95,224,207,.8)}
+.bb.open .bv{color:var(--teal)}
+.bb.us .bl,.bb.us .bv{color:var(--sim)}
+.bb.us .bt{border:1px dashed rgba(224,162,63,.35);background:rgba(224,162,63,.03);box-shadow:none}
+.bbcap{max-width:760px;margin:0 auto 26px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--dim);text-align:center}
+@media(max-width:640px){.bb{grid-template-columns:1fr 60px;grid-template-rows:auto auto}.bb .bl{grid-column:1/3;text-align:left}}
+@media(prefers-reduced-motion:no-preference){
+  .rv .bb .bt i{transform-origin:left center;transform:scaleX(0);transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+  .rv.on .bb .bt i{transform:scaleX(1)}
+  .rv.on .bb:nth-child(2) .bt i{transition-delay:.12s}
+  .rv.on .bb:nth-child(3) .bt i{transition-delay:.24s}
+  .rv.on .bb:nth-child(4) .bt i{transition-delay:.36s}
+  .bb.open .bt::after{animation:openpulse 2.6s ease-in-out infinite}
+  @keyframes openpulse{0%,100%{box-shadow:0 0 8px rgba(95,224,207,.6)}50%{box-shadow:0 0 16px rgba(95,224,207,1)}}
+}
+
+/* ===== CARD CASCADE — children stagger inside a revealed section ===== */
+@media(prefers-reduced-motion:no-preference){
+  .js .rv .prob,.js .rv .opcard{opacity:0;transform:translateY(14px);
+    transition:opacity .65s cubic-bezier(.2,.7,.3,1),transform .65s cubic-bezier(.2,.7,.3,1)}
+  .js .rv.on .prob,.js .rv.on .opcard{opacity:1;transform:none}
+  .js .rv.on .prob:nth-child(2),.js .rv.on .opcard:nth-child(2){transition-delay:.08s}
+  .js .rv.on .prob:nth-child(3),.js .rv.on .opcard:nth-child(3){transition-delay:.16s}
+  .js .rv.on .opcard:nth-child(4){transition-delay:.24s}
+  .js .rv.on .opcard:nth-child(5){transition-delay:.32s}
+}
 .slab{font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--acc);text-transform:uppercase;margin-bottom:14px;text-align:center}
 h2{font-family:var(--disp);font-size:clamp(25px,3.4vw,38px);font-weight:700;color:var(--ink);letter-spacing:-.025em;line-height:1.14;margin:0 auto 16px;max-width:24em;text-align:center}
 h2 .g{color:var(--acc)}
@@ -180,8 +237,16 @@ h2 .g{color:var(--acc)}
 
 /* problems */
 .probs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:960px;margin:0 auto}
-.prob{position:relative;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:24px;transition:border-color .25s,transform .2s;text-align:left;will-change:transform}
-.prob:hover{border-color:rgba(181,123,255,.4)}
+/* gradient hairline border: 1px violet→teal sweep behind a padding-box fill —
+   the flat var(--line) border reads as a wireframe; this reads as an edge
+   catching light. Hover brightens the sweep and lifts a soft bloom. */
+.prob{position:relative;backdrop-filter:blur(8px);border:1px solid transparent;border-radius:6px;padding:24px;
+  background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(155deg,rgba(181,123,255,.32),rgba(36,28,58,.55) 45%,rgba(95,224,207,.14)) border-box;
+  transition:transform .2s,box-shadow .3s;text-align:left;will-change:transform}
+.prob:hover{background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(155deg,rgba(181,123,255,.65),rgba(36,28,58,.7) 45%,rgba(95,224,207,.35)) border-box;
+  box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 30px rgba(181,123,255,.08)}
 .prob .no{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--acc)}
 .prob h3{font-family:var(--disp);color:var(--ink);font-size:16.5px;font-weight:600;margin:11px 0 8px}
 .prob p{font-size:13.5px;color:var(--mut);line-height:1.75}
@@ -206,8 +271,13 @@ h2 .g{color:var(--acc)}
 .ptreecap{font-family:var(--mono);font-size:9px;color:var(--mut);letter-spacing:.1em;text-align:center;padding:8px 4px 2px}
 .opcard .rq0{font-family:var(--mono);font-size:9.8px;color:var(--acc2);margin-top:9px;letter-spacing:.03em;line-height:1.55}
 .ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-bottom:46px}
-.opcard{position:relative;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:22px;text-align:left;transition:border-color .25s,transform .2s;will-change:transform}
-.opcard:hover{border-color:rgba(95,224,207,.4)}
+.opcard{position:relative;backdrop-filter:blur(8px);border:1px solid transparent;border-radius:6px;padding:22px;text-align:left;
+  background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(155deg,rgba(95,224,207,.28),rgba(36,28,58,.55) 45%,rgba(181,123,255,.16)) border-box;
+  transition:transform .2s,box-shadow .3s;will-change:transform}
+.opcard:hover{background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(155deg,rgba(95,224,207,.6),rgba(36,28,58,.7) 45%,rgba(181,123,255,.35)) border-box;
+  box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 30px rgba(95,224,207,.07)}
 .opcard .no{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--teal)}
 .opcard h3{font-family:var(--disp);color:var(--ink);font-size:15.5px;font-weight:600;margin:10px 0 7px}
 .opcard p{font-size:12.8px;color:var(--mut);line-height:1.7}
@@ -338,6 +408,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <div id="mistwrap" aria-hidden="true"><div id="mist"></div></div>
 <div id="grain" aria-hidden="true"></div>
 <canvas id="boot" aria-hidden="true"></canvas>
+
+<nav id="rail" aria-label="Section progress">
+  <a href="#problem" data-label="01 · PROBLEM"></a>
+  <a href="#vision" data-label="02 · DIRECTION"></a>
+  <a href="#research" data-label="03 · RESEARCH"></a>
+  <a href="#benchmark" data-label="03·B · BENCHMARK"></a>
+  <a href="#truth" data-label="04 · GROUND TRUTH"></a>
+  <a href="#real" data-label="05 · CODE"></a>
+  <a href="#sim" data-label="06 · SIMULATOR"></a>
+</nav>
 
 <header>
   <div class="row">
@@ -543,6 +623,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   <b>1,029 open conjectures</b>. Its success criterion is ours, verbatim: <b>the kernel accepts,
   no <span style="font-family:var(--mono)">sorry</span>, no forbidden axioms</b>. That makes it the
   one public benchmark this program can face without changing referees.</p>
+  <div class="benchbars" aria-label="Published baseline solve rates on the frozen evaluation sets">
+    <div class="bb"><span class="bl">AlphaProof · 1k simulations</span><div class="bt"><i style="--w:45%"></i></div><span class="bv">45%</span></div>
+    <div class="bb"><span class="bl">AlphaProof · 16k simulations</span><div class="bt"><i style="--w:50%"></i></div><span class="bv">50%</span></div>
+    <div class="bb"><span class="bl">DeepMind prover agent (dev)</span><div class="bt"><i style="--w:66%"></i></div><span class="bv">66%</span></div>
+    <div class="bb open"><span class="bl">FC100OpenSet1 · every evaluated system</span><div class="bt"><i style="--w:0%"></i></div><span class="bv">0%</span></div>
+  </div>
+  <p class="bbcap">solved-set baselines as published (Firsching et al. 2026, Table 2) · the open set is unresolved by
+  every evaluated system — that zero is the target of our pre-registered sweep · no bar for us until a kernel-verified number exists</p>
   <div class="chal" style="margin-bottom:26px">
     <div class="crow"><span class="cl">Published baselines<br>(frozen solved set)</span><span class="cr">AlphaProof: 45% at 1k simulations, 50% at 16k · DeepMind's dev prover agent: 66% — on <span style="font-family:var(--mono)">FC100SolvedSet1</span>, 100 research-level solved problems.</span></div>
     <div class="crow"><span class="cl">Published baseline<br>(frozen open set)</span><span class="cr"><b>0%.</b> On <span style="font-family:var(--mono)">FC100OpenSet1</span> — 100 open research conjectures — no evaluated system had resolved a single statement at release. One kernel-verified proof <i>or disproof</i> beats every published system.</span></div>
@@ -1237,6 +1325,55 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
     setTimeout(function(){mt.classList.remove('zap');},420);
   });
 }
+/* ============ SCROLLSPY — progress rail + header nav active state ============ */
+(function(){
+  var sections=['problem','vision','research','benchmark','truth','real','sim'];
+  var railLinks={}, navLinks={};
+  document.querySelectorAll('#rail a').forEach(function(a){railLinks[a.getAttribute('href').slice(1)]=a;});
+  document.querySelectorAll('nav a.lnk[href^="#"]').forEach(function(a){navLinks[a.getAttribute('href').slice(1)]=a;});
+  var current='';
+  function setActive(id){
+    if(id===current)return; current=id;
+    Object.keys(railLinks).forEach(function(k){railLinks[k].classList.toggle('on',k===id);});
+    Object.keys(navLinks).forEach(function(k){navLinks[k].classList.toggle('active',k===id);});
+  }
+  if('IntersectionObserver' in window){
+    var visible={};
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){visible[e.target.id]=e.isIntersecting?e.intersectionRatio:0;});
+      var best='',bestR=0;
+      sections.forEach(function(id){if((visible[id]||0)>bestR){bestR=visible[id];best=id;}});
+      if(best)setActive(best);
+    },{threshold:[.12,.3,.55],rootMargin:'-70px 0px -20% 0px'});
+    sections.forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el);});
+  }
+})();
+
+/* ============ COUNT-UP — ground-truth numbers, real data only ============ */
+(function(){
+  if(reduce||!('IntersectionObserver' in window))return;
+  var els=document.querySelectorAll('.statusbar .item b, .groundtruth .z');
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting)return;
+      io.unobserve(e.target);
+      var raw=e.target.textContent.trim();
+      var target=parseInt(raw,10);
+      if(isNaN(target))return;             /* checkmark items stay as-is */
+      var t0=null,D=900;
+      e.target.classList.add('cnum');
+      (function tick(ts){
+        if(!t0)t0=ts;
+        var p=Math.min(1,(ts-t0)/D);
+        e.target.textContent=String(Math.round(target*(1-Math.pow(1-p,3))));
+        if(p<1)requestAnimationFrame(tick);
+        else e.target.textContent=raw;
+      })(performance.now());
+    });
+  },{threshold:.6});
+  els.forEach(function(el){io.observe(el);});
+})();
+
 /* ambient music — Alex Morgan via Pixabay (free license), off by default */
 (function(){
   var bgm=$('bgm'), mb=$('musicbtn');
