@@ -37,6 +37,9 @@ html,body{overflow-anchor:none}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden}
+#ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.55}
+#kg{position:fixed;inset:0;z-index:1;width:100vw;height:100vh;pointer-events:none}
+#boot{position:fixed;inset:0;z-index:80;pointer-events:none;image-rendering:pixelated}
 #fog{position:fixed;inset:0;z-index:2;pointer-events:none;
   background:
    radial-gradient(ellipse 130% 95% at 50% 112%,rgba(2,3,4,.96) 22%,rgba(2,3,4,.6) 58%,transparent 100%),
@@ -92,7 +95,7 @@ nav a.lnk.live:hover::after{background:linear-gradient(90deg,var(--ok),transpare
 }
 
 /* hero — centered */
-.hero{position:relative;z-index:4;min-height:86vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:34px}
+.hero{position:relative;z-index:4;min-height:72vh;display:flex;align-items:center;text-align:center}
 .hero .inner{max-width:860px;margin:0 auto;padding:70px 24px 30px;width:100%}
 .kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;color:var(--acc);text-transform:uppercase;margin-bottom:24px}
 h1{font-family:var(--disp);font-size:clamp(36px,5.6vw,64px);font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1.07;margin:0 auto;max-width:18ch}
@@ -140,13 +143,6 @@ html{scrollbar-width:thin;scrollbar-color:#241c3a #05040a}
 #cursorglow{position:fixed;inset:0;z-index:3;pointer-events:none;
   background:radial-gradient(360px circle at var(--cx,-600px) var(--cy,-600px),
     rgba(181,123,255,.055),rgba(181,123,255,.018) 45%,transparent 70%)}
-
-/* ===== SECTION WATERMARKS — editorial numerals behind headers ===== */
-section[data-num]{overflow:hidden}
-section[data-num]::before{content:attr(data-num);position:absolute;top:26px;right:2vw;
-  font-family:var(--mono);font-weight:700;font-size:clamp(110px,17vw,230px);line-height:1;
-  color:rgba(181,123,255,.045);letter-spacing:-.04em;z-index:0;pointer-events:none;user-select:none}
-@media(max-width:640px){section[data-num]::before{font-size:96px;right:-8px}}
 
 /* ===== NAV STATUS CHIP — real terminal status from state.json ===== */
 #navstatus{display:none;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;
@@ -356,23 +352,6 @@ h2 .g{color:var(--acc)}
 .hypo .fals{font-family:var(--mono);font-size:10.5px;color:var(--sim);margin-top:10px;letter-spacing:.05em}
 .rq0box{border-color:rgba(181,123,255,.4);background:rgba(181,123,255,.05)}
 .rq0box .hm .up{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--mut);display:block;margin-top:8px;letter-spacing:.04em}
-/* hero signature visual — the organism, center stage */
-.heroorg{max-width:1020px;margin:8px auto 0;padding:0 24px;width:100%}
-.heroorg .ptreecap{padding-top:10px}
-/* folded simulator — the labeled toy steps back behind a disclosure */
-.simfold{max-width:1040px;margin:0 auto}
-.simfold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;
-  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--mut);border:1px dashed var(--line2);border-radius:6px;padding:14px 18px;
-  transition:color .2s,border-color .2s}
-.simfold>summary:hover{color:var(--sim);border-color:rgba(224,162,63,.45)}
-.simfold>summary::-webkit-details-marker{display:none}
-.simfold>summary::before{content:"▸";color:var(--sim);transition:transform .2s}
-.simfold[open]>summary::before{transform:rotate(90deg)}
-.simfold[open]>summary{margin-bottom:16px}
-#ptree{width:100%;height:300px;display:block;
-  -webkit-mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
-  mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
 .ptreecap{font-family:var(--mono);font-size:9px;color:var(--mut);letter-spacing:.1em;text-align:center;padding:8px 4px 2px}
 .opcard .rq0{font-family:var(--mono);font-size:9.8px;color:var(--acc2);margin-top:9px;letter-spacing:.03em;line-height:1.55}
 .ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-bottom:46px}
@@ -492,6 +471,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   @keyframes lfade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
   .cursorline::after{content:"▍";color:var(--acc);animation:blink 1.1s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
+  .glitch{position:relative}
+  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;right:0;top:0;
+    font:inherit;letter-spacing:inherit;line-height:inherit;pointer-events:none;opacity:0}
+  .glitch::before{color:var(--acc)}
+  .glitch::after{color:var(--ros)}
+  .js .glitch.zap::before{opacity:.7;animation:gl1 .38s steps(2,end) forwards}
+  .js .glitch.zap::after{opacity:.7;animation:gl2 .38s steps(2,end) forwards}
+  .js .glitch.zap{animation:glshake .38s steps(2,end)}
+  @keyframes gl1{0%{transform:translate(-10px,0) skewX(-2deg);clip-path:inset(8% 0 64% 0)}25%{transform:translate(7px,-3px);clip-path:inset(50% 0 20% 0)}50%{transform:translate(-5px,2px) skewX(1.5deg);clip-path:inset(78% 0 2% 0)}75%{transform:translate(4px,-1px);clip-path:inset(28% 0 58% 0)}100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
+  @keyframes gl2{0%{transform:translate(9px,2px) skewX(2deg);clip-path:inset(58% 0 18% 0)}25%{transform:translate(-8px,3px);clip-path:inset(4% 0 76% 0)}50%{transform:translate(6px,-2px) skewX(-1.5deg);clip-path:inset(34% 0 40% 0)}75%{transform:translate(-4px,1px);clip-path:inset(66% 0 12% 0)}100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
+  @keyframes glshake{25%{transform:translate(2px,0)}55%{transform:translate(-2px,1px)}80%{transform:translate(1px,0)}}
 }
 
 /* ===== TYPE & COMPONENT DISCIPLINE (appended overrides — later rules win) =====
@@ -523,14 +513,16 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
 .chal .crow{background:transparent}
 .plog .pl .body{padding:14px 17px}
 /* breathing room around the two heaviest bands */
-
 .divider{margin-top:104px}
 </style>
 </head>
 <body>
+<canvas id="ca" aria-hidden="true"></canvas>
+<canvas id="kg" aria-hidden="true"></canvas>
 <div id="fog" aria-hidden="true"></div>
 <div id="mistwrap" aria-hidden="true"><div id="mist"></div></div>
 <div id="grain" aria-hidden="true"></div>
+<canvas id="boot" aria-hidden="true"></canvas>
 
 <div id="progress" aria-hidden="true"></div>
 <div id="cursorglow" aria-hidden="true"></div>
@@ -564,16 +556,18 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
       <b>SCHRÖDINGER'S CAT</b>
     </span>
     <nav>
-      <a class="lnk" href="#problem">Problem</a>
-      <a class="lnk" href="#vision">Direction</a>
       <a class="lnk" href="#research">Research</a>
       <a class="lnk" href="#benchmark">Benchmark</a>
-      <a class="lnk" href="#truth">Ground&nbsp;truth</a>
       <a class="lnk" href="#real">Code</a>
-      <a class="lnk" href="#sim">Simulator</a>
       <a class="lnk live" href="dashboard.html"><span class="ld"></span>Dashboard</a>
       <span id="navstatus" title="Latest engine terminal status — read from state.json"></span>
+      <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
+        </svg>
+      </button>
     </nav>
+    <audio id="bgm" src="assets/ambient.mp3" loop preload="none"></audio>
   </div>
 </header>
 
@@ -581,7 +575,7 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
 <div class="hero">
   <div class="inner">
     <div class="kick stag d1">An independent research program · foundations of mathematics × AI</div>
-    <h1 class="stag d2" id="mainTitle">Between RSI and ASI lies a <span class="g">missing mathematics</span>.</h1>
+    <h1 class="stag d2 glitch" id="mainTitle" data-text="Between RSI and ASI lies a missing mathematics.">Between RSI and ASI lies a <span class="g">missing mathematics</span>.</h1>
     <p class="sub stag d3">The field's first dedicated RSI workshop names what is missing: principled
     methods that make self-improvement <b>measurable and reliable</b>. Our answer is precise: an RSI
     whose object of discovery is <b>the mathematics of its own improvement</b> — a theory in the
@@ -591,10 +585,6 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
       <a class="btn pri" href="#problem">Why new mathematics</a>
       <a class="btn sec" href="#real">See the real code</a>
     </div>
-  </div>
-  <div class="heroorg stag d4">
-    <canvas id="ptree" aria-label="Signature visual — proof search as a living organism: branches explored in 3D, dead ends retracted, one path kernel-locked"></canvas>
-    <div class="ptreecap">PROOF SEARCH, LIVE GRAMMAR — BRANCHES EXPLORED · DEAD ENDS RETRACTED · ONE PATH KERNEL-LOCKED</div>
   </div>
 </div>
 
@@ -675,6 +665,7 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
     C: its referee's soundness — never, by Löb.)</span></p>
   </div>
 
+  </div>
 
   <div class="hypo">
     <div class="k">CENTRAL HYPOTHESIS · H1</div>
@@ -874,8 +865,6 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
   <p class="lede">Proposals, triage, kernel verdicts, selection pressure — at a scale the engine has not
   reached. <b>Synthetic telemetry — no backend attached.</b> Amber marks simulation. For the engine's
   <b>real</b> numbers, epoch by epoch, see the <a href="dashboard.html">live dashboard →</a></p>
-  <details class="simfold" id="simfold">
-  <summary>Open the simulation — synthetic swarm, labeled, no backend</summary>
   <div class="simpanel">
     <div class="simhead">
       <span class="dots"><span style="background:#d16a8a"></span><span style="background:#e0a23f"></span><span style="background:#2ee584"></span></span>
@@ -912,7 +901,6 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
       </div>
     </div>
   </div>
-  </details>
 </div></section>
 
 <div id="ticker" aria-label="Kernel-verified results from the engine board">
@@ -922,12 +910,6 @@ h2{font-size:var(--t-h2);margin-bottom:18px}
 
 <footer><div class="wrap">
   <span class="sig">AUTHOR: <b>SCHRÖDINGER'S CAT</b></span>
-  <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-      <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
-    </svg>
-  </button>
-  <audio id="bgm" src="assets/ambient.mp3" loop preload="none"></audio>
   <a class="xlink" href="https://x.com/consciousnessbo" target="_blank" rel="noopener" aria-label="Schrödinger's Cat on X">
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.2l7.3-8.3L1.6 2h6.5l4.4 5.9L18.9 2zm-1.1 18h1.7L7.1 3.9H5.3L17.8 20z"/></svg>
     <span>@consciousnessbo</span>
@@ -946,182 +928,184 @@ if(!reduce && 'IntersectionObserver' in window){
   document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
 }else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('on');});}
 
-/* ============ PROOF-SEARCH ORGANISM v3 — rotating 3D growth ============ */
-/* v2 grew up-right and crowded the top edge. v3 grows through a true 3D
-   space: the trunk advances along the full horizontal axis (the whole
-   horizon), branches drift laterally in y/z, and the entire organism slowly
-   rotates about its growth axis, so the structure reads as a living volume —
-   perspective scale + alpha carry depth, plain canvas, no WebGL. Biological
-   grammar: apical tips extend in short segments (smooth by accumulation),
-   buds glow, dead ends retract tip-to-root in rose, and on kernel lock a
-   light travels root->tip before the field resets. DPR-aware; segment cap
-   700, tip cap 14; hidden-tab pause; reduced motion = one static 3/4-view
-   frame, no rotation. */
-(function(){
-  var cv=document.getElementById('ptree'); if(!cv)return;
-  var px=cv.getContext('2d'),W,Hh,DPR;
-  var segs,tips,phase,pulseT,holdT,fade,lockPath,lockLen,theta,thBase=0;
-  var XW=1000,F=340,RLIM=92;
-  function mid3(a,b){return v3((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2);}
-  /* silk joints: a completed segment draws as a quadratic from its parent's
-     midpoint through the shared joint to its own midpoint; growing, dying or
-     rootless segments fall back to a straight stroke (tips/root dots cover
-     the half-segment ends) */
-  function strokeSeg(e,pa,pb,pbEnd){
-    px.beginPath();
-    if(e.par>=0&&e.prog>=1&&segs[e.par].prog>=1){
-      var p=segs[e.par];
-      var pm=proj(mid3(p.a,p.b)),em=proj(mid3(e.a,pbEnd));
-      px.moveTo(pm.x,pm.y);px.quadraticCurveTo(pa.x,pa.y,em.x,em.y);
-      px.lineTo(pb.x,pb.y);
-    }else{
-      px.moveTo(pa.x,pa.y);px.lineTo(pb.x,pb.y);
+/* ============ CA WORLD ============ */
+var ca=document.getElementById('ca'), cxa=ca.getContext('2d');
+var CELL=11, gw,gh, grid,hue,age, buf,hbuf,abuf;
+var LINEAGES=[258,272,288];  /* curated indigo→violet→soft-magenta ramp — tighter, calmer */
+var bloomSeed=!reduce;
+function caSize(){
+  gw=Math.ceil(innerWidth/CELL); gh=Math.ceil(innerHeight/CELL);
+  ca.width=gw; ca.height=gh;
+  ca.style.width=gw*CELL+'px'; ca.style.height=gh*CELL+'px';
+  grid=new Uint8Array(gw*gh); hue=new Uint16Array(gw*gh); age=new Uint8Array(gw*gh);
+  buf=new Uint8Array(gw*gh); hbuf=new Uint16Array(gw*gh); abuf=new Uint8Array(gw*gh);
+  cxa.fillStyle='#020304'; cxa.fillRect(0,0,gw,gh);
+  seed();
+}
+function seed(){
+  var i;
+  if(!bloomSeed){
+    for(i=0;i<gw*gh;i++){
+      if(Math.random()<.085){grid[i]=1;hue[i]=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];age[i]=0;}
+      else grid[i]=0;
     }
-    px.stroke();
+    return;
   }
-  function v3(x,y,z){return{x:x,y:y,z:z};}
-  function norm(v){var l=Math.hypot(v.x,v.y,v.z)||1;return v3(v.x/l,v.y/l,v.z/l);}
-  function sz(){
-    DPR=Math.min(devicePixelRatio||1,2);W=cv.clientWidth||800;Hh=300;
-    cv.width=Math.round(W*DPR);cv.height=Math.round(Hh*DPR);
-    px.setTransform(DPR,0,0,DPR,0,0);init();
+  bloomSeed=false;
+  var cx0=gw/2, cy0=gh*.4, r0=Math.max(7,Math.min(gw,gh)*.17);
+  for(i=0;i<gw*gh;i++)grid[i]=0;
+  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
+    var d=Math.hypot(x-cx0,y-cy0);
+    if(d<r0&&Math.random()<.6*(1-d/r0)+.08){i=y*gw+x;grid[i]=1;
+      hue[i]=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];age[i]=0;}
   }
-  function init(){
-    segs=[];tips=[];phase='grow';pulseT=0;holdT=0;fade=0;lockPath=null;lockLen=0;
-    if(reduce)theta=0.55; else theta=thBase;
-    tips.push({p:v3(0,0,0),d:norm(v3(1,(Math.random()-.5)*.6,(Math.random()-.5)*.6)),depth:0,seg:-1});
-  }
-  function seglen(s){return Math.hypot(s.b.x-s.a.x,s.b.y-s.a.y,s.b.z-s.a.z);}
-  function lock(si){
-    phase='pulse';pulseT=0;lockPath=[];lockLen=0;
-    var s=si;while(s>=0){segs[s].st=2;lockPath.unshift(s);lockLen+=seglen(segs[s]);s=segs[s].par;}
-    for(var i=0;i<segs.length;i++)if(segs[i].st===0){segs[i].st=1;segs[i].die=Math.random()*420;}
-    tips.length=0;
-  }
-  function die(ti){
-    var t=tips[ti],anc={};
-    tips.forEach(function(o,k){if(k===ti)return;var s=o.seg;while(s>=0){anc[s]=1;s=segs[s].par;}});
-    var s=t.seg,delay=0;
-    while(s>=0&&!anc[s]){segs[s].st=1;segs[s].die=delay;delay+=70;s=segs[s].par;}
-    tips.splice(ti,1);
-  }
-  function grow(){
-    if(phase!=='grow')return;
-    for(var i=tips.length-1;i>=0;i--){
-      var t=tips[i];
-      var d=norm(v3(t.d.x+(Math.random()-.5)*.34+.10,
-                    t.d.y+(Math.random()-.5)*.34-t.p.y*.004,
-                    t.d.z+(Math.random()-.5)*.34-t.p.z*.004));
-      if(d.x<.15)d=norm(v3(.3,d.y,d.z));
-      var step=9+Math.random()*7;
-      var np=v3(t.p.x+d.x*step,t.p.y+d.y*step,t.p.z+d.z*step);
-      var r=Math.hypot(np.y,np.z);if(r>RLIM){np.y*=RLIM/r;np.z*=RLIM/r;}
-      segs.push({a:t.p,b:np,depth:t.depth,st:0,prog:0,die:0,par:t.seg});
-      var si=segs.length-1;
-      t.p=np;t.d=d;t.seg=si;
-      if(np.x>=XW||segs.length>700){lock(si);return;}
-      if(tips.length<14&&Math.random()<.16&&t.depth<7){
-        tips.push({p:np,d:norm(v3(d.x*.7,d.y+(Math.random()-.5)*1.1,d.z+(Math.random()-.5)*1.1)),
-                   depth:t.depth+1,seg:si});
-      }
-      if(t.depth>0&&Math.random()<.05)die(i);
+}
+function patch(){
+  var x0=Math.floor(Math.random()*(gw-8)), y0=Math.floor(Math.random()*(gh-8));
+  var h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
+  for(var y=0;y<6;y++)for(var x=0;x<6;x++)
+    if(Math.random()<.5){var i=(y0+y)*gw+(x0+x);grid[i]=1;hue[i]=h;age[i]=0;}
+}
+var flashes=[],pulses=[];
+function caStep(){
+  var births=0;
+  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
+    var i=y*gw+x, n=0, hs=[], h;
+    for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
+      if(!dx&&!dy)continue;
+      var j=((y+dy+gh)%gh)*gw+((x+dx+gw)%gw);
+      if(grid[j]){n++;hs.push(hue[j]);}
     }
-    if(!tips.length&&phase==='grow')init();
+    if(grid[i]){buf[i]=(n===2||n===3)?1:0;hbuf[i]=hue[i];abuf[i]=Math.min(250,age[i]+1);}
+    else if(n===3){
+      buf[i]=1;births++;abuf[i]=0;
+      if(hs[0]===hs[1]||hs[0]===hs[2])h=hs[0];
+      else if(hs[1]===hs[2])h=hs[1];
+      else{h=hs[Math.floor(Math.random()*3)];
+        if(flashes.length<20)flashes.push({x:x,y:y,t:1});}
+      if(Math.random()<.06)h=LINEAGES[Math.floor(Math.random()*LINEAGES.length)];
+      hbuf[i]=h;
+    } else buf[i]=0;
   }
-  function proj(p){
-    var c=Math.cos(theta),s=Math.sin(theta);
-    var y=p.y*c-p.z*s,z=p.y*s+p.z*c;
-    var sc=F/(F+z+140);
-    return{x:26+(p.x/XW)*(W-56),y:Hh/2+y*sc,s:sc};
-  }
-  function lerp3(a,b,t){return v3(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,a.z+(b.z-a.z)*t);}
-  function draw(dt){
-    px.clearRect(0,0,W,Hh);
-    /* organic sway: base rotation plus a slow sinusoidal breath, so the
-       organism turns like something alive, not a turntable */
-    if(!reduce){thBase+=dt*0.00032;theta=thBase+Math.sin(thBase*1.7)*0.22;}
-    if(fade>0)px.globalAlpha=Math.max(0,1-fade);
-    px.lineCap='round';
-    /* update animation state first, then paint far-to-near so close branches
-       occlude distant ones — the painter's order is most of the 3D illusion */
-    var order=[];
-    for(var i=0;i<segs.length;i++){
-      var e=segs[i];
-      if(e.st===0&&e.prog<1)e.prog=Math.min(1,e.prog+dt/150);
-      if(e.st===1){if(e.die>0)e.die-=dt;else e.prog=Math.max(0,e.prog-dt/190);}
-      if(e.st===2)e.prog=1;
-      if(e.prog<=0)continue;
-      var mzC=Math.cos(theta),mzS=Math.sin(theta);
-      e._z=((e.a.y+e.b.y)/2)*mzS+((e.a.z+e.b.z)/2)*mzC;
-      order.push(i);
+  var t=grid;grid=buf;buf=t; t=hue;hue=hbuf;hbuf=t; t=age;age=abuf;abuf=t;
+  if(births<gw*gh*.004) patch();
+}
+function caDraw(){
+  cxa.fillStyle='rgba(3,2,6,.2)'; cxa.fillRect(0,0,gw,gh);  /* long trails = evolution feel */
+  for(var y=0;y<gh;y++)for(var x=0;x<gw;x++){
+    var i=y*gw+x;
+    if(grid[i]){
+      var a=age[i];
+      var L=a<2?74:a<5?58:a<12?46:38, S=a<5?70:55, A=a<2?.8:a<5?.5:a<12?.34:.22;
+      cxa.fillStyle='hsla('+hue[i]+','+S+'%,'+L+'%,'+A+')';
+      cxa.fillRect(x,y,1,1);
     }
-    order.sort(function(x,y){return segs[y]._z-segs[x]._z;});
-    for(var oi=0;oi<order.length;oi++){
-      var e2=segs[order[oi]];
-      var pa=proj(e2.a),pbEnd=lerp3(e2.a,e2.b,e2.prog),pb=proj(pbEnd);
-      var w=Math.max(.6,3.0*Math.pow(.85,e2.depth))*pa.s;
-      var core,bloom;
-      if(e2.st===2){core='rgba(143,255,196,.92)';bloom='rgba(46,229,132,.20)';w+=.5;}
-      else if(e2.st===1){core='rgba(255,106,193,.5)';bloom='rgba(255,106,193,.09)';}
-      else{
-        /* depth-cued hue: near branches pale warm violet, far ones sink
-           toward indigo — same family, richer volume */
-        var n=Math.max(0,Math.min(1,(pa.s-0.59)/0.29));
-        var cr=Math.round(150+n*70),cg=Math.round(115+n*81),cb=Math.round(235+n*20);
-        var a=(.18+.36*pa.s).toFixed(2);
-        core='rgba('+cr+','+cg+','+cb+','+a+')';bloom='rgba(160,110,255,.10)';
-      }
-      /* midpoint-smoothed joint: curve from the parent's midpoint through the
-         shared joint to this segment's midpoint — silk instead of polyline */
-      px.strokeStyle=bloom;px.lineWidth=w*3.4;
-      strokeSeg(e2,pa,pb,pbEnd);
-      px.strokeStyle=core;px.lineWidth=w;
-      strokeSeg(e2,pa,pb,pbEnd);
-    }
-    for(var k=0;k<tips.length;k++){
-      var tp=proj(tips[k].p);
-      px.fillStyle='rgba(220,188,255,'+(.5+.4*tp.s).toFixed(2)+')';
-      px.beginPath();px.arc(tp.x,tp.y,1.4+1.2*tp.s,0,6.283);px.fill();
-    }
-    var rp=proj(v3(0,0,0));
-    px.fillStyle='rgba(220,188,255,.95)';
-    px.beginPath();px.arc(rp.x,rp.y,3.2,0,6.283);px.fill();
-    if(phase==='pulse'&&lockPath){
-      pulseT+=dt/1200;
-      var pos=pulseT*lockLen,acc=0;
-      for(var c2=0;c2<lockPath.length;c2++){
-        var ce=segs[lockPath[c2]],L=seglen(ce);
-        if(pos>=acc&&pos<=acc+L){
-          var pt=proj(lerp3(ce.a,ce.b,(pos-acc)/L));
-          px.fillStyle='rgba(230,255,244,.95)';
-          px.shadowColor='rgba(46,229,132,.9)';px.shadowBlur=14;
-          px.beginPath();px.arc(pt.x,pt.y,3,0,6.283);px.fill();
-          px.shadowBlur=0;
-        }
-        acc+=L;
-      }
-      if(pulseT>=1){phase='hold';holdT=0;}
-    }else if(phase==='hold'){holdT+=dt;if(holdT>3600)phase='fade';}
-    else if(phase==='fade'){fade+=dt/650;if(fade>=1)init();}
-    px.globalAlpha=1;
   }
-  sz();addEventListener('resize',sz);
-  if(reduce){
-    var guard=0;
-    while(phase==='grow'&&guard++<5000){segs.forEach(function(e){e.prog=1;});grow();}
-    segs.forEach(function(e){e.prog=e.st===1?0:1;});
-    draw(0);return;
-  }
-  var sAcc=0,tPrev=performance.now();
-  (function loop(ts){
-    requestAnimationFrame(loop);
-    if(document.hidden){tPrev=ts;return;}
-    var dt=Math.min(50,ts-tPrev);tPrev=ts;
-    sAcc+=dt;
-    if(phase==='grow'&&sAcc>150){grow();sAcc=0;}
-    draw(dt);
-  })(tPrev);
+  flashes.forEach(function(f){cxa.fillStyle='hsla(172,70%,72%,'+(f.t*.55)+')';cxa.fillRect(f.x-1,f.y-1,3,3);f.t-=.1;});
+  flashes=flashes.filter(function(f){return f.t>0});
+  pulses.forEach(function(p){
+    cxa.strokeStyle='hsla(150,80%,58%,'+(p.t*.65)+')';cxa.lineWidth=.8;
+    cxa.beginPath();cxa.arc(p.x,p.y,(1-p.t)*18+2,0,6.283);cxa.stroke();p.t-=.024;});
+  pulses=pulses.filter(function(p){return p.t>0});
+  if(caGlow>0){ cxa.fillStyle='rgba(224,162,63,'+(caGlow*0.05)+')'; cxa.fillRect(0,0,gw,gh); caGlow-=0.008; }
+}
+var fastUntil=0, caGlow=0;
+/* phase progression: the field builds, then a COLLAPSE — cells die back, echoing
+   dead-end epochs / model collapse — then it rebuilds denser. Varied timing so it
+   never reads as an obvious loop. Amber marks the collapse, within existing tokens. */
+function caCollapseNow(){ for(var i=0;i<gw*gh;i++){ if(grid[i]&&Math.random()<0.62) grid[i]=0; } caGlow=1; }
+function caRebuild(){ for(var k=0,m=6+Math.floor(Math.random()*5);k<m;k++) patch(); }
+(function phaseCycle(){
+  if(reduce) return;
+  setTimeout(function(){
+    caCollapseNow();
+    setTimeout(function(){ caRebuild(); phaseCycle(); }, 1600+Math.random()*1500);
+  }, 24000+Math.random()*32000);
 })();
+caSize(); addEventListener('resize',caSize);
+if(reduce){ caStep(); caDraw(); }
+else{
+  var last=0;
+  (function loop(ts){
+    if(document.hidden){requestAnimationFrame(loop);return;}
+    if(ts-last>(ts<fastUntil?70:200)){caStep();last=ts;}
+    caDraw();
+    requestAnimationFrame(loop);
+  })(0);
+}
+
+/* ============ THEORY GRAPH — the REAL goal families as a constellation ============ */
+/* v2: the node layer used to float invented domain names. It now renders the
+   engine's actual goal families from state.json — brightness and size scale
+   with each family's kernel-verified count. Until the snapshot loads (or if
+   it can't — file://), the layer is simply empty: honest absence. */
+var kg=document.getElementById('kg'), kx=kg.getContext('2d');
+var KW,KH,knodes=[],kedges=[],kgFams=null;
+function kgSetFamilies(fams){
+  kgFams=fams; kgSize();
+  /* reduced-motion draws exactly once at load — before the snapshot fetch
+     resolves — so a data arrival must repaint or the layer stays blank */
+  if(reduce) kgDraw();
+}
+function kgSize(){
+  KW=kg.width=innerWidth; KH=kg.height=innerHeight;
+  if(!kgFams){ knodes=[]; kedges=[]; return; }
+  knodes=kgFams.map(function(f,i){
+    var col=i%4, row=Math.floor(i/4);
+    return {n:f.n, w:f.w,
+      x:KW*(.12+col*.25)+(Math.random()*60-30),
+      y:KH*(.2+row*.28)+(Math.random()*50-25),
+      ph:Math.random()*6.28, lit:0};
+  });
+  kedges=[];
+  knodes.forEach(function(a,i){
+    var ds=knodes.map(function(b,j){return{j:j,d:Math.hypot(a.x-b.x,a.y-b.y)}})
+      .filter(function(o){return o.j!==i}).sort(function(u,v){return u.d-v.d});
+    for(var k=0;k<2;k++){var e=[Math.min(i,ds[k].j),Math.max(i,ds[k].j)];
+      if(!kedges.some(function(x){return x[0]===e[0]&&x[1]===e[1]}))kedges.push(e);}
+  });
+}
+kgSize(); addEventListener('resize',kgSize);
+var KT=0;
+function kgDraw(){
+  KT+=.016;
+  kx.clearRect(0,0,KW,KH);
+  kx.font='9px "JetBrains Mono",monospace';
+  kedges.forEach(function(e){
+    var a=knodes[e[0]],b=knodes[e[1]];
+    var hot=Math.max(a.lit,b.lit);
+    kx.strokeStyle='rgba(181,123,255,'+(.06+hot*.28)+')';
+    kx.lineWidth=hot>0?1.3:.7;
+    kx.beginPath();kx.moveTo(a.x,a.y);kx.lineTo(b.x,b.y);kx.stroke();
+  });
+  knodes.forEach(function(n){
+    if(!reduce){n.x+=Math.sin(KT*.3+n.ph)*.08;n.y+=Math.cos(KT*.23+n.ph)*.06;}
+    /* verified count drives presence: brighter, larger stars for families
+       that have actually produced kernel-verified results */
+    var baseA=Math.min(.62,.26+n.w*.09), r=Math.min(4.2,1.8+n.w*.38);
+    if(n.lit>0){
+      kx.strokeStyle='rgba(46,229,132,'+(n.lit*.7)+')';kx.lineWidth=1.2;
+      kx.beginPath();kx.arc(n.x,n.y,(1-n.lit)*26+4,0,6.283);kx.stroke();
+      kx.fillStyle='rgba(143,255,196,'+(.5+n.lit*.5)+')';
+      n.lit-=.012;
+    } else {
+      kx.fillStyle='rgba(181,123,255,'+baseA+')';
+    }
+    kx.beginPath();kx.arc(n.x,n.y,r,0,6.283);kx.fill();
+    kx.fillStyle=n.lit>0?'rgba(143,255,196,'+(.35+n.lit*.5)+')':'rgba(150,130,180,'+Math.min(.5,.2+n.w*.06)+')';
+    kx.fillText(n.n+(n.w?' ·'+n.w:''),n.x+7,n.y+3);
+  });
+  if(!reduce)requestAnimationFrame(kgDraw);
+}
+if(reduce){kgDraw();}else{requestAnimationFrame(kgDraw);}
+
+/* the organism reacts: real compile event → graph node lights + CA pulse */
+function kernelEvent(){
+  if(reduce||!knodes.length)return;
+  var n=knodes[Math.floor(Math.random()*knodes.length)];
+  n.lit=1;
+  pulses.push({x:(n.x/innerWidth)*gw,y:(n.y/innerHeight)*gh,t:1});
+}
 
 /* ============ LEAN EDITOR — REAL CODE, REAL BUILD OUTPUT ============ */
 /* Source: lean/Discovered.lean · verified 2026-07-14:
@@ -1230,6 +1214,7 @@ function playTheorem(){
       stEl.innerHTML='<div class="cmd">$ lake build</div>'+
         '<div class="oks">✓ Build completed successfully (3 jobs).</div>'+
         '<div class="ax">'+esc2(th.ax)+'</div>';
+      kernelEvent();
       setTimeout(playTheorem, 5200);
     }, 1300);
   }
@@ -1248,6 +1233,57 @@ function playTheorem(){
   }
 }
 playTheorem();
+
+/* ============ INTRO — dither reveal + one glitch ============ */
+var boot=document.getElementById('boot');
+if(reduce){ boot.remove(); }
+else{(function(){
+  var bcx=boot.getContext('2d'), bw,bh;
+  var BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  function bootSize(){
+    bw=Math.ceil(innerWidth/CELL); bh=Math.ceil(innerHeight/CELL);
+    boot.width=bw; boot.height=bh;
+    boot.style.width=bw*CELL+'px'; boot.style.height=bh*CELL+'px';
+  }
+  function paint(p){
+    bcx.clearRect(0,0,bw,bh);
+    var cx0=bw/2, cy0=bh*.4, maxd=Math.hypot(Math.max(cx0,bw-cx0),Math.max(cy0,bh-cy0));
+    for(var y=0;y<bh;y++)for(var x=0;x<bw;x++){
+      var d=Math.hypot(x-cx0,y-cy0)/maxd, t=BAYER[y%4][x%4]/16;
+      if(d+t*.22>p*1.25){
+        bcx.fillStyle=((x+y)%2)?'#04060a':'#020304';
+        if(((x*7+y*13)%149)===0)bcx.fillStyle='#0a2836';
+        bcx.fillRect(x,y,1,1);
+      }
+    }
+  }
+  bootSize(); paint(0);
+  addEventListener('resize',function(){if(boot.parentNode){bootSize();paint(0);}});
+  var h1=document.getElementById('mainTitle');
+  function burst(){h1.classList.remove('zap');void h1.offsetWidth;h1.classList.add('zap');
+    setTimeout(function(){h1.classList.remove('zap');},420);}
+  var started=false;
+  function startIntro(){
+    if(started)return; started=true;
+    fastUntil=performance.now()+3800;
+    var t0=performance.now();
+    (function diss(){
+      var p=(performance.now()-t0)/1500;
+      if(p>=1){boot.remove();
+        /* A1 fix: pin entrance-animated elements visible so later glitch/zap
+           animations can never override `rise`'s forwards fill back to opacity 0 */
+        document.querySelectorAll('.stag').forEach(function(el){el.classList.remove('stag','d1','d2','d3','d4');});
+        burst();setTimeout(burst,500);
+        (function micro(){setTimeout(function(){burst();micro();},6000+Math.random()*6000);})();
+        return;}
+      paint(p); requestAnimationFrame(diss);
+    })();
+  }
+  if(document.visibilityState==='visible')startIntro();
+  else document.addEventListener('visibilitychange',function h(){
+    if(document.visibilityState==='visible'){document.removeEventListener('visibilitychange',h);startIntro();}});
+  setTimeout(function(){if(boot.parentNode&&started)boot.remove();},8000);
+})();}
 
 /* ============ SWARM SIM (labeled synthetic) ============ */
 var term=document.getElementById('term');
@@ -1331,19 +1367,9 @@ function verdictTick(){
   }
 }
 function schedule(){ timer=setTimeout(step, 560+Math.random()*660); }
-/* folded behind a disclosure — the sim only boots (and only spends cycles)
-   once someone actually opens it */
-(function(){
-  var fold=document.getElementById('simfold'), started=false;
-  function startSim(){
-    if(started)return; started=true;
-    line('in','SC_ENGINE   [BOOT]    swarm monitor attached · <span class="wr">SIMULATION — synthetic telemetry · no backend</span>');
-    line('in','SC_ENGINE   [BOOT]    the only real artifacts on this page are in §01 and §05');
-    schedule();
-  }
-  if(fold)fold.addEventListener('toggle',function(){if(fold.open)startSim();});
-  else startSim();
-})();
+line('in','SC_ENGINE   [BOOT]    swarm monitor attached · <span class="wr">SIMULATION — synthetic telemetry · no backend</span>');
+line('in','SC_ENGINE   [BOOT]    the only real artifacts on this page are in §01 and §05');
+schedule();
 
 function $(id){return document.getElementById(id);}
 /* ============ DEPTH — layered parallax + card tilt ============ */
@@ -1362,10 +1388,10 @@ function $(id){return document.getElementById(id);}
    is cheaper than shipping jank to phones. */
 var DEPTH_OK = !reduce && innerWidth>=900;
 if(DEPTH_OK){(function(){
-  var Lmist=$('mistwrap'), Lfog=$('fog');
+  var Lkg=$('kg'), Lmist=$('mistwrap'), Lfog=$('fog');
   var mx=0,my=0,sp=0,queued=false;
   /* px of travel across the full page scroll · px of travel across the pointer */
-  var AMP={mist:[40,-15,-10], fog:[10,7,5]};
+  var AMP={kg:[26,-11,-8], mist:[40,-15,-10], fog:[10,7,5]};
   function progress(){
     var max=document.documentElement.scrollHeight-innerHeight;
     return max>0 ? Math.min(1,Math.max(0,scrollY/max))-.5 : 0;   /* -0.5 .. +0.5 */
@@ -1373,6 +1399,7 @@ if(DEPTH_OK){(function(){
   function apply(){
     queued=false;
     var a;
+    a=AMP.kg;   if(Lkg)   Lkg.style.transform  ='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*-2+my*a[2]).toFixed(1)+'px,0)';
     a=AMP.mist; if(Lmist) Lmist.style.transform='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*-2+my*a[2]).toFixed(1)+'px,0)';
     a=AMP.fog;  if(Lfog)  Lfog.style.transform ='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*2+my*a[2]).toFixed(1)+'px,0)';
   }
@@ -1407,6 +1434,11 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
       });
     },{passive:true});
     c.addEventListener('mouseleave',function(){c.style.transform='';});
+  });
+  var mt=document.getElementById('mainTitle');
+  mt.addEventListener('mouseenter',function(){
+    mt.classList.remove('zap'); void mt.offsetWidth; mt.classList.add('zap');
+    setTimeout(function(){mt.classList.remove('zap');},420);
   });
 }
 /* ============ READING PROGRESS + CURSOR GLOW ============ */
@@ -1502,6 +1534,16 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
       chip.textContent='e'+s.latest.epoch+' · '+st.replace(/_/g,' ');
       chip.className=st==='MERGED'?'ok':(st==='REJECT'?'sim':'bad');
       chip.style.display='inline-block';
+    }
+    /* constellation: real goal families, weighted by verified count */
+    if(s.epochs){
+      var fam={};
+      s.epochs.forEach(function(e){(e.records||[]).forEach(function(r){
+        if(!(r.family in fam))fam[r.family]=0;
+        if(r.status==='verified')fam[r.family]++;
+      });});
+      var fams=Object.keys(fam).map(function(k){return {n:k,w:fam[k]};});
+      if(fams.length)kgSetFamilies(fams);
     }
     /* ticker: every kernel-verified record on the board */
     var row=document.getElementById('tickerrow'), tick=document.getElementById('ticker');
