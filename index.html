@@ -155,12 +155,6 @@ section[data-num]::before{content:attr(data-num);position:absolute;top:26px;righ
 #navstatus.sim{color:var(--sim);border-color:rgba(224,162,63,.45);background:rgba(224,162,63,.07)}
 
 /* ===== COMMAND PALETTE (Ctrl/⌘-K) ===== */
-#kbtn{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;
-  letter-spacing:.1em;color:var(--mut);border:1px solid var(--line2);border-radius:4px;
-  background:rgba(255,255,255,.02);padding:5px 9px;cursor:pointer;transition:all .2s}
-#kbtn:hover{color:var(--acc2);border-color:rgba(181,123,255,.5)}
-#kbtn kbd{font-family:inherit;font-size:8.5px;border:1px solid var(--line2);border-radius:3px;
-  padding:1px 4px;background:rgba(255,255,255,.03)}
 #palette{position:fixed;inset:0;z-index:120;display:none;align-items:flex-start;justify-content:center;
   background:rgba(2,3,4,.72);backdrop-filter:blur(6px);padding:14vh 20px 0}
 #palette.open{display:flex}
@@ -545,7 +539,6 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <a class="lnk" href="#sim">Simulator</a>
       <a class="lnk live" href="dashboard.html"><span class="ld"></span>Dashboard</a>
       <span id="navstatus" title="Latest engine terminal status — read from state.json"></span>
-      <button id="kbtn" aria-label="Open command palette" title="Command palette"><kbd>Ctrl</kbd><kbd>K</kbd></button>
       <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
