@@ -26,6 +26,10 @@
   --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
+/* Belt-and-braces for the scroll-anchoring drag described on .edbody: this page
+   has live regions (editor, swarm terminal) whose content churns constantly, and
+   there is no case here where anchoring helps the reader. */
+html,body{overflow-anchor:none}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden}
@@ -37,7 +41,10 @@ body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.
    radial-gradient(ellipse 130% 95% at 50% 112%,rgba(2,3,4,.96) 22%,rgba(2,3,4,.6) 58%,transparent 100%),
    radial-gradient(ellipse 150% 100% at 50% -25%,rgba(150,90,255,.06),transparent 55%),
    linear-gradient(180deg,rgba(2,3,4,.36),rgba(2,3,4,.64) 42%,rgba(2,3,4,.8))}
-#mist{position:fixed;inset:-30%;z-index:2;pointer-events:none;opacity:.6;
+/* #mist already animates its own transform (mistdrift), so the parallax
+   translate has to live on a wrapper — otherwise the animation wins. */
+#mistwrap{position:fixed;inset:0;z-index:2;pointer-events:none}
+#mist{position:absolute;inset:-30%;opacity:.6;
   background:
    radial-gradient(ellipse 40% 30% at 25% 40%,rgba(120,80,200,.07),transparent 70%),
    radial-gradient(ellipse 50% 35% at 75% 60%,rgba(95,224,207,.04),transparent 70%),
@@ -65,6 +72,12 @@ nav a.lnk{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacin
 nav a.lnk::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:linear-gradient(90deg,var(--acc),transparent);transition:right .25s}
 nav a.lnk:hover{color:var(--acc2);text-shadow:0 0 10px rgba(181,123,255,.4)}
 nav a.lnk:hover::after{right:0}
+nav a.lnk.live{color:var(--acc2);display:inline-flex;align-items:center;gap:7px}
+nav a.lnk.live .ld{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(46,229,132,.75);flex:none}
+nav a.lnk.live:hover{color:var(--ok2)}
+nav a.lnk.live:hover::after{background:linear-gradient(90deg,var(--ok),transparent)}
+@media(prefers-reduced-motion:no-preference){nav a.lnk.live .ld{animation:navpulse 2.4s ease-in-out infinite}}
+@keyframes navpulse{0%,100%{opacity:1}50%{opacity:.35}}
 #musicbtn{background:none;border:1px solid var(--line2);border-radius:4px;cursor:pointer;color:var(--mut);padding:7px 8px;display:flex;transition:all .2s}
 #musicbtn:hover{border-color:var(--acc);color:var(--acc2)}
 #musicbtn.on{color:var(--acc);border-color:rgba(181,123,255,.55);box-shadow:0 0 14px rgba(181,123,255,.25)}
@@ -92,6 +105,15 @@ h1 .g{color:var(--acc);text-shadow:0 0 44px rgba(86,200,242,.35)}
 .btn.pri:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 4px 28px rgba(181,123,255,.45)}
 .btn.sec{color:var(--acc2);border-color:rgba(181,123,255,.35);background:rgba(6,4,12,.6)}
 .btn.sec:hover{transform:translateY(-1px);border-color:var(--acc);background:rgba(181,123,255,.08)}
+/* press + keyboard focus — one motion language across every control */
+.btn:active{transform:translateY(0) scale(.98)}
+.btn.pri:active{box-shadow:0 0 12px rgba(181,123,255,.3)}
+:focus-visible{outline:2px solid var(--acc2);outline-offset:3px}
+.btn:focus-visible,nav a.lnk:focus-visible,#musicbtn:focus-visible,.simbtns button:focus-visible{outline:2px solid var(--acc2);outline-offset:3px;border-radius:3px}
+nav a.lnk:active{color:var(--acc)}
+#musicbtn:active{transform:translateY(1px)}
+.simbtns button:active{transform:translateY(1px)}
+@media(prefers-reduced-motion:reduce){.btn,.simbtns button,#musicbtn{transition:color .2s,background .2s,border-color .2s}}
 .worldcap{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--mut);z-index:4;background:rgba(2,3,4,.6);padding:5px 14px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
 .worldcap i{font-style:normal;color:var(--acc)}
 .worldcap b{font-weight:400;color:var(--ok)}
@@ -119,8 +141,13 @@ h2 .g{color:var(--acc)}
 .eddots span{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
 .edtab{font-family:var(--mono);font-size:11px;color:var(--vio2);background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);padding:4px 12px;border-radius:4px}
 .edlean{margin-left:auto;font-family:var(--mono);font-size:9px;color:#7a6bab;letter-spacing:.12em}
-.edbody{display:flex;min-height:210px;position:relative}
-.codearea{min-height:210px}
+/* Fixed height, not min-height: the typewriter adds lines one at a time, and a
+   growing editor changed the page height on every keystroke. That fed the
+   browser's scroll anchoring, which dragged the reader's viewport downward
+   while they read (you could not hold a scroll position anywhere on the page).
+   Sized to the tallest theorem in THEOREMS (10 lines) so nothing ever reflows. */
+.edbody{display:flex;height:276px;position:relative;overflow-anchor:none}
+.codearea{min-height:0}
 .edscan{position:absolute;inset:0;pointer-events:none;z-index:2;
   background:repeating-linear-gradient(180deg,rgba(167,139,250,.035) 0,rgba(167,139,250,.035) 1px,transparent 2px,transparent 4px)}
 @media(prefers-reduced-motion:no-preference){
@@ -144,7 +171,7 @@ h2 .g{color:var(--acc)}
 #code .caret{display:inline-block;width:7px;height:14px;background:var(--vio2);vertical-align:-2px;animation:ckblink 1s steps(1) infinite}
 @media(prefers-reduced-motion:reduce){#code .caret{animation:none}}
 @keyframes ckblink{50%{opacity:0}}
-.edstatus{border-top:1px solid #241b3f;background:#080512;padding:12px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.9;min-height:92px}
+.edstatus{border-top:1px solid #241b3f;background:#080512;padding:12px 18px;font-family:var(--mono);font-size:11.5px;line-height:1.9;height:112px;overflow:hidden;overflow-anchor:none}
 .edstatus .cmd{color:#7a6bab}
 .edstatus .oks{color:var(--ok2)}
 .edstatus .ax{color:#c9b8ff}
@@ -153,7 +180,7 @@ h2 .g{color:var(--acc)}
 
 /* problems */
 .probs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:960px;margin:0 auto}
-.prob{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:24px;transition:border-color .25s,transform .2s;text-align:left;will-change:transform}
+.prob{position:relative;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:24px;transition:border-color .25s,transform .2s;text-align:left;will-change:transform}
 .prob:hover{border-color:rgba(181,123,255,.4)}
 .prob .no{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--acc)}
 .prob h3{font-family:var(--disp);color:var(--ink);font-size:16.5px;font-weight:600;margin:11px 0 8px}
@@ -179,7 +206,7 @@ h2 .g{color:var(--acc)}
 .ptreecap{font-family:var(--mono);font-size:9px;color:var(--mut);letter-spacing:.1em;text-align:center;padding:8px 4px 2px}
 .opcard .rq0{font-family:var(--mono);font-size:9.8px;color:var(--acc2);margin-top:9px;letter-spacing:.03em;line-height:1.55}
 .ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-bottom:46px}
-.opcard{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:22px;text-align:left;transition:border-color .25s,transform .2s;will-change:transform}
+.opcard{position:relative;background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:6px;padding:22px;text-align:left;transition:border-color .25s,transform .2s;will-change:transform}
 .opcard:hover{border-color:rgba(95,224,207,.4)}
 .opcard .no{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--teal)}
 .opcard h3{font-family:var(--disp);color:var(--ink);font-size:15.5px;font-weight:600;margin:10px 0 7px}
@@ -194,6 +221,24 @@ h3.subh{font-family:var(--disp);color:var(--ink);font-size:18px;font-weight:600;
 @media(max-width:700px){.crow{grid-template-columns:1fr}.crow .cl{border-right:none;border-bottom:1px dashed var(--line)}}
 .lenses{max-width:840px;margin:0 auto;font-size:12.5px;color:var(--mut);line-height:1.95;border-left:2px solid var(--acc);padding-left:20px;text-align:left}
 .lenses b{color:var(--acc2);font-weight:600}
+
+/* ===== CARD DEPTH — perspective tilt + pointer-tracked specular sheen =====
+   The tilt itself is driven in JS (fine-pointer desktop only). The sheen is a
+   soft highlight that follows the cursor across the card face, which is what
+   sells the tilt as a lit surface rather than a skewed rectangle. Kept low-alpha
+   so it never lifts the card background enough to hurt text contrast. */
+.prob,.opcard{transform-style:preserve-3d}
+.prob::after,.opcard::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%),
+    rgba(181,123,255,.11),rgba(181,123,255,.03) 42%,transparent 65%)}
+.opcard::after{background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%),
+    rgba(95,224,207,.10),rgba(95,224,207,.03) 42%,transparent 65%)}
+.prob:hover::after,.opcard:hover::after{opacity:1}
+.prob>*,.opcard>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){
+  .prob::after,.opcard::after{display:none}
+}
 
 /* sim terminal */
 .simpanel{background:rgba(3,5,8,.94);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:1040px;margin:0 auto}
@@ -290,7 +335,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <canvas id="ca" aria-hidden="true"></canvas>
 <canvas id="kg" aria-hidden="true"></canvas>
 <div id="fog" aria-hidden="true"></div>
-<div id="mist" aria-hidden="true"></div>
+<div id="mistwrap" aria-hidden="true"><div id="mist"></div></div>
 <div id="grain" aria-hidden="true"></div>
 <canvas id="boot" aria-hidden="true"></canvas>
 
@@ -309,7 +354,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
       <a class="lnk" href="#research">Research</a>
       <a class="lnk" href="#truth">Ground&nbsp;truth</a>
       <a class="lnk" href="#real">Code</a>
-      <a class="lnk" href="#sim">Telemetry</a>
+      <a class="lnk" href="#sim">Simulator</a>
+      <a class="lnk live" href="dashboard.html"><span class="ld"></span>Dashboard</a>
       <button id="musicbtn" aria-label="dark ambient music — Alex Morgan via Pixabay, free license" title="ambient (Alex Morgan — Pixabay)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4Z"/><path class="waves" d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11"/>
@@ -483,16 +529,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   <div class="slab">04 · Ground truth</div>
   <h2>Real counters, wired to <span class="g">kernel logs</span>.</h2>
   <div class="statusbar">
-    <span class="item"><b>0</b> theorems discovered by the engine</span>
-    <span class="item"><b>4</b> theorems compiled ✓ (the editor — real lake build)</span>
-    <span class="item"><b>✓</b> guarded diagonal dichotomy (Tier-C kernel) verified — 5 theorems, <b>zero axioms</b> (not even propext)</span>
-    <span class="item"><b>✓</b> verifier hardened: two gate bypasses closed (namespace audit · <span style="font-family:var(--mono)">noncomputable axiom : False</span>)</span>
-    <span class="item"><b>0</b> epochs of real evolution</span>
+    <span class="item"><b>11</b> theorems kernel-verified by the engine loop</span>
+    <span class="item"><b>2</b> proofs caught cheating at the honesty gate (<span style="font-family:var(--mono)">sorryAx</span> footprint — rejected, logged)</span>
+    <span class="item"><b>5</b> epochs run — including a full pass through the isolated propose→critic→verify→lint→merge pipeline</span>
+    <span class="item"><b>✓</b> guarded diagonal dichotomy (Tier-C kernel) verified — <b>zero axioms</b> (not even propext)</span>
+    <span class="item"><b>✓</b> verifier hardened: gate bypasses closed (namespace audit · <span style="font-family:var(--mono)">noncomputable axiom : False</span>)</span>
     <span class="item"><b>✓</b> Lean 4.32.0 pinned</span>
-    <span class="pledge">Status 2026-07-17. The editor shows real, compiled code in the engine's target
-    format; theorem 4 (the axiom-free guarded diagonal dichotomy) is the machine-checked Tier-C
-    boundary. Discovery counters stay at zero until the loop itself produces a result — every number
-    that ever moves is published beside the kernel log that moved it.</span>
+    <span class="pledge">Status 2026-07-18. The loop has produced results: 11 theorems now sit in
+    <span style="font-family:var(--mono)">Discovered.lean</span>, each with its axiom footprint; the two
+    failures are shown, not hidden — the honesty gate caught them faking a proof. Every number here is
+    read from <span style="font-family:var(--mono)">board.jsonl</span> and the kernel logs that moved it.
+    The full per-epoch breakdown, live, is on the <a href="dashboard.html">telemetry dashboard →</a></span>
   </div>
   <p class="found"><b>Foundations (primary sources):</b> Gödel 1931 · Löb 1955 (JSL 20) · Turing 1939 (Proc. LMS) ·
   Feferman 1962 &amp; Feferman–Spector 1962 (JSL 27) · Kleene 1952 · Blum 1967/1971 (JACM 14/18) ·
@@ -536,8 +583,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
 <section id="sim"><div class="wrap rv">
   <div class="slab">06 · Engine telemetry — simulated</div>
   <h2>One epoch, end to end — <span class="g">labeled</span> as what it is.</h2>
-  <p class="lede">Proposals, triage, kernel verdicts, selection pressure. <b>Synthetic telemetry — no
-  backend attached.</b> Amber marks simulation; green marks the only real artifacts.</p>
+  <p class="lede">Proposals, triage, kernel verdicts, selection pressure — at a scale the engine has not
+  reached. <b>Synthetic telemetry — no backend attached.</b> Amber marks simulation. For the engine's
+  <b>real</b> numbers, epoch by epoch, see the <a href="dashboard.html">live dashboard →</a></p>
   <div class="simpanel">
     <div class="simhead">
       <span class="dots"><span style="background:#d16a8a"></span><span style="background:#e0a23f"></span><span style="background:#2ee584"></span></span>
@@ -565,9 +613,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
             <input type="range" id="s_tri" min="10" max="90" value="35"></div>
         </div>
         <div class="groundtruth">
-          <span class="z">0</span>
-          <p><b>GROUND TRUTH — REAL.</b> Results discovered by the actual engine: zero. Wired to kernel
-          logs, not to this simulation.</p>
+          <span class="z" style="color:var(--ok2)">11</span>
+          <p><b>GROUND TRUTH — REAL.</b> Theorems the actual engine has kernel-verified: <b>11</b>, across
+          5 epochs. Read from <span style="font-family:var(--mono)">board.jsonl</span>, not from this
+          simulation — the <a href="dashboard.html">dashboard</a> has the breakdown.</p>
         </div>
       </div>
     </div>
@@ -673,8 +722,21 @@ function caDraw(){
     cxa.strokeStyle='hsla(150,80%,58%,'+(p.t*.65)+')';cxa.lineWidth=.8;
     cxa.beginPath();cxa.arc(p.x,p.y,(1-p.t)*18+2,0,6.283);cxa.stroke();p.t-=.024;});
   pulses=pulses.filter(function(p){return p.t>0});
+  if(caGlow>0){ cxa.fillStyle='rgba(224,162,63,'+(caGlow*0.05)+')'; cxa.fillRect(0,0,gw,gh); caGlow-=0.008; }
 }
-var fastUntil=0;
+var fastUntil=0, caGlow=0;
+/* phase progression: the field builds, then a COLLAPSE — cells die back, echoing
+   dead-end epochs / model collapse — then it rebuilds denser. Varied timing so it
+   never reads as an obvious loop. Amber marks the collapse, within existing tokens. */
+function caCollapseNow(){ for(var i=0;i<gw*gh;i++){ if(grid[i]&&Math.random()<0.62) grid[i]=0; } caGlow=1; }
+function caRebuild(){ for(var k=0,m=6+Math.floor(Math.random()*5);k<m;k++) patch(); }
+(function phaseCycle(){
+  if(reduce) return;
+  setTimeout(function(){
+    caCollapseNow();
+    setTimeout(function(){ caRebuild(); phaseCycle(); }, 1600+Math.random()*1500);
+  }, 24000+Math.random()*32000);
+})();
 caSize(); addEventListener('resize',caSize);
 if(reduce){ caStep(); caDraw(); }
 else{
@@ -1067,26 +1129,69 @@ line('in','SC_ENGINE   [BOOT]    the only real artifacts on this page are in §0
 schedule();
 
 function $(id){return document.getElementById(id);}
-/* 3D atmosphere: card tilt + pointer parallax + hover glitch (desktop, motion allowed) */
+/* ============ DEPTH — layered parallax + card tilt ============ */
+/* Four fixed planes sit between the page background and the content:
+      #ca (far, static) · #kg · #mistwrap · #fog (near)
+   The three moving planes translate at their own rates against BOTH scroll and
+   pointer — that difference in rate, not any blur, is what makes the field read
+   as volume.
+   #ca is deliberately NOT parallaxed: it is a pixel-grid CA drawn with
+   image-rendering:pixelated, and sub-pixel translation makes it crawl and
+   shimmer. It stays the fixed far wall the other planes move against.
+   Scroll parallax is normalised to page PROGRESS (0..1) rather than raw
+   scrollY — these layers are position:fixed, so a raw offset would march them
+   off screen. Amplitudes stay small and bounded.
+   Gated to >=900px and fine pointers: below that the layers are static, which
+   is cheaper than shipping jank to phones. */
+var DEPTH_OK = !reduce && innerWidth>=900;
+if(DEPTH_OK){(function(){
+  var Lkg=$('kg'), Lmist=$('mistwrap'), Lfog=$('fog');
+  var mx=0,my=0,sp=0,queued=false;
+  /* px of travel across the full page scroll · px of travel across the pointer */
+  var AMP={kg:[26,-11,-8], mist:[40,-15,-10], fog:[10,7,5]};
+  function progress(){
+    var max=document.documentElement.scrollHeight-innerHeight;
+    return max>0 ? Math.min(1,Math.max(0,scrollY/max))-.5 : 0;   /* -0.5 .. +0.5 */
+  }
+  function apply(){
+    queued=false;
+    var a;
+    a=AMP.kg;   if(Lkg)   Lkg.style.transform  ='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*-2+my*a[2]).toFixed(1)+'px,0)';
+    a=AMP.mist; if(Lmist) Lmist.style.transform='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*-2+my*a[2]).toFixed(1)+'px,0)';
+    a=AMP.fog;  if(Lfog)  Lfog.style.transform ='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*2+my*a[2]).toFixed(1)+'px,0)';
+  }
+  function queue(){ if(!queued){ queued=true; requestAnimationFrame(apply); } }
+  addEventListener('scroll',function(){ sp=progress(); queue(); },{passive:true});
+  if(matchMedia('(pointer:fine)').matches){
+    addEventListener('mousemove',function(e){
+      mx=e.clientX/innerWidth-.5; my=e.clientY/innerHeight-.5; queue();
+    },{passive:true});
+  }
+  addEventListener('resize',function(){ sp=progress(); queue(); },{passive:true});
+  sp=progress(); apply();
+})();}
+
+/* card tilt + pointer-tracked sheen (fine pointer, motion allowed) */
 if(!reduce && matchMedia('(pointer:fine)').matches){
   document.querySelectorAll('.prob,.opcard,.agentcard').forEach(function(c){
+    var raf=null,lx=0,ly=0;
     c.addEventListener('mousemove',function(e){
       var r=c.getBoundingClientRect();
-      var rx=((e.clientY-r.top)/r.height-.5)*-5, ry=((e.clientX-r.left)/r.width-.5)*5;
-      c.style.transform='perspective(700px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) translateY(-2px)';
-    });
+      lx=(e.clientX-r.left)/r.width; ly=(e.clientY-r.top)/r.height;
+      if(raf)return;
+      raf=requestAnimationFrame(function(){
+        raf=null;
+        var rx=(ly-.5)*-5, ry=(lx-.5)*5;
+        /* translateZ lifts the card out of the page as it tilts — the hint of
+           depth the tilt alone doesn't give. Kept to 6px: any more and the
+           text starts to swim. */
+        c.style.transform='perspective(760px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) translateZ(6px)';
+        c.style.setProperty('--mx',(lx*100).toFixed(1)+'%');
+        c.style.setProperty('--my',(ly*100).toFixed(1)+'%');
+      });
+    },{passive:true});
     c.addEventListener('mouseleave',function(){c.style.transform='';});
   });
-  var kgel=document.getElementById('kg'), fogel=document.getElementById('fog'), pT=null;
-  addEventListener('mousemove',function(e){
-    if(pT)return;
-    pT=requestAnimationFrame(function(){
-      pT=null;
-      var dx=e.clientX/innerWidth-.5, dy=e.clientY/innerHeight-.5;
-      kgel.style.transform='translate('+(dx*-10).toFixed(1)+'px,'+(dy*-7).toFixed(1)+'px)';
-      fogel.style.transform='translate('+(dx*6).toFixed(1)+'px,'+(dy*4).toFixed(1)+'px)';
-    });
-  },{passive:true});
   var mt=document.getElementById('mainTitle');
   mt.addEventListener('mouseenter',function(){
     mt.classList.remove('zap'); void mt.offsetWidth; mt.classList.add('zap');

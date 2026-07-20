@@ -1,0 +1,264 @@
+{
+  "generated_at": "2026-07-18T21:07:39Z",
+  "summary": {
+    "epochs_recorded": 4,
+    "records": 13,
+    "verified": 11,
+    "failed": 2,
+    "families": 8
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "families": [
+        "lin_mod",
+        "mul_mod",
+        "pow_mod"
+      ],
+      "verified": 6,
+      "failed": 0,
+      "records": [
+        {
+          "conjecture": "2^7 mod 6 = 2.",
+          "family": "pow_mod",
+          "status": "verified",
+          "axioms": [],
+          "axiom_free": true
+        },
+        {
+          "conjecture": "For all naturals n, m: (7n + 42m) mod 7 = 0.",
+          "family": "lin_mod",
+          "status": "verified",
+          "axioms": [
+            "Quot.sound",
+            "propext"
+          ],
+          "axiom_free": false
+        },
+        {
+          "conjecture": "For all naturals n: 16n mod 2 = 0.",
+          "family": "mul_mod",
+          "status": "verified",
+          "axioms": [
+            "Quot.sound",
+            "propext"
+          ],
+          "axiom_free": false
+        },
+        {
+          "conjecture": "For all naturals n, m: (4n + 4m) mod 2 = 0.",
+          "family": "lin_mod",
+          "status": "verified",
+          "axioms": [
+            "Quot.sound",
+            "propext"
+          ],
+          "axiom_free": false
+        },
+        {
+          "conjecture": "2^11 mod 6 = 2.",
+          "family": "pow_mod",
+          "status": "verified",
+          "axioms": [],
+          "axiom_free": true
+        },
+        {
+          "conjecture": "For all naturals n: 35n mod 7 = 0.",
+          "family": "mul_mod",
+          "status": "verified",
+          "axioms": [
+            "Quot.sound",
+            "propext"
+          ],
+          "axiom_free": false
+        }
+      ],
+      "title": null
+    },
+    {
+      "epoch": 3,
+      "families": [
+        "cubic_mod",
+        "parity",
+        "sum_formula"
+      ],
+      "verified": 1,
+      "failed": 2,
+      "records": [
+        {
+          "conjecture": "The sum of the first n positive multiples of 5 equals 5 times the n-th triangular number (stated as 2*sum = 5n(n+1)).",
+          "family": "sum_formula",
+          "status": "failed",
+          "axioms": [
+            "sorryAx"
+          ],
+          "axiom_free": false
+        },
+        {
+          "conjecture": "For all naturals n, n*(n+1) is even.",
+          "family": "parity",
+          "status": "verified",
+          "axioms": [
+            "Quot.sound",
+            "propext"
+          ],
+          "axiom_free": false
+        },
+        {
+          "conjecture": "For all naturals n, n^3 + 2n is divisible by 3.",
+          "family": "cubic_mod",
+          "status": "failed",
+          "axioms": [
+            "sorryAx"
+          ],
+          "axiom_free": false
+        }
+      ],
+      "title": null
+    },
+    {
+      "epoch": 4,
+      "families": [
+        "llm_cli"
+      ],
+      "verified": 3,
+      "failed": 0,
+      "records": [
+        {
+          "conjecture": "For all naturals n, m: (9n + 12m) mod 3 = 0.",
+          "family": "llm_cli",
+          "status": "verified",
+          "axioms": [
+            "Quot.sound",
+            "propext"
+          ],
+          "axiom_free": false
+        },
+        {
+          "conjecture": "3^5 mod 7 = 5.",
+          "family": "llm_cli",
+          "status": "verified",
+          "axioms": [],
+          "axiom_free": true
+        },
+        {
+          "conjecture": "For all naturals n, n^2 mod 2 has the same value as n mod 2 (a square is even iff its root is even).",
+          "family": "llm_cli",
+          "status": "verified",
+          "axioms": [
+            "propext"
+          ],
+          "axiom_free": false
+        }
+      ],
+      "title": null
+    },
+    {
+      "epoch": 5,
+      "families": [
+        "self_description"
+      ],
+      "verified": 1,
+      "failed": 0,
+      "records": [
+        {
+          "conjecture": "Kolakoski self-description is sustainable: the two-pointer generator's read head stays strictly behind the write frontier with alphabet closed under {1,2}, forever (inv_gen); hence the generator is productive (unbounded growth). Witnesses: the generated prefix matches A000002 and reads off as its own run-length description on a complete-run window.",
+          "family": "self_description",
+          "status": "verified",
+          "axioms": [
+            "Quot.sound",
+            "propext"
+          ],
+          "axiom_free": false
+        }
+      ],
+      "title": "Fable-5-as-Proposer: Kolakoski self-description"
+    },
+    {
+      "epoch": 6,
+      "title": null,
+      "families": [],
+      "verified": 0,
+      "failed": 0,
+      "records": [],
+      "terminal_status": "KERNEL_FAIL",
+      "discard_count": 8
+    }
+  ],
+  "latest": {
+    "epoch": 6,
+    "terminal_status": "KERNEL_FAIL",
+    "pipeline": [
+      {
+        "stage": "propose",
+        "label": "Propose",
+        "state": "passed",
+        "detail": "candidate produced"
+      },
+      {
+        "stage": "critic",
+        "label": "Critic",
+        "state": "passed",
+        "detail": "PASS"
+      },
+      {
+        "stage": "verify",
+        "label": "Verify · kernel",
+        "state": "failed",
+        "detail": "kernel rejected"
+      },
+      {
+        "stage": "lint",
+        "label": "Provenance lint",
+        "state": "not_reached",
+        "detail": ""
+      },
+      {
+        "stage": "merge",
+        "label": "Merge",
+        "state": "not_reached",
+        "detail": ""
+      }
+    ],
+    "discards": [
+      {
+        "statement": "The prefix relation on lists (isPrefix l1 l2 := ∃ l3, l2 = l1 ++ l3) is a partial order: reflexive, transitive, and antisymmetric.",
+        "reason": "antisymmetry needs a length-zero-implies-nil chain through several supporting core lemmas whose exact names/availability are less certain here; more proof surface than the selected sketch for the same branching purpose."
+      },
+      {
+        "statement": "Peirce's law ((p → q) → p) → p is a theorem of classical logic, provable via Classical.byContradiction. [T]",
+        "reason": "one-line term proof, but pulls in Classical.choice as an extra axiom beyond the propext/Quot.sound baseline already seen on the board, with no proof-effort saving over the selected sketch."
+      },
+      {
+        "statement": "For all naturals n, gcd(n, n+1) = 1 (consecutive naturals are coprime).",
+        "reason": "requires unfolding Nat.gcd's well-founded recursion by hand since Mathlib's Coprime API is unavailable; lemma names needed for the induction are not confirmed to exist in core, higher availability risk than selected sketch."
+      },
+      {
+        "statement": "For all naturals n, 4*n*(n+1) + 1 = (2*n + 1)^2.",
+        "reason": "this nonlinear-equality shape already produced two ledger failures this project (sumFives_formula, cube_plus_2n_div3) when closed via induction+omega without a ring-normalization tactic, which is unavailable without Mathlib; same risk class, avoided."
+      },
+      {
+        "statement": "There is no injective function from Fin (n+1) to Fin n (pigeonhole principle).",
+        "reason": "needs a hand-rolled injectivity definition plus a counting/case argument over Fin with no Fintype/Finset support available; larger proof surface than the selected sketch."
+      },
+      {
+        "statement": "Insertion sort on a list of naturals produces a result that is sorted and is a permutation of the input.",
+        "reason": "the permutation half needs either core List.Perm, whose availability without Mathlib is unconfirmed, or a hand-rolled multiset-count equality, adding a whole second lemma family beyond the selected sketch's single counting argument."
+      },
+      {
+        "statement": "List.reverse is an involution: l.reverse.reverse = l.",
+        "reason": "duplicates an existing core-library lemma (List.reverse_reverse); no independent proof content beyond restating it."
+      },
+      {
+        "statement": "Every tournament (complete asymmetric relation) on a finite vertex set has a Hamiltonian path. [T]",
+        "reason": "needs finite-graph/tournament machinery (Fintype, induction over vertex sets) not available without Mathlib; expected proof length far exceeds every other sketch considered."
+      }
+    ],
+    "on_board": false
+  },
+  "axiom_whitelist": [
+    "Quot.sound",
+    "propext"
+  ],
+  "skipped": []
+}

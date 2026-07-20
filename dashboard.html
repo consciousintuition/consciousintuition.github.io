@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engine Telemetry — Schrödinger's Cat</title>
+<meta name="description" content="Live telemetry from the kernel-anchored discovery engine: epoch history, the propose→critic→verify→lint→merge pipeline trace, and the discard ledger — read from real engine state, honest zeros and all.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020304'/%3E%3Cpath d='M8 26 L8 13 L11 5.5 L14.5 10 Q16 9.3 17.5 10 L21 5.5 L24 13 L24 26 Z' stroke='%23b57bff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#020304; --card:rgba(8,7,16,.88); --cardS:#070510;
+  --line:#171226; --line2:#241c3a;
+  --ink:#eef1f6; --txt:#a9b0be; --mut:#767e8c; --dim:#4b5260;
+  --acc:#b57bff; --acc2:#dcbcff;
+  --ok:#2ee584; --ok2:#8fffc4;
+  --sim:#e0a23f;
+  --teal:#5fe0cf;
+  --vio:#a78bfa; --vio2:#c9b8ff; --ros:#ff6ac1;
+  --bad:#ff5c72;           /* brand extension: a red in the warm rose family, for hard kernel/lint failures */
+  --disp:"Chakra Petch","Space Grotesk","Segoe UI",system-ui,sans-serif;
+  --sans:Inter,"Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.75;overflow-x:hidden;min-height:100vh}
+
+/* signature background: an evolving proof-search / neural field (see script) */
+#field{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;opacity:.6}
+/* readability scrim: keeps the field from ever competing with foreground text */
+#scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(2,3,4,.55),rgba(2,3,4,.32) 30%,rgba(2,3,4,.32) 70%,rgba(2,3,4,.6))}
+
+/* ambient layers, matched to the landing page for continuity */
+#fog{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+   radial-gradient(ellipse 130% 95% at 50% 112%,rgba(2,3,4,.9) 30%,rgba(2,3,4,.45) 62%,transparent 100%),
+   radial-gradient(ellipse 150% 100% at 50% -25%,rgba(150,90,255,.06),transparent 55%)}
+/* #mist animates its own transform (mistdrift), so parallax translate lives on
+   a wrapper — otherwise the animation wins. */
+#mistwrap{position:fixed;inset:0;z-index:1;pointer-events:none}
+#mist{position:absolute;inset:-30%;opacity:.55;
+  background:
+   radial-gradient(ellipse 40% 30% at 25% 40%,rgba(120,80,200,.07),transparent 70%),
+   radial-gradient(ellipse 50% 35% at 78% 62%,rgba(95,224,207,.045),transparent 70%),
+   radial-gradient(ellipse 45% 40% at 55% 22%,rgba(181,123,255,.05),transparent 70%)}
+@media(prefers-reduced-motion:no-preference){
+  #mist{animation:mistdrift 46s ease-in-out infinite alternate}
+  @keyframes mistdrift{from{transform:translate(-3%,-2%) scale(1)}to{transform:translate(3%,2%) scale(1.08)}}
+}
+#grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E")}
+
+a{color:var(--acc2);text-decoration:none}
+a:hover{color:var(--acc)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px;position:relative;z-index:5}
+
+/* header */
+header{position:sticky;top:0;z-index:70;background:rgba(2,3,4,.86);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+header .row{max-width:1140px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.brand svg{width:21px;height:21px;flex:none}
+.brand b{font-family:var(--disp);font-size:13px;letter-spacing:.16em;color:var(--ink);font-weight:600}
+.brand span{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--mut);text-transform:uppercase;border-left:1px solid var(--line2);padding-left:10px;margin-left:2px}
+header nav{margin-left:auto;display:flex;gap:22px;align-items:center}
+header nav a{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);transition:color .2s;position:relative;padding:4px 0}
+header nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:linear-gradient(90deg,var(--acc),transparent);transition:right .25s}
+header nav a:hover{color:var(--acc2)}
+header nav a:hover::after{right:0}
+header nav a:active{color:var(--acc)}
+header nav a:focus-visible{outline:2px solid var(--acc2);outline-offset:4px;border-radius:2px}
+.live{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--mut);text-transform:uppercase}
+.live .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(46,229,132,.7)}
+@media(prefers-reduced-motion:no-preference){.live .dot{animation:pulse 2.4s ease-in-out infinite}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* hero */
+.hero{padding:52px 0 30px}
+.kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;color:var(--acc);text-transform:uppercase;margin-bottom:16px}
+h1{font-family:var(--disp);font-size:clamp(30px,4.6vw,46px);font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1.08}
+h1 .g{color:var(--acc);text-shadow:0 0 40px rgba(181,123,255,.35)}
+.hero p{margin-top:16px;max-width:56ch;color:var(--txt);font-size:15px}
+.hero p b{color:var(--ink);font-weight:600}
+
+/* stat tiles */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:34px 0 8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 16px 14px}
+.stat .n{font-family:var(--disp);font-size:30px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.stat .n.ok{color:var(--ok2)} .stat .n.bad{color:var(--bad)} .stat .n.acc{color:var(--acc2)}
+.stat .l{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-top:8px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* section scaffold */
+section{padding:40px 0}
+.slab{font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--acc);text-transform:uppercase;margin-bottom:10px}
+h2{font-family:var(--disp);font-size:clamp(20px,2.6vw,27px);font-weight:700;color:var(--ink);letter-spacing:-.02em;line-height:1.16}
+.sub{color:var(--mut);font-size:13.5px;margin-top:8px;max-width:64ch}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line2),transparent);margin:8px 0}
+
+/* pipeline trace */
+.epochtag{display:inline-flex;align-items:center;gap:9px;margin:22px 0 4px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--txt)}
+.epochtag .num{font-family:var(--disp);font-size:13px;color:var(--acc2);font-weight:700}
+.termbadge{font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:4px 12px;border-radius:99px;border:1px solid;text-transform:uppercase;font-weight:600}
+.termbadge.ok{color:var(--ok2);border-color:rgba(46,229,132,.5);background:rgba(46,229,132,.08)}
+.termbadge.bad{color:var(--bad);border-color:rgba(255,92,114,.5);background:rgba(255,92,114,.08)}
+.termbadge.sim{color:var(--sim);border-color:rgba(224,162,63,.5);background:rgba(224,162,63,.08)}
+.termbadge.gap{color:var(--mut);border-color:var(--line2);background:rgba(255,255,255,.02)}
+
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin:20px 0 6px;position:relative}
+.stage{position:relative;text-align:center;padding:0 8px}
+/* Straight 2px rails replaced by the curved SVG connectors below. Kept out of
+   the DOM entirely rather than hidden — see renderPipe(). */
+.stage .rail{display:none}
+/* --dy is a small per-stage vertical offset set in JS: the nodes sit on a gentle
+   organic curve instead of a dead-straight rule, which is what lets the
+   connectors read as a signal path rather than a table border. Baseline text
+   below each node is NOT offset, so labels stay aligned. */
+.stage .node{position:relative;z-index:2;width:46px;height:46px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:19px;font-weight:700;border:1.5px solid;background:var(--cardS);
+  transform:translateY(var(--dy,0px))}
+
+/* curved, depth-cued pipeline connectors */
+.pipesvg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
+.pipesvg path{fill:none;stroke-linecap:round}
+.pipesvg .glowp{stroke-width:7;opacity:.16}     /* cheap bloom: a wide, faint underlay */
+.pipesvg .basep{stroke-width:1.7}
+.pipesvg .flowp{stroke-width:2.4;stroke-dasharray:4 16}
+@media(prefers-reduced-motion:no-preference){
+  .pipesvg{opacity:0;animation:pipefade .6s ease-out .75s forwards}  /* after the nodes pop in */
+  .pipesvg .flowp{animation:pipeflow 1.5s linear infinite}
+  @keyframes pipeflow{to{stroke-dashoffset:-20}}
+  @keyframes pipefade{to{opacity:1}}
+}
+@media(max-width:720px){.pipesvg{display:none}}
+.stage .sn{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;margin:12px 0 5px}
+.stage .name{font-family:var(--disp);font-size:13px;font-weight:600;color:var(--txt)}
+.stage .det{font-family:var(--mono);font-size:9.5px;color:var(--mut);margin-top:5px;line-height:1.5;min-height:2.6em}
+
+.stage.passed .node{color:var(--ok2);border-color:rgba(46,229,132,.6);box-shadow:0 0 16px rgba(46,229,132,.16)}
+.stage.passed .rail{background:linear-gradient(90deg,rgba(46,229,132,.55),rgba(46,229,132,.25))}
+.stage.passed .name{color:var(--ink)}
+.stage.failed .node{color:var(--bad);border-color:rgba(255,92,114,.65);box-shadow:0 0 18px rgba(255,92,114,.2)}
+.stage.failed .rail{background:repeating-linear-gradient(90deg,var(--line2) 0 6px,transparent 6px 12px)}
+.stage.failed .name{color:var(--ink)}
+.stage.rejected .node{color:var(--sim);border-color:rgba(224,162,63,.6);box-shadow:0 0 16px rgba(224,162,63,.16)}
+.stage.rejected .rail{background:repeating-linear-gradient(90deg,var(--line2) 0 6px,transparent 6px 12px)}
+.stage.reverted .node{color:var(--sim);border-color:rgba(224,162,63,.6)}
+.stage.reverted .rail{background:repeating-linear-gradient(90deg,var(--line2) 0 6px,transparent 6px 12px)}
+.stage.not_reached .node{color:var(--dim);border-color:var(--line2);border-style:dashed;background:transparent}
+.stage.not_reached .rail{background:repeating-linear-gradient(90deg,var(--line) 0 5px,transparent 5px 12px)}
+.stage.not_reached .name{color:var(--mut)}
+.stage.not_reached .det{color:var(--dim)}
+.pipenote{font-family:var(--mono);font-size:10px;color:var(--mut);letter-spacing:.03em;margin-top:16px;padding:12px 16px;border-left:2px solid var(--line2);background:rgba(255,255,255,.015)}
+.pipenote b{color:var(--txt);font-weight:600}
+@media(max-width:720px){
+  .pipe{grid-template-columns:1fr;gap:2px}
+  .stage{display:grid;grid-template-columns:46px 1fr;text-align:left;gap:14px;align-items:start;padding:6px 0}
+  .stage .rail{display:none}
+  .stage .node{margin:0} .stage .sn{margin:0} .stage .det{min-height:0}
+}
+
+/* epoch timeline */
+.timeline{position:relative;margin-top:24px;padding-left:34px}
+.timeline::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(180deg,rgba(181,123,255,.5),rgba(95,224,207,.3),rgba(181,123,255,.1))}
+.ep{position:relative;margin-bottom:22px}
+.ep .mk{position:absolute;left:-34px;top:0;width:24px;height:24px;border-radius:50%;background:var(--cardS);
+  border:1.5px solid var(--line2);display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-size:11px;font-weight:700;color:var(--acc2);z-index:2}
+.ep.hasfail .mk{border-color:rgba(255,92,114,.5);color:var(--bad)}
+.ep.merged .mk,.ep.allok .mk{border-color:rgba(46,229,132,.5);color:var(--ok2)}
+.ep .body{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 18px;transition:border-color .2s}
+.ep .body:hover{border-color:var(--line2)}
+.ep .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.ep .ttl{font-family:var(--disp);font-size:15px;font-weight:600;color:var(--ink)}
+.ep .ttl.none{color:var(--mut);font-style:italic;font-weight:500}
+.ep .counts{margin-left:auto;display:flex;gap:12px;font-family:var(--mono);font-size:10px;letter-spacing:.06em}
+.ep .counts .v{color:var(--ok2)} .ep .counts .f{color:var(--bad)} .ep .counts .z{color:var(--dim)}
+.ep .fams{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase;margin-bottom:10px}
+.recs{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.rec{display:flex;gap:11px;align-items:flex-start;padding:8px 11px;border-radius:5px;background:rgba(255,255,255,.014);border:1px solid var(--line)}
+.rec .rs{flex:none;font-family:var(--mono);font-size:13px;line-height:1.4;width:15px;text-align:center}
+.rec.verified .rs{color:var(--ok)} .rec.failed .rs{color:var(--bad)} .rec.open .rs{color:var(--mut)}
+.rec .rc{font-size:13px;color:var(--txt);line-height:1.5}
+.rec .chips{margin-top:5px;display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;padding:2px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--mut)}
+.chip.axfree{color:var(--ok2);border-color:rgba(46,229,132,.4);background:rgba(46,229,132,.06)}
+.chip.ax{color:var(--vio2);border-color:rgba(167,139,250,.32);background:rgba(167,139,250,.06)}
+.chip.sorry{color:var(--bad);border-color:rgba(255,92,114,.45);background:rgba(255,92,114,.08)}
+.ep .empty{font-family:var(--mono);font-size:11px;color:var(--mut);padding:9px 12px;border:1px dashed var(--line2);border-radius:5px;background:rgba(255,255,255,.01);margin-top:8px}
+.ep .empty b{color:var(--sim);font-weight:600}
+
+/* discard ledger */
+.discards{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+.dc{display:grid;grid-template-columns:1fr;gap:6px;padding:13px 15px;background:var(--card);border:1px solid var(--line);border-left:2px solid var(--sim);border-radius:5px}
+.dc .st{font-size:13.5px;color:var(--ink);line-height:1.55}
+.dc .st.none{color:var(--mut);font-style:italic}
+.dc .rn{font-family:var(--mono);font-size:11px;color:var(--mut);line-height:1.6}
+.dc .rn::before{content:"▸ ";color:var(--sim)}
+.ledgernote{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.04em;margin-top:14px}
+
+/* next-step band (reciprocal link into the main site) */
+.nextstep{text-align:center;margin-top:20px;padding:38px 24px;border:1px solid var(--line);border-radius:8px;
+  background:radial-gradient(ellipse 90% 140% at 50% 0%,rgba(181,123,255,.06),transparent 60%),var(--card)}
+.ns-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;color:var(--teal);text-transform:uppercase;margin-bottom:12px}
+.ns-t{font-family:var(--disp);font-size:clamp(17px,2.2vw,22px);font-weight:600;color:var(--ink);max-width:26ch;margin:0 auto 22px;line-height:1.25}
+.ns-t span{font-family:var(--mono);font-size:.82em;color:var(--acc2)}
+.ns-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.dbtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;padding:13px 26px;border-radius:5px;font-weight:600;border:1px solid transparent;transition:all .22s cubic-bezier(.2,.7,.3,1)}
+.dbtn.pri{color:#0d021c;background:var(--acc);box-shadow:0 0 20px rgba(181,123,255,.22)}
+.dbtn.pri:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 4px 26px rgba(181,123,255,.4)}
+.dbtn.sec{color:var(--acc2);border-color:rgba(181,123,255,.32);background:rgba(6,4,12,.5)}
+.dbtn.sec:hover{border-color:var(--acc);transform:translateY(-1px);background:rgba(181,123,255,.07)}
+.dbtn:active{transform:translateY(0) scale(.98)}
+.dbtn:focus-visible{outline:2px solid var(--acc2);outline-offset:3px}
+a:focus-visible{outline:2px solid var(--acc2);outline-offset:3px;border-radius:2px}
+@media(prefers-reduced-motion:reduce){.dbtn{transition:color .2s,background .2s,border-color .2s}}
+
+/* pipeline: draw-in on load + a pulsing marker at the halt point */
+@media(prefers-reduced-motion:no-preference){
+  .stage .node{animation:nodepop .5s cubic-bezier(.2,.8,.3,1.2) backwards}
+  .stage:nth-child(1) .node{animation-delay:.05s}
+  .stage:nth-child(2) .node{animation-delay:.20s}
+  .stage:nth-child(3) .node{animation-delay:.35s}
+  .stage:nth-child(4) .node{animation-delay:.50s}
+  .stage:nth-child(5) .node{animation-delay:.65s}
+  /* keeps the per-stage --dy offset through the pop-in, so the nodes never jump
+     onto the curve after the animation settles */
+  @keyframes nodepop{from{opacity:0;transform:translateY(var(--dy,0px)) scale(.4)}
+                       to{opacity:1;transform:translateY(var(--dy,0px)) scale(1)}}
+  .stage.failed .node,.stage.rejected .node{animation:nodepop .5s cubic-bezier(.2,.8,.3,1.2) backwards,haltpulse 2s ease-in-out .9s infinite}
+  @keyframes haltpulse{0%,100%{box-shadow:0 0 18px rgba(255,92,114,.2)}50%{box-shadow:0 0 26px rgba(255,92,114,.5)}}
+}
+.stage.failed::after,.stage.rejected::after{content:"halted here";position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--bad);white-space:nowrap;opacity:.85}
+.stage.rejected::after{color:var(--sim)}
+@media(max-width:720px){.stage.failed::after,.stage.rejected::after{left:23px;top:-2px}}
+
+/* ===== per-epoch verified/failed proportion bar =====
+   Same data as before (flex weights straight off e.verified / e.failed) — the
+   escalation is purely in the rendering. The bar now has a recessed well
+   (inset shadow) that the segments sit inside, so it reads as a channel with
+   depth rather than a flat rule.
+   Only the VERIFIED segment glows and catches the travelling highlight. That
+   asymmetry is deliberate and honest: kernel-verified is the outcome that
+   earns light on this site, and a failure should not be dressed up to look
+   equally luminous. */
+.epbar{display:flex;height:7px;border-radius:4px;overflow:hidden;margin:4px 0 11px;
+  background:rgba(255,255,255,.03);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.75),inset 0 0 0 1px rgba(255,255,255,.035)}
+.epbar i{display:block;height:100%;position:relative;overflow:hidden}
+.epbar .bv{background:linear-gradient(180deg,var(--ok2),var(--ok) 52%,#1c9c5c);
+  box-shadow:0 0 12px rgba(46,229,132,.45),inset 0 1px 0 rgba(255,255,255,.45)}
+.epbar .bf{background:linear-gradient(180deg,#ff8a99,var(--bad) 58%,#a82f42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+.epbar .bz{background:var(--line2);flex:1}
+@media(prefers-reduced-motion:no-preference){
+  .epbar .bv::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(100deg,transparent 34%,rgba(255,255,255,.34) 50%,transparent 66%);
+    transform:translateX(-130%);animation:epshine 5.2s ease-in-out infinite}
+  @keyframes epshine{0%,74%{transform:translateX(-130%)}100%{transform:translateX(240%)}}
+}
+
+/* ===== CARD DEPTH — perspective tilt + pointer-tracked sheen =====
+   Matches the landing page's motion language. Tilt is driven in JS and gated to
+   fine pointers at >=900px; the sheen is what makes the tilt read as a lit
+   surface. Alphas stay low enough that the card background never lifts far
+   enough to cost text contrast. */
+.stat,.ep .body,.dc{position:relative;transform-style:preserve-3d;
+  transition:border-color .2s,transform .18s cubic-bezier(.2,.7,.3,1)}
+.stat::after,.ep .body::after,.dc::after{content:"";position:absolute;inset:0;
+  border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),
+    rgba(181,123,255,.10),rgba(181,123,255,.03) 44%,transparent 66%)}
+.stat:hover::after,.ep .body:hover::after,.dc:hover::after{opacity:1}
+.stat>*,.ep .body>*,.dc>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){
+  .stat::after,.ep .body::after,.dc::after{display:none}
+  .stat,.ep .body,.dc{transition:border-color .2s}
+}
+
+/* states */
+#err{display:none;margin:60px auto;max-width:560px;text-align:center;padding:30px;border:1px dashed var(--bad);border-radius:8px;background:rgba(255,92,114,.04)}
+#err .t{font-family:var(--disp);color:var(--bad);font-size:18px;margin-bottom:10px}
+#err .m{font-family:var(--mono);font-size:12px;color:var(--mut);line-height:1.7}
+#load{text-align:center;padding:80px 0;font-family:var(--mono);font-size:12px;color:var(--mut);letter-spacing:.16em;text-transform:uppercase}
+
+footer{border-top:1px solid var(--line);margin-top:50px;padding:26px 0 60px}
+footer .row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--mut)}
+footer .row b{color:var(--txt);font-weight:500}
+</style>
+</head>
+<body>
+<canvas id="field" aria-hidden="true"></canvas>
+<div id="scrim"></div>
+<div id="fog"></div>
+<div id="mistwrap" aria-hidden="true"><div id="mist"></div></div>
+<div id="grain"></div>
+
+<header>
+  <div class="row">
+    <span class="brand">
+      <svg viewBox="0 0 32 32" fill="none" stroke="#b57bff" stroke-width="1.6" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px rgba(181,123,255,.5))">
+        <path d="M8 26 L8 13 L11 5.5 L14.5 10 Q16 9.3 17.5 10 L21 5.5 L24 13 L24 26 Z"/>
+        <path d="M12.2 17.5 L14.6 18.6 M19.8 17.5 L17.4 18.6" stroke-width="1.3"/>
+      </svg>
+      <b>SCHRÖDINGER'S CAT</b>
+      <span>Engine Telemetry</span>
+    </span>
+    <nav>
+      <a href="index.html">← Site</a>
+      <span class="live"><span class="dot"></span><span id="livets">reading state…</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="kick">Kernel-anchored discovery · live engine state</div>
+    <h1>Every epoch, <span class="g">honestly</span> — verified, failed,<br>and the pipeline where it stopped.</h1>
+    <p>This dashboard reads the engine's real state: the kernel-checked blackboard, the
+    orchestrator's own pipeline trace, and the discard ledger. <b>Nothing here is a
+    placeholder.</b> A stage that never ran shows as an unresolved gap, not a green check.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+<div id="load">reading engine state…</div>
+<div id="err"><div class="t">Engine state unavailable</div><div class="m" id="errm"></div></div>
+
+<main id="main" style="display:none">
+  <div class="wrap">
+    <section>
+      <div class="slab">Latest epoch · pipeline trace</div>
+      <h2>Where the most recent run stopped</h2>
+      <div class="sub">The engine's real architecture: <b>propose → critic → verify → lint → merge</b>.
+      Each stage shows its actual outcome for the latest epoch. A dashed rail marks where the run halted.</div>
+      <div id="pipehead"></div>
+      <div class="pipe" id="pipe"></div>
+      <div class="pipenote" id="pipenote"></div>
+    </section>
+
+    <div class="wrap" style="padding:0"><div class="divider"></div></div>
+
+    <section>
+      <div class="slab">Epoch history</div>
+      <h2>The record so far</h2>
+      <div class="sub">Chronological; each epoch's kernel-verified and failed results, with axiom
+      footprints. Failures are shown with their real cause signatures.</div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <div class="wrap" style="padding:0"><div class="divider"></div></div>
+
+    <section>
+      <div class="slab">Discard ledger · latest epoch</div>
+      <h2>Roads not taken</h2>
+      <div class="sub">Every direction the Proposer considered and set aside, with its feasibility/cost
+      reason — logged before the candidate was chosen, so nothing is silently dropped.</div>
+      <div class="discards" id="discards"></div>
+      <div class="ledgernote" id="ledgernote"></div>
+    </section>
+
+    <section class="nextstep">
+      <div class="ns-k">Not abstractions</div>
+      <div class="ns-t">Every verified theorem above compiles — really — in <span>Discovered.lean</span>.</div>
+      <div class="ns-cta">
+        <a class="dbtn pri" href="index.html#real">See the compiled Lean code →</a>
+        <a class="dbtn sec" href="index.html">The research program ↗</a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="wrap"><div class="row">
+      <span>SNAPSHOT <b id="gents">—</b></span>
+      <span>source: <b>engine/export_site_data.py → site/data/state.json</b></span>
+      <span>the Lean kernel is the only judge · <b id="whitelist">—</b></span>
+    </div></div>
+  </footer>
+</main>
+
+<script>
+/* ================= SIGNATURE BACKGROUND =================
+   An evolving proof-search / neural field: structure GROWS by branching from a
+   frontier (proposals extending the tree), a few paths LOCK teal (kernel-verified),
+   then the field COLLAPSES — dead-end subtrees die back, echoing dead-end epochs
+   and model collapse — and REBUILDS. Palette stays within the site tokens
+   (violet base · teal verified · amber collapse). Ambient, low-contrast, behind
+   everything. prefers-reduced-motion → one static frame, no loop. */
+(function(){
+  const cv=document.getElementById('field'); if(!cv) return;
+  const cx=cv.getContext('2d');
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DPR=Math.min(window.devicePixelRatio||1,1.5);
+  const VIO=[168,133,250], TEAL=[95,224,207], AMBER=[224,162,63];
+  let W,H,MOBILE,MAXN, nodes,frontier, state,stateT,target, collapseGlow, tPrev,acc;
+
+  function size(){
+    W=cv.width=Math.round(innerWidth*DPR); H=cv.height=Math.round(innerHeight*DPR);
+    cv.style.width=innerWidth+'px'; cv.style.height=innerHeight+'px';
+    MOBILE=innerWidth<720; MAXN=MOBILE?90:180;
+    reset();
+    if(reduce){ for(let k=0;k<Math.round(MAXN*2.2);k++) grow(); draw(1); }
+  }
+  function reset(){
+    nodes=[]; frontier=[]; state='grow'; stateT=0; collapseGlow=0;
+    target=(0.66+Math.random()*0.28)*MAXN;
+    const roots=MOBILE?2:3;
+    for(let i=0;i<roots;i++){
+      nodes.push({x:W*(0.06+Math.random()*0.12), y:H*(0.16+0.68*Math.random()),
+                  p:-1, gen:0, st:0, life:1, pulse:0});
+      frontier.push(nodes.length-1);
+    }
+  }
+  function density(){ return Math.min(1, nodes.length/MAXN); }
+  function grow(){
+    if(!frontier.length){ if(nodes.length) state='collapse'; return; }
+    if(nodes.length>=MAXN){ state='collapse'; return; }
+    const fi=Math.floor(Math.random()*frontier.length), pi=frontier[fi], p=nodes[pi];
+    const branches = 1 + ((Math.random() < 0.22+density()*0.4) ? 1 : 0);
+    let added=false;
+    for(let b=0;b<branches && nodes.length<MAXN;b++){
+      const ang=(Math.random()-0.5)*1.15;
+      const dist=(17+Math.random()*30)*DPR;
+      const nx=p.x+Math.cos(ang)*dist+dist*0.45, ny=p.y+Math.sin(ang)*dist;
+      if(nx<0||nx>W*1.03||ny<-4||ny>H+4) continue;
+      nodes.push({x:nx,y:ny,p:pi,gen:p.gen+1,st:0,life:1,pulse:0});
+      frontier.push(nodes.length-1); added=true;
+    }
+    if(Math.random()<0.16){ p.st=1; p.pulse=1; frontier.splice(fi,1); }   /* verified lock */
+    else if(!added && Math.random()<0.34){ frontier.splice(fi,1); }        /* dead frontier */
+  }
+  function beginCollapse(){
+    // prune leaves/newer generations back toward the roots — dead-end die-back
+    const frac=0.4+Math.random()*0.35;
+    for(let i=nodes.length-1;i>0;i--){
+      if(nodes[i].st===2) continue;
+      if(nodes[i].gen>1 && Math.random()<frac){ nodes[i].st=2; }
+    }
+    collapseGlow=1;
+  }
+  function rebuildFrontier(){
+    // compact: drop collapsed/dead nodes, remap parent indices (bounds the array)
+    const keep=[], map=new Array(nodes.length).fill(-1);
+    for(let i=0;i<nodes.length;i++){
+      if(nodes[i].life>0.05 && nodes[i].st!==2){ map[i]=keep.length; keep.push(nodes[i]); }
+    }
+    for(const n of keep){ n.p = (n.p>=0 && map[n.p]>=0) ? map[n.p] : -1; n.st=0; n.pulse=0; }
+    nodes=keep;
+    if(!nodes.length){ reset(); return; }
+    frontier=[];
+    for(let i=0;i<nodes.length;i++) if(Math.random()<0.5) frontier.push(i);
+    if(!frontier.length) frontier.push(Math.floor(Math.random()*nodes.length));
+    target=(0.66+Math.random()*0.28)*MAXN;
+  }
+  function tick(dt){
+    stateT+=dt;
+    if(state==='grow'){
+      if(nodes.length>=target || !frontier.length){ state='hold'; stateT=0; }
+      else { let n=Math.ceil(dt/26); while(n-->0) grow(); }
+    } else if(state==='hold'){
+      if(stateT>500+Math.random()*900){ beginCollapse(); state='collapse'; stateT=0; }
+    } else if(state==='collapse'){
+      if(stateT>1500){ rebuildFrontier(); state='grow'; stateT=0; }
+    }
+    // integrate node life (dying nodes retract & fade)
+    for(let i=nodes.length-1;i>=0;i--){
+      const n=nodes[i];
+      if(n.st===2){ n.life-=dt*0.0016; if(n.life<=0){ /* keep index stable: mark gone */ n.life=0; } }
+      if(n.pulse>0) n.pulse-=dt*0.0022;
+    }
+    if(collapseGlow>0) collapseGlow=Math.max(0, collapseGlow-dt*0.0006);
+  }
+  function lerpA(base,k){ return 'rgba('+base[0]+','+base[1]+','+base[2]+','+k+')'; }
+  function draw(){
+    // soft trail clear — gentle so the structure reads as evolving, not smeared
+    cx.fillStyle='rgba(2,3,4,0.16)'; cx.fillRect(0,0,W,H);
+    const dens=density(), calm=0.6+dens*0.4;
+    // edges (parent links)
+    cx.lineWidth=Math.max(0.6,0.8*DPR);
+    for(let i=0;i<nodes.length;i++){
+      const c=nodes[i]; if(c.p<0) continue; const p=nodes[c.p];
+      const life=Math.min(c.life,p.life); if(life<=0) continue;
+      let col=VIO, a=0.10*life*calm;
+      if(c.st===1){ col=TEAL; a=0.22*life; }
+      if(c.st===2||p.st===2){ col=AMBER; a=0.16*c.life; }
+      cx.strokeStyle=lerpA(col, a);
+      cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(c.x,c.y); cx.stroke();
+    }
+    // nodes
+    for(let i=0;i<nodes.length;i++){
+      const n=nodes[i]; if(n.life<=0) continue;
+      let col=VIO, a=0.28*n.life*calm, r=1.3*DPR;
+      if(n.st===1){ col=TEAL; a=0.5*n.life; r=1.7*DPR; }
+      if(n.st===2){ col=AMBER; a=0.32*n.life; }
+      if(n.pulse>0){ a=Math.min(0.7, a+n.pulse*0.5); r+=n.pulse*2.4*DPR; }
+      cx.fillStyle=lerpA(col,a);
+      cx.beginPath(); cx.arc(n.x,n.y,r,0,6.283); cx.fill();
+    }
+    if(collapseGlow>0){ // brief amber wash on collapse — darker, warmer
+      cx.fillStyle='rgba(224,162,63,'+(collapseGlow*0.03)+')'; cx.fillRect(0,0,W,H);
+    }
+  }
+  size(); addEventListener('resize', size);
+  if(!reduce){
+    tPrev=performance.now(); acc=0;
+    (function loop(t){
+      const dt=Math.min(60, t-tPrev); tPrev=t;
+      if(!document.hidden){ acc+=dt;
+        if(acc>=24){ tick(acc); draw(); acc=0; }   // ~40fps cap: cheaper, no jank
+      }
+      requestAnimationFrame(loop);
+    })(tPrev);
+  }
+
+})();
+
+/* ============ DEPTH — layered parallax + card tilt ============ */
+/* Three fixed planes between the page background and the content:
+      #field (far, static) · #mistwrap · #fog (near)
+   The two moving planes translate at their own rates against scroll and
+   pointer; that difference in rate is the depth cue. #field is left static for
+   the same reason #ca is on the landing page — it is a trail-rendered canvas
+   (each frame composites over a 0.16-alpha wash of the last), so translating it
+   would smear the accumulated trails sideways.
+   Scroll parallax is normalised to page PROGRESS (0..1), not raw scrollY: these
+   layers are position:fixed, so a raw offset would march them off screen.
+   Gated to >=900px — below that the layers are static rather than janky. */
+(function(){
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce || innerWidth<900) return;
+  const Lmist=document.getElementById('mistwrap'),
+        Lfog =document.getElementById('fog');
+  let mx=0,my=0,sp=0,queued=false;
+  const AMP={mist:[40,-15,-10], fog:[10,7,5]};   /* scroll · pointerX · pointerY */
+  function progress(){
+    const max=document.documentElement.scrollHeight-innerHeight;
+    return max>0 ? Math.min(1,Math.max(0,scrollY/max))-.5 : 0;
+  }
+  function apply(){
+    queued=false; let a;
+    a=AMP.mist; if(Lmist) Lmist.style.transform='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*-2+my*a[2]).toFixed(1)+'px,0)';
+    a=AMP.fog;  if(Lfog)  Lfog.style.transform ='translate3d('+(mx*a[1]).toFixed(1)+'px,'+(sp*a[0]*2+my*a[2]).toFixed(1)+'px,0)';
+  }
+  function queue(){ if(!queued){ queued=true; requestAnimationFrame(apply); } }
+  addEventListener('scroll',function(){ sp=progress(); queue(); },{passive:true});
+  addEventListener('resize',function(){ sp=progress(); queue(); },{passive:true});
+  if(matchMedia('(pointer:fine)').matches){
+    addEventListener('mousemove',function(e){
+      mx=e.clientX/innerWidth-.5; my=e.clientY/innerHeight-.5; queue();
+    },{passive:true});
+  }
+  sp=progress(); apply();
+
+  /* card tilt + pointer-tracked sheen — delegated, so it covers cards that are
+     rendered from state.json after this script runs */
+  if(!matchMedia('(pointer:fine)').matches) return;
+  let raf=null,cur=null,cx0=0,cy0=0;
+  document.addEventListener('mousemove',function(e){
+    const c=e.target.closest && e.target.closest('.stat,.ep .body,.dc');
+    if(c!==cur && cur){ cur.style.transform=''; }
+    cur=c; if(!c) return;
+    const r=c.getBoundingClientRect();
+    cx0=(e.clientX-r.left)/r.width; cy0=(e.clientY-r.top)/r.height;
+    if(raf) return;
+    raf=requestAnimationFrame(function(){
+      raf=null; if(!cur) return;
+      const rx=(cy0-.5)*-4, ry=(cx0-.5)*4;
+      cur.style.transform='perspective(760px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) translateZ(5px)';
+      cur.style.setProperty('--mx',(cx0*100).toFixed(1)+'%');
+      cur.style.setProperty('--my',(cy0*100).toFixed(1)+'%');
+    });
+  },{passive:true});
+})();
+
+const $=(id)=>document.getElementById(id);
+const el=(t,c,txt)=>{const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;};
+
+const STAGE_SYM={passed:"✓",failed:"✕",rejected:"⦸",reverted:"↩",not_reached:"·"};
+const TERM_CLASS={MERGED:"ok",KERNEL_FAIL:"bad",LINT_FAIL:"bad",MERGE_REVERTED:"bad",
+  REJECT:"sim",NO_VERDICT:"gap",NO_CANDIDATE:"gap",INCOMPLETE:"gap"};
+const TERM_WORD={KERNEL_FAIL:"kernel rejected — halted before merge",
+  LINT_FAIL:"provenance lint blocked the merge",MERGE_REVERTED:"merge reverted on integration",
+  MERGED:"merged into the verified library",REJECT:"critic rejected the candidate",
+  NO_VERDICT:"critic produced no verdict",NO_CANDIDATE:"no candidate produced",
+  INCOMPLETE:"run did not reach a terminal stage"};
+
+/* ===== PIPELINE CONNECTORS =====
+   Curved bezier connectors between the stage nodes, replacing the flat 2px
+   rails. Geometry is measured from the real laid-out node positions (including
+   each node's --dy stagger) so the curve always lands on the rim, at any width.
+
+   The rendering is driven entirely by state.json's own pipeline states — no new
+   numbers enter here. An edge is LIVE (animated dash-offset flow, coloured by
+   the stage it feeds) only when the upstream stage passed AND the downstream
+   stage was actually reached; otherwise it is a dim static dashed line, which
+   is how "nothing flowed past here" stays visually honest.
+   Redrawn on resize; not drawn at all <=720px, where the pipe stacks. */
+const SVGNS="http://www.w3.org/2000/svg";
+const PIPE_DY=[0,-9,7,-6,9];
+const EDGE_RGB={passed:"46,229,132",failed:"255,92,114",
+                rejected:"224,162,63",reverted:"224,162,63"};
+
+function drawPipeLinks(stages){
+  const pipe=$("pipe"); if(!pipe) return;
+  const old=pipe.querySelector(".pipesvg"); if(old) old.remove();
+  if(innerWidth<=720 || !stages || stages.length<2) return;
+  const nodes=Array.prototype.slice.call(pipe.querySelectorAll(".stage .node"));
+  if(nodes.length<2) return;
+  const pr=pipe.getBoundingClientRect();
+  if(!pr.width) return;
+
+  const svg=document.createElementNS(SVGNS,"svg");
+  svg.setAttribute("class","pipesvg");
+  svg.setAttribute("aria-hidden","true");
+  svg.setAttribute("viewBox","0 0 "+pr.width+" "+pr.height);
+  svg.setAttribute("preserveAspectRatio","none");
+
+  function add(d,cls,stroke,dash){
+    const p=document.createElementNS(SVGNS,"path");
+    p.setAttribute("d",d); p.setAttribute("class",cls); p.setAttribute("stroke",stroke);
+    if(dash) p.setAttribute("stroke-dasharray",dash);
+    svg.appendChild(p); return p;
+  }
+
+  for(let i=0;i<nodes.length-1;i++){
+    const a=nodes[i].getBoundingClientRect(), b=nodes[i+1].getBoundingClientRect();
+    const x1=a.left-pr.left+a.width/2,  y1=a.top-pr.top+a.height/2;
+    const x2=b.left-pr.left+b.width/2,  y2=b.top-pr.top+b.height/2;
+    const ang=Math.atan2(y2-y1,x2-x1), rim=a.width/2+4;
+    const sx=x1+Math.cos(ang)*rim, sy=y1+Math.sin(ang)*rim;
+    const ex=x2-Math.cos(ang)*rim, ey=y2-Math.sin(ang)*rim;
+    const cdx=(ex-sx)*0.45;                       /* horizontal handles → smooth S */
+    const d="M"+sx.toFixed(1)+","+sy.toFixed(1)+
+            " C"+(sx+cdx).toFixed(1)+","+sy.toFixed(1)+
+            " "+(ex-cdx).toFixed(1)+","+ey.toFixed(1)+
+            " "+ex.toFixed(1)+","+ey.toFixed(1);
+
+    const from=stages[i], to=stages[i+1];
+    const live = from.state==="passed" && to.state!=="not_reached";
+    if(live){
+      const rgb=EDGE_RGB[to.state]||"181,123,255";
+      add(d,"glowp","rgba("+rgb+",1)");           /* wide faint underlay = bloom */
+      add(d,"basep","rgba("+rgb+",.55)");
+      add(d,"flowp","rgba("+rgb+",.95)");         /* the travelling data flow */
+    } else {
+      add(d,"basep","rgba(90,78,124,.42)","3 7"); /* nothing flowed past here */
+    }
+  }
+  pipe.appendChild(svg);
+}
+
+let pipeRz=null, lastPipeline=null;
+addEventListener("resize",function(){
+  if(pipeRz) clearTimeout(pipeRz);
+  pipeRz=setTimeout(function(){ if(lastPipeline) drawPipeLinks(lastPipeline); },140);
+},{passive:true});
+
+function renderStats(s){
+  const box=$("stats");box.innerHTML="";
+  const tiles=[
+    ["acc", s.epochs_recorded ?? (s.records!=null?"—":0), "epochs on board"],
+    ["ok", s.verified, "kernel-verified"],
+    ["bad", s.failed, "failed at gate"],
+    ["", s.families, "goal families"],
+    ["", s.records, "total records"],
+  ];
+  for(const [c,n,l] of tiles){
+    const t=el("div","stat");
+    t.appendChild(el("div","n "+c, n==null?"—":String(n)));
+    t.appendChild(el("div","l",l));
+    box.appendChild(t);
+  }
+}
+
+function renderPipe(latest){
+  const head=$("pipehead");head.innerHTML="";
+  if(!latest){head.appendChild(el("div","pipenote","No orchestrated epoch has run yet."));return;}
+  const tag=el("div","epochtag");
+  tag.appendChild(el("span","num","EPOCH "+latest.epoch));
+  const tc=TERM_CLASS[latest.terminal_status]||"gap";
+  const badge=el("span","termbadge "+tc,latest.terminal_status.replace(/_/g," "));
+  tag.appendChild(badge);
+  head.appendChild(tag);
+
+  const pipe=$("pipe");pipe.innerHTML="";
+  latest.pipeline.forEach((st,i)=>{
+    const d=el("div","stage "+st.state);
+    const node=el("div","node",STAGE_SYM[st.state]||"·");
+    /* gentle vertical stagger — the nodes sit on a curve, not a ruled line */
+    node.style.setProperty("--dy",(PIPE_DY[i]||0)+"px");
+    d.appendChild(node);
+    d.appendChild(el("div","sn","0"+(i+1)));
+    d.appendChild(el("div","name",st.label));
+    d.appendChild(el("div","det",st.state==="not_reached"?"not reached":(st.detail||st.state)));
+    pipe.appendChild(d);
+  });
+  lastPipeline=latest.pipeline;
+  drawPipeLinks(latest.pipeline);
+  const note=$("pipenote");
+  const word=TERM_WORD[latest.terminal_status]||latest.terminal_status;
+  note.innerHTML="Terminal state: <b>"+word+"</b>. "+
+    (latest.on_board?"":"This epoch ran through the orchestrator, which is isolated from the blackboard by design, so it is reconstructed from the run's own pipeline trace.");
+}
+
+function axChips(rec){
+  const wrap=el("div","chips");
+  if(rec.axiom_free){wrap.appendChild(el("span","chip axfree","axiom-free"));return wrap;}
+  if(!rec.axioms||!rec.axioms.length){
+    if(rec.status==="verified")wrap.appendChild(el("span","chip","no footprint reported"));
+    return wrap;
+  }
+  for(const a of rec.axioms){
+    const isSorry=a==="sorryAx";
+    wrap.appendChild(el("span","chip "+(isSorry?"sorry":"ax"),isSorry?"sorryAx · cheated proof caught":a));
+  }
+  return wrap;
+}
+
+function renderTimeline(epochs,latest){
+  const tl=$("timeline");tl.innerHTML="";
+  epochs.forEach(e=>{
+    const failed=e.failed>0, allok=e.verified>0&&e.failed===0&&(e.records&&e.records.length);
+    const merged=e.terminal_status==="MERGED";
+    const row=el("div","ep"+(failed?" hasfail":"")+(merged?" merged":(allok?" allok":"")));
+    row.appendChild(el("div","mk",String(e.epoch)));
+    const body=el("div","body");
+    const head=el("div","head");
+    const ttl=el("div","ttl"+(e.title?"":" none"),e.title||"untitled epoch");
+    head.appendChild(ttl);
+    const counts=el("div","counts");
+    counts.appendChild(el("span",e.verified?"v":"z",e.verified+" verified"));
+    counts.appendChild(el("span",e.failed?"f":"z",e.failed+" failed"));
+    head.appendChild(counts);
+    body.appendChild(head);
+    if(e.families&&e.families.length) body.appendChild(el("div","fams",e.families.join(" · ")));
+    // proportion bar: verified vs failed at a glance
+    const tot=(e.verified||0)+(e.failed||0);
+    if(tot>0){
+      const bar=el("div","epbar");
+      if(e.verified){const v=el("i","bv");v.style.flex=e.verified;bar.appendChild(v);}
+      if(e.failed){const f=el("i","bf");f.style.flex=e.failed;bar.appendChild(f);}
+      body.appendChild(bar);
+    }
+
+    if(e.records&&e.records.length){
+      const recs=el("div","recs");
+      for(const r of e.records){
+        const rc=el("div","rec "+(r.status==="verified"?"verified":(r.status==="open"?"open":"failed")));
+        rc.appendChild(el("div","rs",r.status==="verified"?"✓":(r.status==="open"?"○":"✕")));
+        const body2=el("div");
+        body2.appendChild(el("div","rc",r.conjecture));
+        body2.appendChild(axChips(r));
+        rc.appendChild(body2);
+        recs.appendChild(rc);
+      }
+      body.appendChild(recs);
+    } else {
+      // honest empty state: an epoch that produced no board records
+      const em=el("div","empty");
+      let html="No verified records on the board for this epoch";
+      if(e.terminal_status){
+        const word=TERM_WORD[e.terminal_status]||e.terminal_status;
+        html+=". Terminal: <b>"+e.terminal_status.replace(/_/g," ")+"</b> — "+word;
+      } else { html+="."; }
+      if(e.discard_count) html+=" · "+e.discard_count+" candidate direction(s) discarded";
+      em.innerHTML=html;
+      body.appendChild(em);
+    }
+    row.appendChild(body);
+    tl.appendChild(row);
+  });
+}
+
+function renderDiscards(latest){
+  const box=$("discards");box.innerHTML="";
+  const note=$("ledgernote");
+  if(!latest||!latest.discards||!latest.discards.length){
+    box.appendChild(Object.assign(el("div","dc"),{innerHTML:'<div class="st none">No discards recorded for the latest epoch.</div>'}));
+    note.textContent="";
+    return;
+  }
+  for(const d of latest.discards){
+    const dc=el("div","dc");
+    if(d.statement){dc.appendChild(el("div","st",d.statement));}
+    else{dc.appendChild(Object.assign(el("div","st none"),{textContent:"(statement withheld — critic-side discard, isolation)"}));}
+    if(d.reason)dc.appendChild(el("div","rn",d.reason));
+    box.appendChild(dc);
+  }
+  note.textContent="epoch "+latest.epoch+" · "+latest.discards.length+" discarded direction(s), each logged before the candidate was chosen";
+}
+
+fetch("data/state.json",{cache:"no-store"})
+  .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status+" fetching data/state.json");return r.json();})
+  .then(s=>{
+    $("load").style.display="none";
+    $("main").style.display="block";
+    renderStats(s.summary||{});
+    renderPipe(s.latest);
+    renderTimeline(s.epochs||[],s.latest);
+    renderDiscards(s.latest);
+    $("gents").textContent=s.generated_at||"—";
+    $("livets").textContent="snapshot "+((s.generated_at||"").replace("T"," ").replace("Z"," UTC"));
+    $("whitelist").textContent="footprint whitelist { "+(s.axiom_whitelist||[]).join(", ")+" }";
+  })
+  .catch(e=>{
+    $("load").style.display="none";
+    $("err").style.display="block";
+    $("errm").textContent=e.message+" — run `python engine/export_site_data.py` to generate the snapshot, and serve the site over http (fetch needs a server, not file://).";
+  });
+</script>
+</body>
+</html>
