@@ -356,7 +356,9 @@ h2 .g{color:var(--acc)}
 .rq0box{border-color:rgba(181,123,255,.4);background:rgba(181,123,255,.05)}
 .rq0box .hm .up{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--mut);display:block;margin-top:8px;letter-spacing:.04em}
 .ptreewrap{max-width:840px;margin:0 auto 40px;border:1px solid var(--line);border-radius:6px;background:rgba(3,2,6,.62);padding:10px}
-#ptree{width:100%;height:300px;display:block}
+#ptree{width:100%;height:300px;display:block;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+  mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
 .ptreecap{font-family:var(--mono);font-size:9px;color:var(--mut);letter-spacing:.1em;text-align:center;padding:8px 4px 2px}
 .opcard .rq0{font-family:var(--mono);font-size:9.8px;color:var(--acc2);margin-top:9px;letter-spacing:.03em;line-height:1.55}
 .ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px;margin-bottom:46px}
@@ -1101,8 +1103,25 @@ function kernelEvent(){
 (function(){
   var cv=document.getElementById('ptree'); if(!cv)return;
   var px=cv.getContext('2d'),W,Hh,DPR;
-  var segs,tips,phase,pulseT,holdT,fade,lockPath,lockLen,theta;
+  var segs,tips,phase,pulseT,holdT,fade,lockPath,lockLen,theta,thBase=0;
   var XW=1000,F=340,RLIM=92;
+  function mid3(a,b){return v3((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2);}
+  /* silk joints: a completed segment draws as a quadratic from its parent's
+     midpoint through the shared joint to its own midpoint; growing, dying or
+     rootless segments fall back to a straight stroke (tips/root dots cover
+     the half-segment ends) */
+  function strokeSeg(e,pa,pb,pbEnd){
+    px.beginPath();
+    if(e.par>=0&&e.prog>=1&&segs[e.par].prog>=1){
+      var p=segs[e.par];
+      var pm=proj(mid3(p.a,p.b)),em=proj(mid3(e.a,pbEnd));
+      px.moveTo(pm.x,pm.y);px.quadraticCurveTo(pa.x,pa.y,em.x,em.y);
+      px.lineTo(pb.x,pb.y);
+    }else{
+      px.moveTo(pa.x,pa.y);px.lineTo(pb.x,pb.y);
+    }
+    px.stroke();
+  }
   function v3(x,y,z){return{x:x,y:y,z:z};}
   function norm(v){var l=Math.hypot(v.x,v.y,v.z)||1;return v3(v.x/l,v.y/l,v.z/l);}
   function sz(){
@@ -1112,7 +1131,7 @@ function kernelEvent(){
   }
   function init(){
     segs=[];tips=[];phase='grow';pulseT=0;holdT=0;fade=0;lockPath=null;lockLen=0;
-    theta=reduce?0.55:theta||0;
+    if(reduce)theta=0.55; else theta=thBase;
     tips.push({p:v3(0,0,0),d:norm(v3(1,(Math.random()-.5)*.6,(Math.random()-.5)*.6)),depth:0,seg:-1});
   }
   function seglen(s){return Math.hypot(s.b.x-s.a.x,s.b.y-s.a.y,s.b.z-s.a.z);}
@@ -1161,26 +1180,46 @@ function kernelEvent(){
   function lerp3(a,b,t){return v3(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,a.z+(b.z-a.z)*t);}
   function draw(dt){
     px.clearRect(0,0,W,Hh);
-    if(!reduce)theta+=dt*0.00035;
+    /* organic sway: base rotation plus a slow sinusoidal breath, so the
+       organism turns like something alive, not a turntable */
+    if(!reduce){thBase+=dt*0.00032;theta=thBase+Math.sin(thBase*1.7)*0.22;}
     if(fade>0)px.globalAlpha=Math.max(0,1-fade);
     px.lineCap='round';
+    /* update animation state first, then paint far-to-near so close branches
+       occlude distant ones — the painter's order is most of the 3D illusion */
+    var order=[];
     for(var i=0;i<segs.length;i++){
       var e=segs[i];
       if(e.st===0&&e.prog<1)e.prog=Math.min(1,e.prog+dt/150);
       if(e.st===1){if(e.die>0)e.die-=dt;else e.prog=Math.max(0,e.prog-dt/190);}
       if(e.st===2)e.prog=1;
       if(e.prog<=0)continue;
-      var pa=proj(e.a),pb=proj(lerp3(e.a,e.b,e.prog));
-      var w=Math.max(.6,3.0*Math.pow(.85,e.depth))*pa.s;
+      var mzC=Math.cos(theta),mzS=Math.sin(theta);
+      e._z=((e.a.y+e.b.y)/2)*mzS+((e.a.z+e.b.z)/2)*mzC;
+      order.push(i);
+    }
+    order.sort(function(x,y){return segs[y]._z-segs[x]._z;});
+    for(var oi=0;oi<order.length;oi++){
+      var e2=segs[order[oi]];
+      var pa=proj(e2.a),pbEnd=lerp3(e2.a,e2.b,e2.prog),pb=proj(pbEnd);
+      var w=Math.max(.6,3.0*Math.pow(.85,e2.depth))*pa.s;
       var core,bloom;
-      if(e.st===2){core='rgba(143,255,196,.92)';bloom='rgba(46,229,132,.20)';w+=.5;}
-      else if(e.st===1){core='rgba(255,106,193,.5)';bloom='rgba(255,106,193,.09)';}
-      else{var a=(.20+.34*pa.s).toFixed(2);
-        core='rgba(199,166,255,'+a+')';bloom='rgba(160,110,255,.10)';}
+      if(e2.st===2){core='rgba(143,255,196,.92)';bloom='rgba(46,229,132,.20)';w+=.5;}
+      else if(e2.st===1){core='rgba(255,106,193,.5)';bloom='rgba(255,106,193,.09)';}
+      else{
+        /* depth-cued hue: near branches pale warm violet, far ones sink
+           toward indigo — same family, richer volume */
+        var n=Math.max(0,Math.min(1,(pa.s-0.59)/0.29));
+        var cr=Math.round(150+n*70),cg=Math.round(115+n*81),cb=Math.round(235+n*20);
+        var a=(.18+.36*pa.s).toFixed(2);
+        core='rgba('+cr+','+cg+','+cb+','+a+')';bloom='rgba(160,110,255,.10)';
+      }
+      /* midpoint-smoothed joint: curve from the parent's midpoint through the
+         shared joint to this segment's midpoint — silk instead of polyline */
       px.strokeStyle=bloom;px.lineWidth=w*3.4;
-      px.beginPath();px.moveTo(pa.x,pa.y);px.lineTo(pb.x,pb.y);px.stroke();
+      strokeSeg(e2,pa,pb,pbEnd);
       px.strokeStyle=core;px.lineWidth=w;
-      px.beginPath();px.moveTo(pa.x,pa.y);px.lineTo(pb.x,pb.y);px.stroke();
+      strokeSeg(e2,pa,pb,pbEnd);
     }
     for(var k=0;k<tips.length;k++){
       var tp=proj(tips[k].p);
