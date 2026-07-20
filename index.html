@@ -14,7 +14,11 @@
 :root{
   --bg:#020304; --card:rgba(8,7,16,.88); --cardS:#070510;
   --line:#171226; --line2:#241c3a;
-  --ink:#eef1f6; --txt:#a9b0be; --mut:#767e8c; --dim:#4b5260;
+  --ink:#eef1f6; --txt:#aeb5c2; --mut:#828a99; --dim:#586070;
+  /* type scale — six sizes, used everywhere; ad-hoc px is the enemy */
+  --t-xs:9.5px; --t-s:11px; --t-body:15.5px; --t-l:18px; --t-h2:clamp(25px,3.4vw,38px); --t-h1:clamp(36px,5.6vw,64px);
+  /* two mono-label styles, site-wide */
+  --lab1:10px/.3em; --lab2:9px/.12em;
   --acc:#b57bff; --acc2:#dcbcff;
   --ok:#2ee584; --ok2:#8fffc4;
   --sim:#e0a23f;
@@ -119,7 +123,7 @@ nav a.lnk:active{color:var(--acc)}
 .worldcap b{font-weight:400;color:var(--ok)}
 @media(max-width:640px){.worldcap{display:none}}
 
-section{padding:96px 0 10px;position:relative;z-index:4;scroll-margin-top:76px}
+section{padding:118px 0 14px;position:relative;z-index:4;scroll-margin-top:76px}
 h1,h2{text-wrap:balance}
 
 /* ===== MICRO-POLISH ===== */
@@ -490,6 +494,38 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}
   @keyframes gl2{0%{transform:translate(9px,2px) skewX(2deg);clip-path:inset(58% 0 18% 0)}25%{transform:translate(-8px,3px);clip-path:inset(4% 0 76% 0)}50%{transform:translate(6px,-2px) skewX(-1.5deg);clip-path:inset(34% 0 40% 0)}75%{transform:translate(-4px,1px);clip-path:inset(66% 0 12% 0)}100%{transform:none;clip-path:inset(48% 0 48% 0);opacity:0}}
   @keyframes glshake{25%{transform:translate(2px,0)}55%{transform:translate(-2px,1px)}80%{transform:translate(1px,0)}}
 }
+
+/* ===== TYPE & COMPONENT DISCIPLINE (appended overrides — later rules win) =====
+   One type scale, two mono-label styles, one card system. Every rule here
+   REPLACES an ad-hoc size or one-off card style defined above; nothing new is
+   introduced. This block is what makes the page feel designed rather than
+   accumulated. */
+h1{font-size:var(--t-h1)}
+h2{font-size:var(--t-h2);margin-bottom:18px}
+.lede{font-size:var(--t-body);margin-bottom:48px;max-width:640px}
+.hero .sub{font-size:var(--t-body)}
+/* label style 1 — section-level kickers */
+.kick,.slab{font-size:10px;letter-spacing:.28em}
+/* label style 2 — captions, credits, metadata */
+.ptreecap,.bbcap,.worldcap,.edlean,.found,.sig,.ledgernote{font-size:var(--t-xs);letter-spacing:.1em}
+.prob p,.opcard p{font-size:13px;line-height:1.75}
+.prob h3,.opcard h3{font-size:16px}
+.crow .cr{font-size:13px}
+/* one card system: the gradient hairline everywhere a panel exists */
+.hypo{border:1px solid transparent;
+  background:linear-gradient(rgba(95,224,207,.04),rgba(95,224,207,.04)) padding-box,
+    linear-gradient(155deg,rgba(95,224,207,.4),rgba(36,28,58,.55) 45%,rgba(181,123,255,.18)) border-box}
+.rq0box{border:1px solid transparent;
+  background:linear-gradient(rgba(181,123,255,.05),rgba(181,123,255,.05)) padding-box,
+    linear-gradient(155deg,rgba(181,123,255,.45),rgba(36,28,58,.6) 45%,rgba(95,224,207,.2)) border-box}
+.statusbar,.chal{border:1px solid transparent;
+  background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(155deg,rgba(181,123,255,.28),rgba(36,28,58,.55) 45%,rgba(95,224,207,.13)) border-box}
+.chal .crow{background:transparent}
+.plog .pl .body{padding:14px 17px}
+/* breathing room around the two heaviest bands */
+.ptreewrap{margin-bottom:52px}
+.divider{margin-top:104px}
 </style>
 </head>
 <body>
