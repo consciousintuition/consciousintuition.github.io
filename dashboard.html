@@ -20,7 +20,7 @@
   --teal:#5fe0cf;
   --vio:#a78bfa; --vio2:#c9b8ff; --ros:#ff6ac1;
   --bad:#ff5c72;           /* brand extension: a red in the warm rose family, for hard kernel/lint failures */
-  --disp:"Chakra Petch","Space Grotesk","Segoe UI",system-ui,sans-serif;
+  --disp:"Space Grotesk","Chakra Petch","Segoe UI",system-ui,sans-serif;
   --sans:Inter,"Segoe UI",system-ui,sans-serif;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
 }
@@ -34,7 +34,8 @@ html{scrollbar-width:thin;scrollbar-color:#241c3a #05040a}
 ::-webkit-scrollbar-thumb:hover{background:#3a2d5e}
 #progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:95;pointer-events:none;
   background:linear-gradient(90deg,var(--acc),var(--teal));box-shadow:0 0 10px rgba(181,123,255,.55)}
-body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.75;overflow-x:hidden;min-height:100vh}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.75;overflow-x:hidden;min-height:100vh;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 
 /* signature background: an evolving proof-search / neural field (see script) */
 #field{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;opacity:.6}

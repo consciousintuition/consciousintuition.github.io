@@ -25,7 +25,9 @@
   --teal:#5fe0cf;
   --ink2:#f2f4f8;
   --vio:#a78bfa; --vio2:#c9b8ff; --ros:#ff6ac1;
-  --disp:"Chakra Petch","Space Grotesk","Segoe UI",system-ui,sans-serif;
+  /* Space Grotesk leads: same geometric family as before but far more refined —
+     Chakra Petch's angular techno cut read closer to game/crypto than research. */
+  --disp:"Space Grotesk","Chakra Petch","Segoe UI",system-ui,sans-serif;
   --sans:Inter,"Segoe UI",system-ui,sans-serif;
   --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
 }
@@ -36,7 +38,10 @@
 html,body{overflow-anchor:none}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.8;overflow-x:hidden;
+  /* light text on a dark ground renders heavy without this — antialiased is the
+     single biggest "expensive typography" win on dark UIs */
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 #ca{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;image-rendering:pixelated;opacity:.6}
 #boot{position:fixed;inset:0;z-index:80;pointer-events:none;image-rendering:pixelated}
 #fog{position:fixed;inset:0;z-index:2;pointer-events:none;
@@ -73,7 +78,7 @@ header .row{max-width:1140px;margin:0 auto;padding:14px 24px;display:flex;align-
 nav{margin-left:auto;display:flex;gap:22px;align-items:center}
 nav a.lnk{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);position:relative;padding:5px 0;transition:color .2s}
 nav a.lnk::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:linear-gradient(90deg,var(--acc),transparent);transition:right .25s}
-nav a.lnk:hover{color:var(--acc2);text-shadow:0 0 10px rgba(181,123,255,.4)}
+nav a.lnk:hover{color:var(--acc2)}
 nav a.lnk:hover::after{right:0}
 nav a.lnk.live{color:var(--acc2);display:inline-flex;align-items:center;gap:7px}
 nav a.lnk.live .ld{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(46,229,132,.75);flex:none}
@@ -103,8 +108,8 @@ h1 .g{color:var(--acc);text-shadow:0 0 48px rgba(181,123,255,.4)}
 .hero .sub b{color:var(--ink);font-weight:600}
 .cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 .btn{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:15px 30px;transition:transform .3s cubic-bezier(.22,1,.36,1),background .3s ease,box-shadow .3s ease,border-color .3s ease;border:1px solid transparent;position:relative;font-weight:600;border-radius:8px}
-.btn.pri{color:#0d021c;background:var(--acc);box-shadow:0 0 20px rgba(181,123,255,.25)}
-.btn.pri:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 4px 28px rgba(181,123,255,.45)}
+.btn.pri{color:#0d021c;background:var(--acc);box-shadow:0 2px 16px rgba(181,123,255,.18)}
+.btn.pri:hover{background:var(--acc2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(181,123,255,.3)}
 .btn.sec{color:var(--acc2);border-color:rgba(181,123,255,.35);background:rgba(6,4,12,.6)}
 .btn.sec:hover{transform:translateY(-1px);border-color:var(--acc);background:rgba(181,123,255,.08)}
 /* press + keyboard focus — one motion language across every control */
@@ -211,7 +216,7 @@ html{scrollbar-width:thin;scrollbar-color:#241c3a #05040a}
   display:flex;flex-direction:column;gap:13px}
 #rail a{width:8px;height:8px;border-radius:50%;border:1px solid var(--line2);
   background:rgba(255,255,255,.04);transition:background .25s,border-color .25s,box-shadow .25s;position:relative;display:block}
-#rail a.on{background:var(--acc);border-color:var(--acc);box-shadow:0 0 12px rgba(181,123,255,.65)}
+#rail a.on{background:var(--acc);border-color:var(--acc);box-shadow:0 0 10px rgba(181,123,255,.42)}
 #rail a:hover::after,#rail a:focus-visible::after{content:attr(data-label);position:absolute;left:17px;top:50%;
   transform:translateY(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.12em;
   color:var(--acc2);white-space:nowrap;background:rgba(2,3,4,.92);padding:4px 9px;
@@ -272,7 +277,7 @@ h2 .g{color:var(--acc)}
 .edwrap{max-width:880px;margin:0 auto}
 .bdg{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:3px 10px;border-radius:99px;border:1px solid}
 .bdg.real{color:var(--ok2);border-color:rgba(46,229,132,.55);background:rgba(46,229,132,.07);
-  box-shadow:0 0 14px rgba(46,229,132,.15);text-shadow:0 0 8px rgba(46,229,132,.4)}
+  box-shadow:0 0 12px rgba(46,229,132,.1)}
 .editor{position:relative;background:linear-gradient(180deg,#0f0a20,#08050f);border:1px solid #2a1f4a;border-radius:10px;overflow:hidden;
   box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 80px rgba(167,139,250,.1),inset 0 0 60px rgba(167,139,250,.02)}
 .editor::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;border-radius:10px;
